@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://smwlover.github.io/sitemap.xml 
