@@ -226,7 +226,7 @@
 
 <h3>友情链接：</h3>
 
-<p>和上面的方法类似，创建一个<code>friend.html</code>页面，然后向其中加入一些带有链接的条目即可，不再赘述。</p>
+<p>和上面的方法类似，先创建一个<code>friend.html</code>页面，然后向其中加入一些带有链接的条目，最后在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径即可，不再赘述。</p>
 
 <figure class='code'><figcaption><span>friend.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -256,7 +256,7 @@
 <h2>七、个性化之自定义样式</h2>
 
 <p>有关样式的所有内容都在<code>sass/</code>目录下，我们可以通过修改<code>sass/custom/_layout.scss</code>来修改博客的布局，比如调节侧边栏的宽度，或者调节标题的字体大小等。<br/>
-我们可以向<code>sass/custom/_styles.scss</code>文件中添加自定义背景图片的内容，如下面的代码所示。对应的图片<code>background.png</code>需要放置于<code>source/images/</code>目录下：</p>
+我们可以向<code>sass/custom/_styles.scss</code>文件中添加自定义背景图片的代码，对应的图片<code>background.png</code>则需要放置于<code>source/images/</code>目录下：</p>
 
 <figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -315,7 +315,7 @@
 
 <h2>八、在侧边栏中增加分类列表</h2>
 
-<p>如同本博客所示，侧边栏的分类列表会按照博文的类别对博文进行整理与归纳，十分方便。为了达到这样的效果，首先我们需要定义一个插件。Octopress的插件是以<code>plugins/*.rb</code>文件的形式存在的。我们要写的插件，需要根据所有的博文归纳出博文的类型，然后显示出一系列形如<code>category_name(post_number)</code>的标签，并且还要定义该标签指向的超链接位置。<br/>
+<p>如同本博客所示，侧边栏的分类列表会按照博文的类别对博文进行整理与归纳，十分方便。为了达到这样的效果，首先我们需要定义一个插件。Octopress的插件是以<code>plugins/*.rb</code>文件的形式存在的。我们要写的插件，需要归纳出所有博文的类型，然后显示出一系列形如<code>category_name (post_number)</code>的标签，并且还要定义每个标签指向的超链接位置。<br/>
 我们在<code>plugins/</code>目录下添加<code>category_list_tag.rb</code>文件，代码如下：</p>
 
 <figure class='code'><figcaption><span>category_list_tag.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -361,7 +361,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>然后，像之前往侧边栏添加内容时一样，我们在<code>source/_includes/custom/asides</code>目录下添加<code>category_list.html</code>文件，并且在<code>_config.yml</code>中加入该文件的路径：</p>
+<p>然后，像之前往侧边栏添加内容时一样，我们在<code>source/_includes/custom/asides</code>目录下添加<code>category_list.html</code>文件，并且在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径：</p>
 
 <figure class='code'><figcaption><span>category_list.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -378,9 +378,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>九、在首页添加“个人信息”（关于）选项卡：</h2>
+<h2>九、在首页添加“个人简介”（关于）选项卡：</h2>
 
-<p>我们可以在<code>source/_includes/custom/navigation.html</code>文件中自定义导航栏中选项卡的内容。为了加入“个人信息”选项卡，首先我们需要通过命令<code>rake new_page['about']</code>，在<code>source/</code>目录下创建一个<code>about/</code>目录，里面包含一个<code>index.markdown</code>文件。然后我们只需要在导航栏中添加一个指向该页面的标签即可：</p>
+<p>我们可以在<code>source/_includes/custom/navigation.html</code>文件中自定义导航栏中选项卡的内容。为了加入“个人简介”选项卡，首先我们需要通过命令<code>rake new_page['about']</code>，在<code>source/</code>目录下创建一个<code>about/</code>目录，里面包含一个<code>index.markdown</code>文件。然后我们只需要在导航栏中添加一个指向该页面的标签即可：</p>
 
 <figure class='code'><figcaption><span>navigation.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
