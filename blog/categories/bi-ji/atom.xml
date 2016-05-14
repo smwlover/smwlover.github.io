@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 笔记 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/bi-ji/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-14T14:14:23+08:00</updated>
+  <updated>2016-05-14T20:47:18+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -18,7 +18,315 @@
     <link href="http://smwlover.github.io/blog/2016/05/14/how-to-build-my-own-blog/"/>
     <updated>2016-05-14T13:29:41+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/05/14/how-to-build-my-own-blog</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<p>本文介绍了我在Windows操作系统下，从零开始搭建基于Octopress的博客，并且为自己的博客添加一些个性化内容的简要流程。</p>
+
+<!--more-->
+
+
+<h2>一、准备工作</h2>
+
+<ul>
+<li>安装Git for Windows：可以到<a href="https://git-scm.com/">Git官网</a>下载安装。</li>
+<li>安装Ruby：可以到<a href="http://rubyinstaller.org/downloads/">Ruby官网</a>下载安装，我所下载的Ruby版本是2.2.4。</li>
+<li>安装Python2.7：可以到<a href="https://www.python.org/downloads/">Python官网</a>下载安装，安装后运行<code>easy_install pygments</code>安装代码高亮脚本。</li>
+<li>需要注意的是，安装上述工具的过程中，<strong>最好都勾选上“添加到系统环境变量”一项，</strong>否则需要稍后自己手动设置。</li>
+</ul>
+
+
+<h2>二、安装Octopress</h2>
+
+<p>我们可以直接从Github上将Octopress的对应源代码clone下来并进行安装：
+<code>bash
+cd &lt;the_directory_of_your_blog&gt;
+git clone git://github.com/imathis/octopress.git
+</code>
+此时在<code>the_directory_of_your_blog/</code>目录下应该有一个名为<code>octopress</code>的文件夹了。
+<code>bash
+cd octopress
+gem install bundle
+bundle install
+rake install
+</code>
+这样就算完成了Octopress的安装流程。为了测试是否成功，我们可以在命令行中执行<code>rake preview</code>，然后在浏览器中输入<code>localhost:4000</code>。如果安装顺利，我们便可以看到自己博客的“雏形”了。</p>
+
+<h2>三、部署到Github</h2>
+
+<p>当然刚才我们只是可以在本地访问自己的博客，为了让它可以被互联网中的用户访问到，我们可以将其部署到Github上。<br/>
+首先我们在Github上新建一个Repository，命名为<code>username.github.io</code>。<br/>
+然后我们就可以进行部署工作了，以本博客为例（我的Github账号为smwlover，新建的Repository名称为<code>smwlover.github.io</code>）：
+<code>bash
+rake setup_github_pages
+https://github.com/smwlover/smwlover.github.io
+rake deploy
+</code>
+<strong>注意：在执行</strong><code>rake deploy</code><strong>之前，请确认自己有访问对应Repository的权限。</strong></p>
+
+<h2>四、常用操作：</h2>
+
+<ul>
+<li><code>rake new_post['article title']</code>可以用来新建一篇博文，该命令会在<code>source/_posts/</code>文件夹下生成一个对应的markdown文件，我们可以打开该文件，编辑博文的内容。</li>
+<li><code>rake install['theme name']</code>可以用来安装一个新的Octopress主题。</li>
+<li><code>rake preview</code>可以用来对博客进行预览，通过浏览器访问<code>localhost:4000</code>即可。</li>
+<li><code>rake generate</code>可以用来生成博客对应的静态网页，生成到<code>public/</code>目录下。</li>
+<li><code>rake deploy</code>则将博客对应的静态网页部署到Github上。</li>
+</ul>
+
+
+<h2>五、个性化之_config.yml</h2>
+
+<p>在Octopress的根目录下，我们可以看到一个名为<code>_config.yml</code>的文件，该文件包含了自己博客的一些最基本的配置。<br/>
+1. <code>title:</code>对应博客的标题，<code>subtitle:</code>对应博客的副标题，<code>author:</code>则会显示在博客的页脚处。我们可以尝试着修改它们对应的值，然后观察产生的效果。<strong>注意：在修改的时候，一定要注意冒号后面有一个半角的空格，否则会出错。以下同理。</strong><br/>
+2. <code>default_asides:</code>中的内容会在侧边栏按照顺序依次显示。<br/>
+3. <code>github_user:</code>对应我们的Github用户名，如果我们设置在侧边栏中显示Github条目，Octopress会自动获取该用户创建的Repository的信息。<br/>
+4. <code>disqus_short_name:</code>对应我们的Disqus用户名，Octopress默认支持Disqus评论系统，它会在每篇博文的最底部显示该用户所对应的评论信息。</p>
+
+<h2>六、个性化之自定义侧边栏</h2>
+
+<p>上面已经提到，在<code>default_asides:</code>中可以添加侧边栏中要显示的内容。Octopress默认支持的内容位于<code>source/_includes/asides/</code>目录下，我们自己添加的内容则最好放在<code>source/_includes/custom/asides/</code>目录下。下面我会简单介绍一下我的博客中“博客简介”、“歌曲列表”和“友情链接”的添加流程。</p>
+
+<h3>博客简介：</h3>
+
+<p>在<code>source/_includes/custom/asides/</code>目录下创建<code>about.html</code>，然后在<code>default_asides:</code>对应的数组中添加<code>custom/asides/about.html</code>。本博客的<code>about.html</code>内容如下：
+<code>html about.html
+&lt;section&gt;
+  &lt;h1&gt;博客简介&lt;/h1&gt;
+  &lt;p&gt;欢迎来到美柑的房间！&lt;/p&gt;
+  &lt;p&gt;……&lt;/p&gt;
+&lt;/section&gt;
+</code></p>
+
+<h3>歌曲列表：</h3>
+
+<p>在<code>source/_includes/custom/asides/</code>目录下创建<code>music.html</code>并且在<code>default_asides:</code>中添加对应路径。目前包括网易云音乐和虾米音乐在内的很多音乐平台都支持外链播放器的功能，我们只需要获取到html格式的外链，然后加入到<code>music.html</code>中即可。<br/>
+因为本博客利用的是虾米音乐的歌曲外链，在Safari浏览器下好像无法正常工作，所以我在<code>music.html</code>首先判断是否是Safari浏览器，如果不是再加入html内容：
+<figure class='code'><figcaption><span>music.html</p></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 --&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">Sys</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">ua</span> <span class="o">=</span> <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">ua</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/version\/([\d.]+).*safari/</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">s</span> <span class="o">?</span> <span class="nx">Sys</span><span class="p">.</span><span class="nx">safari</span> <span class="o">=</span> <span class="nx">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">Sys</span><span class="p">.</span><span class="nx">safari</span><span class="p">){</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;section&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;h1&gt;歌曲列表&lt;/h1&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;!-- 音乐平台的歌曲外链 --&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;/section&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;pre&gt;&lt;code&gt;</span>### 友情链接：
+</span><span class='line'>和上面的方法类似，创建一个`friend.html`页面，然后向其中加入一些带有链接的条目即可，不再赘述。
+</span><span class='line'><span class="nt">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;&lt;section&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;h1&gt;</span>友情链接<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;li&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://music.163.com/#/playlist?id=60530487&quot;</span><span class="nt">&gt;</span>我的《命运石之门》歌单<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;li&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://wangshenghu.github.io&quot;</span><span class="nt">&gt;</span>Wangsheng Hu的个人博客<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'><span class="nt">&lt;/section&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>七、个性化之自定义样式</h2>
+
+<p>有关样式的所有内容都在<code>sass/</code>目录下，我们可以通过修改<code>sass/custom/_layout.scss</code>来修改博客的布局，比如调节侧边栏的宽度，或者调节标题的字体大小等。<br/>
+我们可以向<code>sass/custom/_styles.scss</code>文件中添加自定义背景图片的内容，如下面的代码所示。对应的图片<code>background.png</code>需要放置于<code>source/images/</code>目录下：
+<figure class='code'><figcaption><span>_styles.scss <a href="http://octopress.org/docs/theme/styles/">http://octopress.org/docs/theme/styles/</a> Link</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nt">html</span> <span class="p">{</span>
+</span><span class='line'>        <span class="na">background</span><span class="o">:</span> <span class="mh">#555555</span> <span class="sx">url(&amp;ldquo;/images/background.png&amp;rdquo;)</span> <span class="no">fixed</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="nt">body</span> <span class="o">&gt;</span> <span class="nt">div</span> <span class="p">{</span>
+</span><span class='line'>        <span class="na">background-image</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="nt">body</span> <span class="o">&gt;</span> <span class="nt">div</span> <span class="o">&gt;</span> <span class="nt">div</span> <span class="p">{</span>
+</span><span class='line'>        <span class="na">background-image</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="na">&lt;code&gt;</span>
+</span><span class='line'><span class="na">在添加完背景图片之后，我们可能会发现标题栏的背景色有些突兀，我们想要将标题栏的背景色修改为透明。经过百般寻找，我们发现标题栏的背景色在`sass/base/_theme.scss`中设置，直接将透明度修改为0即可：</span>
+</span><span class='line'><span class="na">&lt;/code&gt;scss</span>
+</span><span class='line'><span class="nv">$header-bg</span><span class="o">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="mh">#333</span><span class="o">,</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">!default</span><span class="p">;</span>
+</span><span class='line'><span class="na">&lt;code&gt;</span>
+</span><span class='line'><span class="na">在标题栏透明之后，我们可能更喜欢导航栏的左上角和右上角更加圆滑一些，这时我们可以在`sass/custom/_styles.scss`添加如下代码：</span>
+</span><span class='line'><span class="na">&lt;/code&gt;scss</span><span class="err"> </span><span class="na">_styles.scss</span><span class="err"> </span><span class="na">&lt;a</span><span class="err"> </span><span class="na">href</span><span class="err">=&quot;</span><span class="na">http</span><span class="o">:</span><span class="c1">//octopress.org/docs/theme/styles/&quot;&gt;http://octopress.org/docs/theme/styles/&lt;/a&gt; Link</span>
+</span><span class='line'><span class="o">@</span><span class="n">media</span> <span class="n">only</span> <span class="n">screen</span> <span class="ow">and</span> <span class="p">(</span><span class="no">min-width</span><span class="o">:</span> <span class="mi">1040</span><span class="kt">px</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">body</span> <span class="o">&gt;</span> <span class="nt">nav</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">@include</span><span class="nd"> border-top-radius</span><span class="p">(</span><span class="mf">.4</span><span class="kt">em</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">pre</span><span class="o">&gt;&lt;</span><span class="nt">code</span><span class="o">&gt;</span>    <span class="nt">body</span> <span class="k">&amp;</span><span class="nt">gt</span><span class="o">;</span> <span class="nt">footer</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">@include</span><span class="nd"> border-bottom-radius</span><span class="p">(</span><span class="mf">.4</span><span class="kt">em</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>八、在侧边栏中增加分类列表</h2>
+
+<p>如同本博客所示，侧边栏的分类列表会按照博文的类别对博文进行整理与归纳，十分方便。为了达到这样的效果，首先我们需要定义一个插件。Octopress的插件是以<code>plugins/*.rb</code>文件的形式存在的。我们要写的插件，需要根据所有的博文归纳出博文的类型，然后显示出一系列形如<code>category_name(post_number)</code>的标签，并且还要定义该标签指向的超链接位置。<br/>
+我们在<code>plugins/</code>目录下添加<code>category_list_tag.rb</code>文件，代码如下：
+<figure class='code'><figcaption><span>category_list_tag.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">CategoryListTag</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">html</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="c1">#这是最终要生成的html。</span>
+</span><span class='line'>            <span class="n">categories</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">registers</span><span class="o">[</span><span class="ss">:site</span><span class="o">].</span><span class="n">categories</span><span class="o">.</span><span class="n">keys</span>
+</span><span class='line'>            <span class="n">categories</span><span class="o">.</span><span class="n">sort</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">category</span><span class="o">|</span> <span class="c1">#对于博文的每种类型catagory：</span>
+</span><span class='line'>                <span class="n">posts_in_category</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">registers</span><span class="o">[</span><span class="ss">:site</span><span class="o">].</span><span class="n">categories</span><span class="o">[</span><span class="n">category</span><span class="o">].</span><span class="n">size</span> <span class="c1">#获取该类型下有多少博文。</span>
+</span><span class='line'>                <span class="n">category_dir</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">registers</span><span class="o">[</span><span class="ss">:site</span><span class="o">].</span><span class="n">config</span><span class="o">[&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">category_dir</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">]</span> <span class="c1">#获取_config.yml文件中category_dir对应的路径，该路径默认是/blog/categories。&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>            <span class="c1">#这一步最为关键，category.to_url.downcase是当前类型catagory所对应的拼音（汉字无法识别）。</span>
+</span><span class='line'>            <span class="c1">#假设当前类型catagory为“笔记”，那么&#39;/#{category_dir}/#{category.to_url.downcase}/&#39;的值就是&#39;/blog/categories/bi-ji&#39;，这就是该标签的超链接指向的位置。</span>
+</span><span class='line'>            <span class="c1">#“#{category} (#{posts_in_category})”是该标签显示的内容，如“笔记 (2)”。</span>
+</span><span class='line'>            <span class="n">html</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s2">&quot;&amp;lt;li class=&#39;category&#39;&amp;gt;&amp;lt;a href=&#39;http://smwlover.github.io/</span><span class="si">#{</span><span class="n">category_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">category</span><span class="o">.</span><span class="n">to_url</span><span class="o">.</span><span class="n">downcase</span><span class="si">}</span><span class="s2">/&#39;&amp;gt;</span><span class="si">#{</span><span class="n">category</span><span class="si">}</span><span class="s2"> (</span><span class="si">#{</span><span class="n">posts_in_category</span><span class="si">}</span><span class="s2">)&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="n">html</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;category_list&amp;rsquo;, Jekyll::CategoryListTag)</span>
+</span><span class='line'><span class="sr">&lt;code&gt;</span>
+</span><span class='line'><span class="sr">然后，像之前往侧边栏添加内容时一样，我们在`source/</span><span class="n">_includes</span><span class="o">/</span><span class="n">custom</span><span class="o">/</span><span class="n">asides</span><span class="sb">`目录下添加`</span><span class="n">category_list</span><span class="o">.</span><span class="n">html</span><span class="sb">`文件，并且在`</span><span class="n">_config</span><span class="o">.</span><span class="n">yml</span><span class="sb">`中加入该文件的路径：</span>
+</span><span class='line'><span class="sb">&lt;/code&gt;html category_list.html</span>
+</span><span class='line'><span class="sb">&lt;section&gt;</span>
+</span><span class='line'><span class="sb">  &lt;h1&gt;文章分类&lt;/h1&gt;</span>
+</span><span class='line'><span class="sb">  &lt;ul id=&quot;categories&quot;&gt;</span>
+</span><span class='line'><span class="sb">    {% category_list %}</span>
+</span><span class='line'><span class="sb">  &lt;/ul&gt;</span>
+</span><span class='line'><span class="sb">&lt;/section&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>九、在首页添加“个人信息”（关于）选项卡：</h2>
+
+<p>我们可以在<code>source/_includes/custom/navigation.html</code>文件中自定义导航栏中选项卡的内容。为了加入“个人信息”选项卡，首先我们需要通过命令<code>rake new_page['about']</code>，在<code>source/</code>目录下创建一个<code>about/</code>目录，里面包含一个<code>index.markdown</code>文件。然后我们只需要在导航栏中添加一个指向该页面的标签即可：
+```html navigation.html</p>
+
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+
+<p>```</p>
+
+<h2>十、优化加载速度：</h2>
+
+<p>到此为止，我们已经有了一个比较个性化的博客了，但是我们发现每次打开页面的速度相当慢，这是由于打开博客的时候有些条目需要访问Google的资源所致。我们可以将这些条目删除，使打开博客的速度快如闪电。<br/>
+1. 将<code>source/_includes/head.html</code>文件中的Google的jquery脚本地址改成<a href="http://developer.baidu.com/wiki/index.php?title=docs/cplat/libs">百度</a>的。<br/>
+2. 将<code>source/_includes/custom/head.html</code>文件中的Google Font请求注释掉。<br/>
+3. 将<code>_config.yml</code>文件中的twitter内容注释掉。</p>
+
+<h2>参考资料：</h2>
+
+<p><a href="http://wangshenghu.github.io/blog/2016/05/07/personal-settings-of-octopress/">Octopress的个性化设置</a><br/>
+<a href="https://segmentfault.com/markdown">Markdown编辑器语法指南</a><br/>
+<a href="http://octopress.org/docs/">Octopress官方文档</a></p>
 ]]></content>
   </entry>
   
