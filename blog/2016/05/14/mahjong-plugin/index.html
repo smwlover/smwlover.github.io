@@ -94,13 +94,13 @@
 
 
 <p>那么问题来了：当我想说明某个关于日麻的问题时，只凭文字总是显得不那么直观。然而如果用图片的话，对于每张麻将牌都去插入一个<code>&lt;img/&gt;</code>标签又非常不方便。究竟该如何解决呢？我的解决方法是开发一个Octopress插件，在之后写博客时，只需利用此插件简单地键入几个字符，Octopress就可以自动在生成的网页中插入对应的图片。<br/>
-比如，日麻中的“一万”通常会简称为<code>1m</code>；“五饼”则通常会简称为<code>5p</code>。在我想插入一张“一万”的图片的时候，我只需要使用我开发的插件，写出如下代码<code>{% mahjong 1m%}</code>，Octopress就会自动添加该图片。是不是比起自己写<code>&lt;img/&gt;</code>标签来要方便很多？<br/>
+比如，日麻中的“一万”通常会简称为<code>1m</code>；“五饼”则通常会简称为<code>5p</code>。在我想插入一张“一万”的图片的时候，我只需要使用我开发的插件，写出如下代码<code>{% mahjong 1m %}</code>，Octopress就会自动添加该图片。是不是比起自己写<code>&lt;img/&gt;</code>标签来要方便很多？<br/>
 那么就开始开发自己需要的插件吧！</p>
 
 <h2>一、基本功能</h2>
 
 <p>具体来说，我的需求分为两部分：首先是在一行文本内部加入单张麻将牌的图片，我计划开发一个名为<code>mahjong</code>的插件来实现；然后是可以另起一行显示一组麻将牌（通常是13张，表示某位玩家的手牌）的图片，我计划开发一个名为<code>mahjonglist</code>的插件来实现。这篇博文讲的是第一个插件的实现方式。<br/>
-然后我们可以开始定义本插件的语法了，在markdown中调用插件一般是通过<code>{% plugin_name parameters%}</code>的方式，我们当然也需要遵循这种方式，所以调用我们的插件语法是<code>{% mahjong cardName%}</code>。<br/>
+然后我们可以开始定义本插件的语法了，在markdown中调用插件一般是通过<code>{% plugin_name parameters %}</code>的方式，我们当然也需要遵循这种方式，所以调用我们的插件语法是<code>{% mahjong cardName %}</code>。<br/>
 下一步定义<code>cardName</code>的语法。首先我们遵照日本麻将玩家的习惯，“万”简写为<code>m</code>，“饼”简写为<code>p</code>，“索”简写为<code>s</code>，这样就可以表示所有非字牌了。对于字牌，我采用后缀<code>j</code>来表示，<code>1j</code>到<code>7j</code>对应东南西北白发中。<br/>
 另外，日麻中有红宝牌（赤ドラ）的概念，通常是红五万、红五索、红五饼。我采用在数字后加一个<code>!</code>的方法将红宝牌与普通牌区分。所以“五索”为<code>5s</code>，“红五索”则为<code>5!s</code>。<br/>
 还有，由于日麻中在吃、碰、杠后会将其中一张牌横置，表示这张牌来自于哪个玩家。所以我采用在数字后加一个<code>$</code>的方法表示这张牌是横置的。比如要表示一个横置的北风，即为<code>4$j</code>。后缀符<code>$</code>和<code>!</code>的先后顺序无关。<br/>
@@ -237,9 +237,9 @@
 </span><span class='line'><span class="c1"># Syntax: <strong>错误：缺少m、p、s、j标签</strong></span>
 </span><span class='line'><span class="c1">#</span>
 </span><span class='line'><span class="c1"># Examples:</span>
-</span><span class='line'><span class="c1"># {% mahjong 1m%} 表示一万</span>
-</span><span class='line'><span class="c1"># {% mahjong 5!s%} 表示红五索（日麻中的红宝牌）</span>
-</span><span class='line'><span class="c1"># {% mahjong 3$p%} 表示横置的三饼（日麻中吃、碰、杠的横置）</span>
+</span><span class='line'><span class="c1"># {% mahjong 1m %} 表示一万</span>
+</span><span class='line'><span class="c1"># {% mahjong 5!s %} 表示红五索（日麻中的红宝牌）</span>
+</span><span class='line'><span class="c1"># {% mahjong 3$p %} 表示横置的三饼（日麻中吃、碰、杠的横置）</span>
 </span><span class='line'><span class="c1"># 字牌用数字1-7加j表示。其中1-4分别对应东、南、西、北，5-7则对应白、发、中。</span>
 </span><span class='line'><span class="c1"># 暗牌用数字0加m、s、p或j中的任何一个都可以表示。</span>
 </span><span class='line'>
@@ -254,7 +254,7 @@
 </span><span class='line'>      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span> <span class="c1">#解析是否成功</span>
 </span><span class='line'>      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="c1">#存储解析的结果</span>
 </span><span class='line'>  
-</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
 </span><span class='line'>      <span class="n">strLen</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">size</span>
 </span><span class='line'>      <span class="n">strReversed</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">reverse</span>
 </span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -376,31 +376,31 @@
 <h3>类别一：普通麻将牌</h3>
 
 <ul>
-<li><code>{% mahjong 3s%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/12.png"/>；</li>
-<li><code>{% mahjong 6p%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/24.png"/>；</li>
-<li><code>{% mahjong 8m%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/8.png"/>；</li>
-<li><code>{% mahjong 3j%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/30.png"/>;
+<li><code>{% mahjong 3s %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/12.png"/>；</li>
+<li><code>{% mahjong 6p %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/24.png"/>；</li>
+<li><code>{% mahjong 8m %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/8.png"/>；</li>
+<li><code>{% mahjong 3j %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/30.png"/>;
 
 <h3>类别二：红宝牌与暗牌</h3></li>
-<li><code>{% mahjong 5!p%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/aka5p.png"/>;</li>
-<li><code>{% mahjong 5!m%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/aka5m.png"/>;</li>
-<li><code>{% mahjong 5!s%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/aka5s.png"/>;</li>
-<li><code>{% mahjong 0j%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/back.png"/>;</li>
-<li><code>{% mahjong 0p%}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/back.png"/>;
+<li><code>{% mahjong 5!p %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/aka5p.png"/>;</li>
+<li><code>{% mahjong 5!m %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/aka5m.png"/>;</li>
+<li><code>{% mahjong 5!s %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/aka5s.png"/>;</li>
+<li><code>{% mahjong 0j %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/back.png"/>;</li>
+<li><code>{% mahjong 0p %}</code>会显示出<img class="mahjong" src="/images/mahjong/tate/back.png"/>;
 
 <h3>类别三：横置的牌与红宝牌综合测试</h3></li>
-<li><code>{% mahjong 5$j%}</code>会显示出<img class="mahjong" src="/images/mahjong/yoko/32.png"/>;</li>
-<li><code>{% mahjong 5!$s%}</code>会显示出<img class="mahjong" src="/images/mahjong/yoko/aka5s.png"/>;</li>
-<li><code>{% mahjong 5$!p%}</code>会显示出<img class="mahjong" src="/images/mahjong/yoko/aka5p.png"/>;
+<li><code>{% mahjong 5$j %}</code>会显示出<img class="mahjong" src="/images/mahjong/yoko/32.png"/>;</li>
+<li><code>{% mahjong 5!$s %}</code>会显示出<img class="mahjong" src="/images/mahjong/yoko/aka5s.png"/>;</li>
+<li><code>{% mahjong 5$!p %}</code>会显示出<img class="mahjong" src="/images/mahjong/yoko/aka5p.png"/>;
 
 <h3>类别四：错误情况测试</h3></li>
 <li>本插件定义的错误情况包括：最右端标签不是<code>m, p, s, j</code>；对于标签<code>j</code>，数字范围不在<code>0-7</code>内或对于标签<code>m, p, s</code>，数字范围不在<code>0-9</code>内；或者红宝牌的数字不是5；或者企图将暗牌横置（日麻中暗牌不可能横置）等。</li>
-<li><code>{% mahjong 4!s%}</code>会显示出<strong>错误：红宝牌必须是五万、五饼、五索</strong>;</li>
-<li><code>{% mahjong 5!j%}</code>会显示出<strong>错误：红宝牌必须是五万、五饼、五索</strong>;</li>
-<li><code>{% mahjong 0$j%}</code>会显示出<strong>错误：暗牌不能横置</strong>;</li>
-<li><code>{% mahjong 4a%}</code>会显示出<strong>错误：缺少m、p、s、j标签</strong>;</li>
-<li><code>{% mahjong bs%}</code>会显示出<strong>错误：m、p、s标签对应的编号只能为0到9</strong>;</li>
-<li><code>{% mahjong 8j%}</code>会显示出<strong>错误：j标签对应的编号只能为0到7</strong>;</li>
+<li><code>{% mahjong 4!s %}</code>会显示出<strong>错误：红宝牌必须是五万、五饼、五索</strong>;</li>
+<li><code>{% mahjong 5!j %}</code>会显示出<strong>错误：红宝牌必须是五万、五饼、五索</strong>;</li>
+<li><code>{% mahjong 0$j %}</code>会显示出<strong>错误：暗牌不能横置</strong>;</li>
+<li><code>{% mahjong 4a %}</code>会显示出<strong>错误：缺少m、p、s、j标签</strong>;</li>
+<li><code>{% mahjong bs %}</code>会显示出<strong>错误：m、p、s标签对应的编号只能为0到9</strong>;</li>
+<li><code>{% mahjong 8j %}</code>会显示出<strong>错误：j标签对应的编号只能为0到7</strong>;</li>
 </ul>
 
 
@@ -446,6 +446,8 @@
         <a class="basic-alignment left" href="/blog/2016/05/14/how-to-build-my-own-blog/" title="Previous Post: 如何搭建基于Octopress的博客">&laquo; 如何搭建基于Octopress的博客</a>
       
       
+        <a class="basic-alignment right" href="/blog/2016/05/15/mahjong-plugin-2/" title="Next Post: Octopress插件设计：mahjong(2)">Octopress插件设计：mahjong(2) &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -471,13 +473,17 @@
 <section>
   <h1>文章分类</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (1)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (2)</a></li>
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (3)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/14/mahjong-plugin/">Octopress插件设计：mahjong</a>
