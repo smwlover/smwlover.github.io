@@ -108,7 +108,7 @@
 
 <h2>二、插件开发</h2>
 
-<p>首先我们有一组麻将牌图片的资源，我们需要做的是写一个<code>rb</code>文件，解析我们定义的<code>cardName</code>的语法，并且生成对应的<code>&lt;img/&gt;</code>标签。我们在<code>plugins/</code>目录下新建一个文件名为<code>mahjong.rb</code>。笔者之前没有任何Ruby开发的经验，这次开发插件，完全是参照已有插件的写法开发的。<br/>
+<p>首先我们有一组<a href="https://github.com/smwlover/smwlover.github.io/tree/master/images/mahjong">麻将牌图片的资源</a>，我们需要做的是写一个<code>rb</code>文件，解析我们定义的<code>cardName</code>的语法，并且生成对应的<code>&lt;img/&gt;</code>标签。我们在<code>plugins/</code>目录下新建一个文件名为<code>mahjong.rb</code>。笔者之前没有任何Ruby开发的经验，这次开发插件，完全是参照已有插件的写法开发的。<br/>
 我们发现，大部分插件都是自己定义了一个类，继承自<code>Liquid::Tag</code>或者<code>Liquid::Block</code>。在文件的最后，我们需要利用<code>Liquid::Template.register_tag()</code>对插件进行注册。<br/>
 其中，继承自<code>Liquid::Block</code>的插件属于语句块类型的，即用一个开始标识符和一个结束标识符将要显示的内容包裹起来，比如<code>blockquote.rb</code>；而继承自<code>Liquid::Tag</code>的插件属于标签类型的，不需要用两个标识符包裹，比如<code>image_tag.rb</code>。考虑到我们的功能，我们需要选用的是后一种类型，即继承自<code>Liquid::Tag</code>。<br/>
 我们还发现，我们的插件需要写的函数包括<code>initialize(tag_name, markup, tokens)</code>函数，我们的<code>cardName</code>就是通过<code>markup</code>参数传递进来的。在该函数中，我们需要对传进来的参数进行解析。<br/>
@@ -427,7 +427,7 @@
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/kai-fa/'>开发</a>, <a class='category' href='/blog/categories/bi-ji/'>笔记,</a>
+    <a class='category' href='/blog/categories/kai-fa/'>开发</a>, <a class='category' href='/blog/categories/bi-ji/'>笔记</a>
   
 </span>
 
@@ -472,8 +472,7 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (1)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (1)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记, (1)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (2)</a></li>
 
   </ul>
 </section><section>
