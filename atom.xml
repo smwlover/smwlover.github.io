@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-16T13:46:03+08:00</updated>
+  <updated>2016-05-16T19:11:16+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -698,7 +698,8 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>需要注意到的是，在上面的代码中，我生成html的时候，为每个image增加了一个属性<code>class="mahjong"</code>。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：<br/>
+<p>对于我来讲，相对于实现代码本身的逻辑，学习Ruby语法是更加困难的事情。关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以<code>@</code>开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过<code>#{expression}</code>的方式直接使用一个变量或表达式的值。<br/>
+需要注意到的是，在上面的代码中，我生成html的时候，为每个image增加了一个属性<code>class="mahjong"</code>。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：<br/>
 <img src="http://smwlover.github.io/images/mahjong/tate/1.png" /><br/>
 为了覆盖这种默认的显示效果，我为每个image添加一个属性<code>class="mahjong"</code>，并且在<code>sass/custom/_styles.scss</code>文件中添加了分类器：</p>
 
