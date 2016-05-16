@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-15T21:40:36+08:00</updated>
+  <updated>2016-05-16T11:14:05+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -421,7 +421,7 @@
 
 <p>到现在为止，<code>mahjong</code>和<code>mahjonglist</code>插件的开发即告一段落，这样一来，在博客上贴关于日麻牌型的图片会方便很多。比如下面的这手麻将听什么牌呢？答案是<img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/14.png"/>、<img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/16.png"/>和<img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/>。其中已经确定的役种包括<strong>一杯口</strong>和<strong>断幺</strong>，如果听<img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/14.png"/>和<img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/>还会有<strong>平和</strong>。所以，在不考虑额外宝牌的情况下，高目是4番满贯哦。</p>
 
-<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/aka5p.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/16.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/8.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/7.png"/></td></tr></table>
+<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/aka5p.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/16.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/8.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/7.png"/></td></tr></table>
 
 
 <p>  <br/>
@@ -580,7 +580,7 @@
 <span class='line-number'>117</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Title: Simple Mahjong tag for Jekyll</span>
 </span><span class='line'><span class="c1"># Author: smwlover</span>
-</span><span class='line'><span class="c1"># Syntax: <strong>错误：缺少m、p、s、j标签</strong></span>
+</span><span class='line'><span class="c1"># Syntax: {% mahjong cardName %}</span>
 </span><span class='line'><span class="c1">#</span>
 </span><span class='line'><span class="c1"># Examples:</span>
 </span><span class='line'><span class="c1"># {% mahjong 1m %} 表示一万</span>

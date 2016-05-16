@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 开发 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/kai-fa/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-15T21:40:36+08:00</updated>
+  <updated>2016-05-16T11:14:05+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -415,7 +415,7 @@
 <h2>四、结语</h2>
 
 <p>到现在为止，<code>mahjong</code>和<code>mahjonglist</code>插件的开发即告一段落，这样一来，在博客上贴关于日麻牌型的图片会方便很多。比如下面的这手麻将听什么牌呢？答案是<img class="mahjong" src="/images/mahjong/tate/14.png"/>、<img class="mahjong" src="/images/mahjong/tate/16.png"/>和<img class="mahjong" src="/images/mahjong/tate/17.png"/>。其中已经确定的役种包括<strong>一杯口</strong>和<strong>断幺</strong>，如果听<img class="mahjong" src="/images/mahjong/tate/14.png"/>和<img class="mahjong" src="/images/mahjong/tate/17.png"/>还会有<strong>平和</strong>。所以，在不考虑额外宝牌的情况下，高目是4番满贯哦。
-<table><tr><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/aka5p.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/16.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/8.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/yoko/7.png"/></td></tr></table>  <br/>
+<table><tr><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/aka5p.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/16.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/yoko/8.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="/images/mahjong/tate/7.png"/></td></tr></table>  <br/>
 那么我也可以开始轻轻松松地写关于日麻的博文了，行くよ！</p>
 ]]></content>
   </entry>
@@ -593,7 +593,7 @@
 </span><span class='line'>
 </span><span class='line'><span class="sr">&lt;h1&gt;Author: smwlover&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">Syntax</span><span class="p">:</span> <span class="p">{</span><span class="o">%</span> <span class="n">mahjong</span> <span class="n">cardName</span> <span class="sx">%}&lt;/h1&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">Syntax</span><span class="p">:</span> <span class="p">{</span><span class="o">%</span> <span class="n">raw</span> <span class="sx">%}<strong>错误：缺少m、p、s、j标签</strong></span><span class="p">{</span><span class="o">%</span> <span class="n">endraw</span> <span class="sx">%}&lt;/h1&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="sx">&lt;p&gt;#&lt;/p&gt;</span>
 </span><span class='line'>
