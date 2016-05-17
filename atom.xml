@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-16T19:11:16+08:00</updated>
+  <updated>2016-05-17T12:59:57+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,270 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[更多Octopress插件来袭]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/16/more-plugins/"/>
+    <updated>2016-05-16T19:18:17+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/16/more-plugins</id>
+    <content type="html"><![CDATA[<p>有需求才会有动力，在上两篇博客中，因为我想介绍关于日麻的内容，所以我开发了两款用于显示日麻图片的插件<code>mahjong</code>和<code>majonglist</code>。然而今天，我在逛<a href="https://zh.moegirl.org/Mainpage">萌娘百科</a>时发现里面有一些很cool的东西，这么cool的东西能够搬到自己的博客中来不是极好的吗？所以，我又开发了三个简易的Octopress插件。</p>
+
+<!--more-->
+
+
+<h2>第一个插件：删除线</h2>
+
+<p><del>其实这个东西根本没必要写成插件的</del>   ←就是这样的效果。<br/>
+之前说到过，所谓Octopress的插件，其实就是把我们在markdown文件中写的内容转化为html的工具，要写关于删除线的插件，就要先弄明白删除线在html里是怎么表示的。我随便找了一个有删除线的萌娘百科网页，通过F12键查看源代码……<br/>
+<img src="http://smwlover.github.io/images/blogimg/1.png"><br/>
+可以发现，删除线什么的，就是用<code>&lt;del&gt;</code>和<code>&lt;/del&gt;</code>标签括起来嘛！所以写markdown的时候直接手动加上这样的两个标签就可以了，也不麻烦，<del>根本用不着什么插件嘛</del>。<br/>
+不过，写就写了，语法是<code>{% delete sentence %}</code>。看看代码吧，反正就几行：</p>
+
+<figure class='code'><figcaption><span>delete.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">DeleteTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;del&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/del&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">DeleteTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第二个插件：36K钛合金防剧透屏障</h2>
+
+<p><span class="mask">这是什么中二爆表的名字</span> ←就是这样的效果。<br/>
+同理，我们要查看一下相应的html是怎么写的，我找到的网页如下：<br/>
+<img src="http://smwlover.github.io/images/blogimg/2.png"><br/>
+我们可以发现，这是一种特殊类别的<code>&lt;span&gt;</code>，在css分类器中为这种<code>&lt;span&gt;</code>定义了特殊的样式表，使得文字颜色和背景色相同，就可以达到“防剧透屏障”的效果。我们也照葫芦画瓢，开发一个语法为<code>{% mask sentence %}</code>的插件：</p>
+
+<figure class='code'><figcaption><span>mask.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">MaskTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;span class=</span><span class="se">\&quot;</span><span class="s2">mask</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">MaskTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们定义了一种类别叫<code>mask</code>，然后我们需要到<code>sass/custom/_styles.scss</code>中定义<code>mask</code>对应的样式：</p>
+
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Mask Plugin:</span>
+</span><span class='line'><span class="nc">.mask</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">background-color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">text-shadow</span><span class="o">:</span> <span class="no">none</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第三个插件：写作xx读作xx</h2>
+
+<p>不知道大家看过《<ruby><rb>Clannad</rb><rp>(</rp><rt class="rubytagrt">人生</rt><rp>)</rp></ruby>》没有？ ←就是这样的效果。当然，这种效果还可以用来对日语进行注音，比如“<ruby><rb>学</rb><rp>(</rp><rt class="rubytagrt">がっ</rt><rp>)</rp></ruby><ruby><rb>校</rb><rp>(</rp><rt class="rubytagrt">こう</rt><rp>)</rp></ruby>”。<br/>
+日语中，经常见到用假名在汉字上方标明读音的情况，这种情况叫振假名（<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>）。又因为日文印刷时以五号格大小的振假名为标准，并且五号格大小的文字在印刷行业被简称为ruby，所以振假名也有“<ruby><rb>ルビー</rb><rp>(</rp><rt class="rubytagrt">ruby</rt><rp>)</rp></ruby>”的别称。所以，我把这个插件的名字叫做<code>rubytag</code>。<br/>
+同样，我找到了萌娘百科的一个网页，观察振假名的具体实现方式：<br/>
+<img src="http://smwlover.github.io/images/blogimg/3.png"><br/>
+可以发现，这种效果正是利用html一个叫做<code>&lt;ruby&gt;</code>的标签实现的。其中，<code>&lt;rb&gt;&lt;/rb&gt;</code>中的内容是下面的文字，<code>&lt;rt&gt;&lt;/rt&gt;</code>中的内容是上面的标注。通过调查发现，一般情况下，<code>&lt;rp&gt;&lt;/rp&gt;</code>中的内容是不显示的，但是在不支持<code>&lt;ruby&gt;</code>标签的浏览器中，<code>&lt;rp&gt;(&lt;/rp&gt;</code>和<code>&lt;rp&gt;)&lt;/rp&gt;</code>中的内容就会显示出来，使得标注不是显示在文字上方，而是显示在由<code>&lt;rp&gt;</code>组成的一对括号中，效果类似于“学(がっ)校(こう)”。<br/>
+总体来讲，这个插件的逻辑比上面两个插件要复杂一些，但是比起前面的<code>mahjonglist</code>来还是较为简单的。我定义了本插件的语法为<code>{% rubytag word1[-tag1]/word2[-tag2]/... %}</code>，其中不同的单词之间用<code>/</code>分割，每个单词及其注音则用<code>-</code>分割。本插件允许不带注音的单词，这种情况下该单词就会被当成一个普通文本来显示。<br/>
+实现本插件的代码如下，总体来讲就是一个<code>string.split</code>函数的调用过程：</p>
+
+<figure class='code'><figcaption><span>rubytag.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">RubyTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>      <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>      <span class="vi">@result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>  
+</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="n">arr</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>      <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>          <span class="n">word</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>          <span class="n">word</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span class='line'>              <span class="n">parts</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">2</span>
+</span><span class='line'>                  <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                  <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;每组对应关系中内容太多&quot;</span>
+</span><span class='line'>                  <span class="k">break</span>
+</span><span class='line'>              <span class="k">elsif</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">2</span>
+</span><span class='line'>                  <span class="n">html</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>                  <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
+</span><span class='line'>              <span class="k">else</span>
+</span><span class='line'>                  <span class="n">rb</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>                  <span class="n">rt</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>                  <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;ruby&gt;&lt;rb&gt;</span><span class="si">#{</span><span class="n">rb</span><span class="si">}</span><span class="s2">&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt class=</span><span class="se">\&quot;</span><span class="s2">rubytagrt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">rt</span><span class="si">}</span><span class="s2">&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&quot;</span>
+</span><span class='line'>                  <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
+</span><span class='line'>              <span class="k">end</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>          <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="vi">@successful</span>
+</span><span class='line'>          <span class="vi">@result</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@information</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>      
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;rubytag&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">RubyTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>由于默认的日文标注字体太丑陋，我新定义了一种标注类别<code>rubytagrt</code>，将其字体改为较美观的微软雅黑。当然这一步仍然需要修改<code>_styles.scss</code>：</p>
+
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Rubytag Plugin:</span>
+</span><span class='line'><span class="nc">.rubytagrt</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">font-family</span><span class="o">:</span> <span class="n">microsoft</span> <span class="n">yahei</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到此为止，这个插件的开发就告一段落，那么我们可以输入各种各样的用例，测试插件的显示效果了：<br/>
+1. 正常情况：<code>{% rubytag 明日-あした %}</code>会显示成<ruby><rb>明日</rb><rp>(</rp><rt class="rubytagrt">あした</rt><rp>)</rp></ruby>；<br/>
+2. 包含多个单词的情况：<code>{% rubytag 明-みょう/日-にち %}</code>会显示成<ruby><rb>明</rb><rp>(</rp><rt class="rubytagrt">みょう</rt><rp>)</rp></ruby><ruby><rb>日</rb><rp>(</rp><rt class="rubytagrt">にち</rt><rp>)</rp></ruby>；<br/>
+3. 包含多个单词，但是有些单词没有标注的情况：<code>{% rubytag 振-ふ/り/仮-が/名-な %}</code>会显示成<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>；<br/>
+4. 错误情况：<code>{% rubytag 明-みょう-日-にち %}</code>会显示成<strong>错误：每组对应关系中内容太多</strong>。<br/>
+另外，我还发现了一个神奇的事情，就是有些Octopress插件还可以嵌套使用，比如下面的例子，我就把<code>blockquote</code>插件和我自己开发的<code>rubytag</code>插件嵌套起来使用了：</p>
+
+<blockquote><p><ruby><rb>迷</rb><rp>(</rp><rt class="rubytagrt">まよ</rt><rp>)</rp></ruby>いはないよ、<ruby><rb>固</rb><rp>(</rp><rt class="rubytagrt">かた</rt><rp>)</rp></ruby>く<ruby><rb>決</rb><rp>(</rp><rt class="rubytagrt">き</rt><rp>)</rp></ruby>めたから。<ruby><rb>涙</rb><rp>(</rp><rt class="rubytagrt">なみだ</rt><rp>)</rp></ruby>は<ruby><rb>見</rb><rp>(</rp><rt class="rubytagrt">み</rt><rp>)</rp></ruby>せないと<ruby><rb>誓</rb><rp>(</rp><rt class="rubytagrt">ちか</rt><rp>)</rp></ruby>った。<br/>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。</p><footer><strong>阿万音铃羽</strong> <cite>虹色の光りの中で</cite></footer></blockquote>
+
+
+<p>对应的代码如下：</p>
+
+<figure class='code'><figcaption><span>嵌套使用 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{% blockquote 阿万音铃羽, 虹色の光りの中で %}
+</span><span class='line'>{% rubytag 迷-まよ/いはないよ、/固-かた/く/決-き/めたから。/涙-なみだ/は/見-み/せないと/誓-ちか/った。 %}
+</span><span class='line'>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。
+</span><span class='line'>{% endblockquote %}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>展望：</h2>
+
+<p>还是那句话，有需求才会有动力。获取某天，我又偶然间发现了什么想搬到自己博客中来的东西，于是又开发了一个新的Octopress插件呢。这也是有可能的，不是么？</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Octopress插件设计：mahjong(2)]]></title>
@@ -34,7 +298,8 @@
 
 <p>大体的实现方法与上一个插件类似。为了连续显示多张图片，我利用html标签<code>&lt;table&gt;&lt;tr&gt;...&lt;/tr&gt;&lt;/table&gt;</code>创建了一个表格，表格中的每个元素对应一张图片<code>&lt;td&gt;&lt;img/&gt;&lt;/td&gt;</code>。对于加杠的情况，相当于在原本表格中的一栏里又嵌套了一个两行一列的表格，形如下面代码：</p>
 
-<figure class='code'><figcaption><span>实现加杠的方法</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>实现加杠的方法 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -51,7 +316,8 @@
 
 <p>另外就是实现的时候要注意逻辑的严密性，考虑清楚所有可能的输入情况。比如在两个加杠符号<code>/</code>中包裹的牌数量不等于两张，或者在两个加杠符号<code>/</code>中出现了分隔符<code>-</code>，或者一个加杠符号<code>/</code>还没有合拢整个文本就结束的情况等。具体处理方法参见代码：</p>
 
-<figure class='code'><figcaption><span>mahjonglist.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>mahjonglist.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -380,7 +646,8 @@
 
 <p>当然，和上一篇博客类似，为了覆盖Octopress的默认表格样式，我们需要在<code>sass/custom/_styles.scss</code>文件中添加如下代码：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -461,7 +728,8 @@
 我们还需要写一个<code>render(context)</code>函数，这个函数执行的结果就是对应的html标签。<br/>
 注意到这些点之后，我写出的插件代码如下：</p>
 
-<figure class='code'><figcaption><span>mahjong.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>mahjong.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -698,12 +966,13 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>对于我来讲，相对于实现代码本身的逻辑，学习Ruby语法是更加困难的事情。关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以<code>@</code>开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过<code>#{expression}</code>的方式直接使用一个变量或表达式的值。<br/>
+<p>对于我来讲，在短时间内学习Ruby语法是一件比实现代码逻辑更加困难的事情。关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以<code>@</code>开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过<code>#{expression}</code>的方式直接使用一个变量或表达式的值。<br/>
 需要注意到的是，在上面的代码中，我生成html的时候，为每个image增加了一个属性<code>class="mahjong"</code>。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：<br/>
 <img src="http://smwlover.github.io/images/mahjong/tate/1.png" /><br/>
 为了覆盖这种默认的显示效果，我为每个image添加一个属性<code>class="mahjong"</code>，并且在<code>sass/custom/_styles.scss</code>文件中添加了分类器：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -781,7 +1050,7 @@
 
 <p>我们可以直接从Github上将Octopress的对应源代码clone下来并进行安装：</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> &lt;the_directory_of_your_blog&gt;
 </span><span class='line'>git clone git://github.com/imathis/octopress.git
@@ -790,7 +1059,7 @@
 
 <p>此时在<code>the_directory_of_your_blog/</code>目录下应该有一个名为<code>octopress</code>的文件夹了。</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -809,7 +1078,7 @@
 首先我们在Github上新建一个Repository，命名为<code>username.github.io</code>。<br/>
 然后我们就可以进行部署工作了，以本博客为例（我的Github账号为smwlover，新建的Repository名称为<code>smwlover.github.io</code>）：</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>rake setup_github_pages
@@ -847,7 +1116,8 @@
 
 <p>在<code>source/_includes/custom/asides/</code>目录下创建<code>about.html</code>，然后在<code>default_asides:</code>对应的数组中添加<code>custom/asides/about.html</code>。本博客的<code>about.html</code>内容如下：</p>
 
-<figure class='code'><figcaption><span>about.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>about.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -865,7 +1135,8 @@
 <p>在<code>source/_includes/custom/asides/</code>目录下创建<code>music.html</code>并且在<code>default_asides:</code>中添加对应路径。目前包括网易云音乐和虾米音乐在内的很多音乐平台都支持外链播放器的功能，我们只需要获取到html格式的外链，然后加入到<code>music.html</code>中即可。<br/>
 因为本博客利用的是虾米音乐的歌曲外链，在Safari浏览器下好像无法正常工作，所以我在<code>music.html</code>首先判断是否是Safari浏览器，如果不是再加入html内容：</p>
 
-<figure class='code'><figcaption><span>music.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>music.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -902,7 +1173,8 @@
 
 <p>和上面的方法类似，先创建一个<code>friend.html</code>页面，然后向其中加入一些带有链接的条目，最后在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径即可，不再赘述。</p>
 
-<figure class='code'><figcaption><span>friend.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>friend.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -932,7 +1204,7 @@
 <p>有关样式的所有内容都在<code>sass/</code>目录下，我们可以通过修改<code>sass/custom/_layout.scss</code>来修改博客的布局，比如调节侧边栏的宽度，或者调节标题的字体大小等。<br/>
 我们可以向<code>sass/custom/_styles.scss</code>文件中添加自定义背景图片的代码，对应的图片<code>background.png</code>则需要放置于<code>source/images/</code>目录下：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -959,14 +1231,14 @@
 
 <p>在添加完背景图片之后，我们可能会发现标题栏的背景色有些突兀，我们想要将标题栏的背景色修改为透明。经过百般寻找，我们发现标题栏的背景色在<code>sass/base/_theme.scss</code>中设置，直接将透明度修改为0即可：</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nv">$header-bg</span><span class="o">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="mh">#333</span><span class="o">,</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">!default</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>在标题栏透明之后，我们可能更喜欢导航栏的左上角和右上角更加圆滑一些，这时我们可以在<code>sass/custom/_styles.scss</code>添加如下代码：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -992,7 +1264,8 @@
 <p>如同本博客所示，侧边栏的分类列表会按照博文的类别对博文进行整理与归纳，十分方便。为了达到这样的效果，首先我们需要定义一个插件。Octopress的插件是以<code>plugins/*.rb</code>文件的形式存在的。我们要写的插件，需要归纳出所有博文的类型，然后显示出一系列形如<code>category_name (post_number)</code>的标签，并且还要定义每个标签指向的超链接位置。<br/>
 我们在<code>plugins/</code>目录下添加<code>category_list_tag.rb</code>文件，代码如下：</p>
 
-<figure class='code'><figcaption><span>category_list_tag.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>category_list_tag.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -1037,7 +1310,8 @@
 
 <p>然后，像之前往侧边栏添加内容时一样，我们在<code>source/_includes/custom/asides</code>目录下添加<code>category_list.html</code>文件，并且在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径：</p>
 
-<figure class='code'><figcaption><span>category_list.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>category_list.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -1056,7 +1330,8 @@
 
 <p>我们可以在<code>source/_includes/custom/navigation.html</code>文件中自定义导航栏中选项卡的内容。为了加入“个人简介”选项卡，首先我们需要通过命令<code>rake new_page['about']</code>，在<code>source/</code>目录下创建一个<code>about/</code>目录，里面包含一个<code>index.markdown</code>文件。然后我们只需要在导航栏中添加一个指向该页面的标签即可：</p>
 
-<figure class='code'><figcaption><span>navigation.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>navigation.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -1073,7 +1348,8 @@
 
 <p>当自己的博文长度很长时，每次手动返回顶部就显得很不方便。我们可以在页面的右下角加入一个返回顶部按钮。首先，我们在<code>source/javascripts/</code>文件夹中加入<code>top.js</code>，这是实现返回顶部功能的代码：</p>
 
-<figure class='code'><figcaption><span>top.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>top.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -1152,12 +1428,17 @@
 
 <p>然后我们需要写一个按钮，该按钮可以调用这段代码。我们在<code>source/_includes/custom</code>文件夹下创建<code>totop.html</code>，代码如下：</p>
 
-<figure class='code'><figcaption><span>totop.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>totop.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;full&quot;</span> <span class="na">style=</span><span class="s">&quot;width:0px; height:0px; position:fixed; right:90px; bottom:90px; z-index:100; text-align:center; background-color:transparent; cursor:pointer;&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#&quot;</span> <span class="na">onclick=</span><span class="s">&quot;goTop();return false;&quot;</span><span class="nt">&gt;&lt;img</span> <span class="na">src=</span><span class="s">&quot;/images/top.png&quot;</span> <span class="na">border=</span><span class="s">0</span> <span class="na">alt=</span><span class="s">&quot;返回顶部&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#&quot;</span> <span class="na">onclick=</span><span class="s">&quot;goTop(); return false;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/images/top.png&quot;</span> <span class="na">border=</span><span class="s">0</span> <span class="na">alt=</span><span class="s">&quot;返回顶部&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/a&gt;</span>
 </span><span class='line'><span class="nt">&lt;/div&gt;</span>
 </span><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/javascripts/top.js&quot;</span> <span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -1165,7 +1446,8 @@
 
 <p>最后，我们需要修改<code>source/_layouts/default.html</code>，使其包含进我们刚才写的<code>totop.html</code>：</p>
 
-<figure class='code'><figcaption><span>default.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>default.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>

@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>更多Octopress插件来袭 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="通过Ruby语言开发了更多Octopress插件，包括删除线等。">
+  <meta name="keywords" content="octopress, 插件, ruby, smwlover, html, 日语, 假名, 注音">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/05/16/more-plugins/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">更多Octopress插件来袭</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-16T19:18:17+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>7:18 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://smwlover.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>有需求才会有动力，在上两篇博客中，因为我想介绍关于日麻的内容，所以我开发了两款用于显示日麻图片的插件<code>mahjong</code>和<code>majonglist</code>。然而今天，我在逛<a href="https://zh.moegirl.org/Mainpage">萌娘百科</a>时发现里面有一些很cool的东西，这么cool的东西能够搬到自己的博客中来不是极好的吗？所以，我又开发了三个简易的Octopress插件。</p>
+
+<!--more-->
+
+
+<h2>第一个插件：删除线</h2>
+
+<p><del>其实这个东西根本没必要写成插件的</del>   ←就是这样的效果。<br/>
+之前说到过，所谓Octopress的插件，其实就是把我们在markdown文件中写的内容转化为html的工具，要写关于删除线的插件，就要先弄明白删除线在html里是怎么表示的。我随便找了一个有删除线的萌娘百科网页，通过F12键查看源代码……<br/>
+<img src="/images/blogimg/1.png"><br/>
+可以发现，删除线什么的，就是用<code>&lt;del&gt;</code>和<code>&lt;/del&gt;</code>标签括起来嘛！所以写markdown的时候直接手动加上这样的两个标签就可以了，也不麻烦，<del>根本用不着什么插件嘛</del>。<br/>
+不过，写就写了，语法是<code>{% delete sentence %}</code>。看看代码吧，反正就几行：</p>
+
+<figure class='code'><figcaption><span>delete.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">DeleteTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;del&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/del&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">DeleteTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第二个插件：36K钛合金防剧透屏障</h2>
+
+<p><span class="mask">这是什么中二爆表的名字</span> ←就是这样的效果。<br/>
+同理，我们要查看一下相应的html是怎么写的，我找到的网页如下：<br/>
+<img src="/images/blogimg/2.png"><br/>
+我们可以发现，这是一种特殊类别的<code>&lt;span&gt;</code>，在css分类器中为这种<code>&lt;span&gt;</code>定义了特殊的样式表，使得文字颜色和背景色相同，就可以达到“防剧透屏障”的效果。我们也照葫芦画瓢，开发一个语法为<code>{% mask sentence %}</code>的插件：</p>
+
+<figure class='code'><figcaption><span>mask.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">MaskTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;span class=</span><span class="se">\&quot;</span><span class="s2">mask</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">MaskTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们定义了一种类别叫<code>mask</code>，然后我们需要到<code>sass/custom/_styles.scss</code>中定义<code>mask</code>对应的样式：</p>
+
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Mask Plugin:</span>
+</span><span class='line'><span class="nc">.mask</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">background-color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">text-shadow</span><span class="o">:</span> <span class="no">none</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第三个插件：写作xx读作xx</h2>
+
+<p>不知道大家看过《<ruby><rb>Clannad</rb><rp>(</rp><rt class="rubytagrt">人生</rt><rp>)</rp></ruby>》没有？ ←就是这样的效果。当然，这种效果还可以用来对日语进行注音，比如“<ruby><rb>学</rb><rp>(</rp><rt class="rubytagrt">がっ</rt><rp>)</rp></ruby><ruby><rb>校</rb><rp>(</rp><rt class="rubytagrt">こう</rt><rp>)</rp></ruby>”。<br/>
+日语中，经常见到用假名在汉字上方标明读音的情况，这种情况叫振假名（<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>）。又因为日文印刷时以五号格大小的振假名为标准，并且五号格大小的文字在印刷行业被简称为ruby，所以振假名也有“<ruby><rb>ルビー</rb><rp>(</rp><rt class="rubytagrt">ruby</rt><rp>)</rp></ruby>”的别称。所以，我把这个插件的名字叫做<code>rubytag</code>。<br/>
+同样，我找到了萌娘百科的一个网页，观察振假名的具体实现方式：<br/>
+<img src="/images/blogimg/3.png"><br/>
+可以发现，这种效果正是利用html一个叫做<code>&lt;ruby&gt;</code>的标签实现的。其中，<code>&lt;rb&gt;&lt;/rb&gt;</code>中的内容是下面的文字，<code>&lt;rt&gt;&lt;/rt&gt;</code>中的内容是上面的标注。通过调查发现，一般情况下，<code>&lt;rp&gt;&lt;/rp&gt;</code>中的内容是不显示的，但是在不支持<code>&lt;ruby&gt;</code>标签的浏览器中，<code>&lt;rp&gt;(&lt;/rp&gt;</code>和<code>&lt;rp&gt;)&lt;/rp&gt;</code>中的内容就会显示出来，使得标注不是显示在文字上方，而是显示在由<code>&lt;rp&gt;</code>组成的一对括号中，效果类似于“学(がっ)校(こう)”。<br/>
+总体来讲，这个插件的逻辑比上面两个插件要复杂一些，但是比起前面的<code>mahjonglist</code>来还是较为简单的。我定义了本插件的语法为<code>{% rubytag word1[-tag1]/word2[-tag2]/... %}</code>，其中不同的单词之间用<code>/</code>分割，每个单词及其注音则用<code>-</code>分割。本插件允许不带注音的单词，这种情况下该单词就会被当成一个普通文本来显示。<br/>
+实现本插件的代码如下，总体来讲就是一个<code>string.split</code>函数的调用过程：</p>
+
+<figure class='code'><figcaption><span>rubytag.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">RubyTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>      <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>      <span class="vi">@result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>  
+</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="n">arr</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>      <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>          <span class="n">word</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>          <span class="n">word</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span class='line'>              <span class="n">parts</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">2</span>
+</span><span class='line'>                  <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                  <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;每组对应关系中内容太多&quot;</span>
+</span><span class='line'>                  <span class="k">break</span>
+</span><span class='line'>              <span class="k">elsif</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">2</span>
+</span><span class='line'>                  <span class="n">html</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>                  <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
+</span><span class='line'>              <span class="k">else</span>
+</span><span class='line'>                  <span class="n">rb</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>                  <span class="n">rt</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>                  <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;ruby&gt;&lt;rb&gt;</span><span class="si">#{</span><span class="n">rb</span><span class="si">}</span><span class="s2">&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt class=</span><span class="se">\&quot;</span><span class="s2">rubytagrt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">rt</span><span class="si">}</span><span class="s2">&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&quot;</span>
+</span><span class='line'>                  <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
+</span><span class='line'>              <span class="k">end</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>          <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="vi">@successful</span>
+</span><span class='line'>          <span class="vi">@result</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@information</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>      
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;rubytag&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">RubyTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>由于默认的日文标注字体太丑陋，我新定义了一种标注类别<code>rubytagrt</code>，将其字体改为较美观的微软雅黑。当然这一步仍然需要修改<code>_styles.scss</code>：</p>
+
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Rubytag Plugin:</span>
+</span><span class='line'><span class="nc">.rubytagrt</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">font-family</span><span class="o">:</span> <span class="n">microsoft</span> <span class="n">yahei</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到此为止，这个插件的开发就告一段落，那么我们可以输入各种各样的用例，测试插件的显示效果了：<br/>
+1. 正常情况：<code>{% rubytag 明日-あした %}</code>会显示成<ruby><rb>明日</rb><rp>(</rp><rt class="rubytagrt">あした</rt><rp>)</rp></ruby>；<br/>
+2. 包含多个单词的情况：<code>{% rubytag 明-みょう/日-にち %}</code>会显示成<ruby><rb>明</rb><rp>(</rp><rt class="rubytagrt">みょう</rt><rp>)</rp></ruby><ruby><rb>日</rb><rp>(</rp><rt class="rubytagrt">にち</rt><rp>)</rp></ruby>；<br/>
+3. 包含多个单词，但是有些单词没有标注的情况：<code>{% rubytag 振-ふ/り/仮-が/名-な %}</code>会显示成<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>；<br/>
+4. 错误情况：<code>{% rubytag 明-みょう-日-にち %}</code>会显示成<strong>错误：每组对应关系中内容太多</strong>。<br/>
+另外，我还发现了一个神奇的事情，就是有些Octopress插件还可以嵌套使用，比如下面的例子，我就把<code>blockquote</code>插件和我自己开发的<code>rubytag</code>插件嵌套起来使用了：</p>
+
+<blockquote><p><ruby><rb>迷</rb><rp>(</rp><rt class="rubytagrt">まよ</rt><rp>)</rp></ruby>いはないよ、<ruby><rb>固</rb><rp>(</rp><rt class="rubytagrt">かた</rt><rp>)</rp></ruby>く<ruby><rb>決</rb><rp>(</rp><rt class="rubytagrt">き</rt><rp>)</rp></ruby>めたから。<ruby><rb>涙</rb><rp>(</rp><rt class="rubytagrt">なみだ</rt><rp>)</rp></ruby>は<ruby><rb>見</rb><rp>(</rp><rt class="rubytagrt">み</rt><rp>)</rp></ruby>せないと<ruby><rb>誓</rb><rp>(</rp><rt class="rubytagrt">ちか</rt><rp>)</rp></ruby>った。<br/>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。</p><footer><strong>阿万音铃羽</strong> <cite>虹色の光りの中で</cite></footer></blockquote>
+
+
+<p>对应的代码如下：</p>
+
+<figure class='code'><figcaption><span>嵌套使用 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{% blockquote 阿万音铃羽, 虹色の光りの中で %}
+</span><span class='line'>{% rubytag 迷-まよ/いはないよ、/固-かた/く/決-き/めたから。/涙-なみだ/は/見-み/せないと/誓-ちか/った。 %}
+</span><span class='line'>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。
+</span><span class='line'>{% endblockquote %}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>展望：</h2>
+
+<p>还是那句话，有需求才会有动力。获取某天，我又偶然间发现了什么想搬到自己博客中来的东西，于是又开发了一个新的Octopress插件呢。这也是有可能的，不是么？</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-16T19:18:17+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>7:18 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/kai-fa/'>开发</a>, <a class='category' href='/blog/categories/bi-ji/'>笔记</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/15/mahjong-plugin-2/" title="Previous Post: Octopress插件设计：mahjong(2)">&laquo; Octopress插件设计：mahjong(2)</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (3)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (4)</a></li>
+
+  </ul>
+</section><section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/14/mahjong-plugin/">Octopress插件设计：mahjong</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/14/how-to-build-my-own-blog/">如何搭建基于Octopress的博客</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_310_430_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="310" height="430" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/05/16/more-plugins/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/05/16/more-plugins/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="width:0px; height:0px; position:fixed; right:90px; bottom:90px; z-index:100; text-align:center; background-color:transparent; cursor:pointer;">
+        <a href="#" onclick="goTop();return false;"><img src="/images/top.png" border=0 alt="返回顶部"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>

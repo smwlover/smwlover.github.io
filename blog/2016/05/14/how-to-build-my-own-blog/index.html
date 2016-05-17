@@ -117,7 +117,7 @@
 
 <p>我们可以直接从Github上将Octopress的对应源代码clone下来并进行安装：</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> &lt;the_directory_of_your_blog&gt;
 </span><span class='line'>git clone git://github.com/imathis/octopress.git
@@ -126,7 +126,7 @@
 
 <p>此时在<code>the_directory_of_your_blog/</code>目录下应该有一个名为<code>octopress</code>的文件夹了。</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -145,7 +145,7 @@
 首先我们在Github上新建一个Repository，命名为<code>username.github.io</code>。<br/>
 然后我们就可以进行部署工作了，以本博客为例（我的Github账号为smwlover，新建的Repository名称为<code>smwlover.github.io</code>）：</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>rake setup_github_pages
@@ -183,7 +183,8 @@
 
 <p>在<code>source/_includes/custom/asides/</code>目录下创建<code>about.html</code>，然后在<code>default_asides:</code>对应的数组中添加<code>custom/asides/about.html</code>。本博客的<code>about.html</code>内容如下：</p>
 
-<figure class='code'><figcaption><span>about.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>about.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -201,7 +202,8 @@
 <p>在<code>source/_includes/custom/asides/</code>目录下创建<code>music.html</code>并且在<code>default_asides:</code>中添加对应路径。目前包括网易云音乐和虾米音乐在内的很多音乐平台都支持外链播放器的功能，我们只需要获取到html格式的外链，然后加入到<code>music.html</code>中即可。<br/>
 因为本博客利用的是虾米音乐的歌曲外链，在Safari浏览器下好像无法正常工作，所以我在<code>music.html</code>首先判断是否是Safari浏览器，如果不是再加入html内容：</p>
 
-<figure class='code'><figcaption><span>music.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>music.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -238,7 +240,8 @@
 
 <p>和上面的方法类似，先创建一个<code>friend.html</code>页面，然后向其中加入一些带有链接的条目，最后在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径即可，不再赘述。</p>
 
-<figure class='code'><figcaption><span>friend.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>friend.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -268,7 +271,7 @@
 <p>有关样式的所有内容都在<code>sass/</code>目录下，我们可以通过修改<code>sass/custom/_layout.scss</code>来修改博客的布局，比如调节侧边栏的宽度，或者调节标题的字体大小等。<br/>
 我们可以向<code>sass/custom/_styles.scss</code>文件中添加自定义背景图片的代码，对应的图片<code>background.png</code>则需要放置于<code>source/images/</code>目录下：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -295,14 +298,14 @@
 
 <p>在添加完背景图片之后，我们可能会发现标题栏的背景色有些突兀，我们想要将标题栏的背景色修改为透明。经过百般寻找，我们发现标题栏的背景色在<code>sass/base/_theme.scss</code>中设置，直接将透明度修改为0即可：</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nv">$header-bg</span><span class="o">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="mh">#333</span><span class="o">,</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">!default</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>在标题栏透明之后，我们可能更喜欢导航栏的左上角和右上角更加圆滑一些，这时我们可以在<code>sass/custom/_styles.scss</code>添加如下代码：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss</span><a href='http://octopress.org/docs/theme/styles/'>Link </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -328,7 +331,8 @@
 <p>如同本博客所示，侧边栏的分类列表会按照博文的类别对博文进行整理与归纳，十分方便。为了达到这样的效果，首先我们需要定义一个插件。Octopress的插件是以<code>plugins/*.rb</code>文件的形式存在的。我们要写的插件，需要归纳出所有博文的类型，然后显示出一系列形如<code>category_name (post_number)</code>的标签，并且还要定义每个标签指向的超链接位置。<br/>
 我们在<code>plugins/</code>目录下添加<code>category_list_tag.rb</code>文件，代码如下：</p>
 
-<figure class='code'><figcaption><span>category_list_tag.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>category_list_tag.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -373,7 +377,8 @@
 
 <p>然后，像之前往侧边栏添加内容时一样，我们在<code>source/_includes/custom/asides</code>目录下添加<code>category_list.html</code>文件，并且在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径：</p>
 
-<figure class='code'><figcaption><span>category_list.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>category_list.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -392,7 +397,8 @@
 
 <p>我们可以在<code>source/_includes/custom/navigation.html</code>文件中自定义导航栏中选项卡的内容。为了加入“个人简介”选项卡，首先我们需要通过命令<code>rake new_page['about']</code>，在<code>source/</code>目录下创建一个<code>about/</code>目录，里面包含一个<code>index.markdown</code>文件。然后我们只需要在导航栏中添加一个指向该页面的标签即可：</p>
 
-<figure class='code'><figcaption><span>navigation.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>navigation.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -409,7 +415,8 @@
 
 <p>当自己的博文长度很长时，每次手动返回顶部就显得很不方便。我们可以在页面的右下角加入一个返回顶部按钮。首先，我们在<code>source/javascripts/</code>文件夹中加入<code>top.js</code>，这是实现返回顶部功能的代码：</p>
 
-<figure class='code'><figcaption><span>top.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>top.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -488,12 +495,17 @@
 
 <p>然后我们需要写一个按钮，该按钮可以调用这段代码。我们在<code>source/_includes/custom</code>文件夹下创建<code>totop.html</code>，代码如下：</p>
 
-<figure class='code'><figcaption><span>totop.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>totop.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;full&quot;</span> <span class="na">style=</span><span class="s">&quot;width:0px; height:0px; position:fixed; right:90px; bottom:90px; z-index:100; text-align:center; background-color:transparent; cursor:pointer;&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#&quot;</span> <span class="na">onclick=</span><span class="s">&quot;goTop();return false;&quot;</span><span class="nt">&gt;&lt;img</span> <span class="na">src=</span><span class="s">&quot;/images/top.png&quot;</span> <span class="na">border=</span><span class="s">0</span> <span class="na">alt=</span><span class="s">&quot;返回顶部&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#&quot;</span> <span class="na">onclick=</span><span class="s">&quot;goTop(); return false;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/images/top.png&quot;</span> <span class="na">border=</span><span class="s">0</span> <span class="na">alt=</span><span class="s">&quot;返回顶部&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/a&gt;</span>
 </span><span class='line'><span class="nt">&lt;/div&gt;</span>
 </span><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/javascripts/top.js&quot;</span> <span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -501,7 +513,8 @@
 
 <p>最后，我们需要修改<code>source/_layouts/default.html</code>，使其包含进我们刚才写的<code>totop.html</code>：</p>
 
-<figure class='code'><figcaption><span>default.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>default.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -600,14 +613,18 @@
 <section>
   <h1>文章分类</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (2)</a></li>
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (3)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (3)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (4)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>

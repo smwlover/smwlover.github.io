@@ -114,7 +114,8 @@
 
 <p>大体的实现方法与上一个插件类似。为了连续显示多张图片，我利用html标签<code>&lt;table&gt;&lt;tr&gt;...&lt;/tr&gt;&lt;/table&gt;</code>创建了一个表格，表格中的每个元素对应一张图片<code>&lt;td&gt;&lt;img/&gt;&lt;/td&gt;</code>。对于加杠的情况，相当于在原本表格中的一栏里又嵌套了一个两行一列的表格，形如下面代码：</p>
 
-<figure class='code'><figcaption><span>实现加杠的方法</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>实现加杠的方法 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -131,7 +132,8 @@
 
 <p>另外就是实现的时候要注意逻辑的严密性，考虑清楚所有可能的输入情况。比如在两个加杠符号<code>/</code>中包裹的牌数量不等于两张，或者在两个加杠符号<code>/</code>中出现了分隔符<code>-</code>，或者一个加杠符号<code>/</code>还没有合拢整个文本就结束的情况等。具体处理方法参见代码：</p>
 
-<figure class='code'><figcaption><span>mahjonglist.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>mahjonglist.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -460,7 +462,8 @@
 
 <p>当然，和上一篇博客类似，为了覆盖Octopress的默认表格样式，我们需要在<code>sass/custom/_styles.scss</code>文件中添加如下代码：</p>
 
-<figure class='code'><figcaption><span>_styles.scss</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -545,6 +548,8 @@
         <a class="basic-alignment left" href="/blog/2016/05/14/mahjong-plugin/" title="Previous Post: Octopress插件设计：mahjong">&laquo; Octopress插件设计：mahjong</a>
       
       
+        <a class="basic-alignment right" href="/blog/2016/05/16/more-plugins/" title="Next Post: 更多Octopress插件来袭">更多Octopress插件来袭 &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -576,14 +581,18 @@
 <section>
   <h1>文章分类</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (2)</a></li>
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (3)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (3)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (4)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>

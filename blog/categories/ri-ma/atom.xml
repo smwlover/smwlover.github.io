@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 日麻 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/ri-ma/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-16T19:11:16+08:00</updated>
+  <updated>2016-05-17T12:59:57+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -32,17 +32,27 @@
 
 <h2>二、实现方法</h2>
 
-<p>大体的实现方法与上一个插件类似。为了连续显示多张图片，我利用html标签<code>&lt;table&gt;&lt;tr&gt;...&lt;/tr&gt;&lt;/table&gt;</code>创建了一个表格，表格中的每个元素对应一张图片<code>&lt;td&gt;&lt;img/&gt;&lt;/td&gt;</code>。对于加杠的情况，相当于在原本表格中的一栏里又嵌套了一个两行一列的表格，形如下面代码：
-<code>html 实现加杠的方法
-&lt;td&gt;
-    &lt;table&gt;
-        &lt;tr&gt;&lt;td&gt;&lt;img src="第一张麻将牌的地址"&gt;&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr&gt;&lt;td&gt;&lt;img src="第二张麻将牌的地址"&gt;&lt;/td&gt;&lt;/tr&gt;
-    &lt;/table&gt;
-&lt;/td&gt;
-</code>
-另外就是实现的时候要注意逻辑的严密性，考虑清楚所有可能的输入情况。比如在两个加杠符号<code>/</code>中包裹的牌数量不等于两张，或者在两个加杠符号<code>/</code>中出现了分隔符<code>-</code>，或者一个加杠符号<code>/</code>还没有合拢整个文本就结束的情况等。具体处理方法参见代码：
-<figure class='code'><figcaption><span>mahjonglist.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>大体的实现方法与上一个插件类似。为了连续显示多张图片，我利用html标签<code>&lt;table&gt;&lt;tr&gt;...&lt;/tr&gt;&lt;/table&gt;</code>创建了一个表格，表格中的每个元素对应一张图片<code>&lt;td&gt;&lt;img/&gt;&lt;/td&gt;</code>。对于加杠的情况，相当于在原本表格中的一栏里又嵌套了一个两行一列的表格，形如下面代码：</p>
+
+<p><figure class='code'><figcaption><span>实现加杠的方法 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;table&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;&lt;td&gt;&lt;img</span> <span class="na">src=</span><span class="s">&quot;第一张麻将牌的地址&quot;</span><span class="nt">&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;&lt;td&gt;&lt;img</span> <span class="na">src=</span><span class="s">&quot;第二张麻将牌的地址&quot;</span><span class="nt">&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/table&gt;</span>
+</span><span class='line'><span class="nt">&lt;/td&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>另外就是实现的时候要注意逻辑的严密性，考虑清楚所有可能的输入情况。比如在两个加杠符号<code>/</code>中包裹的牌数量不等于两张，或者在两个加杠符号<code>/</code>中出现了分隔符<code>-</code>，或者一个加杠符号<code>/</code>还没有合拢整个文本就结束的情况等。具体处理方法参见代码：</p>
+
+<p><figure class='code'><figcaption><span>mahjonglist.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -206,14 +216,6 @@
 <span class='line-number'>162</span>
 <span class='line-number'>163</span>
 <span class='line-number'>164</span>
-<span class='line-number'>165</span>
-<span class='line-number'>166</span>
-<span class='line-number'>167</span>
-<span class='line-number'>168</span>
-<span class='line-number'>169</span>
-<span class='line-number'>170</span>
-<span class='line-number'>171</span>
-<span class='line-number'>172</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="sr">&lt;p&gt;  class MahjongListTag &amp;lt; Liquid::Tag</span>
@@ -378,14 +380,21 @@
 </span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;mahjonglist&amp;rsquo;, Jekyll::MahjongListTag)</span>
-</span><span class='line'><span class="sr">&lt;code&gt;</span>
-</span><span class='line'><span class="sr">当然，和上一篇博客类似，为了覆盖Octopress的默认表格样式，我们需要在``sass/</span><span class="n">custom</span><span class="o">/</span><span class="n">_styles</span><span class="o">.</span><span class="n">scss</span><span class="sb">``</span><span class="err">文件中添加如下代码：</span>
-</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;scss _styles.scss</span>
-</span><span class='line'><span class="sr">.mahjongTableElement{</span>
-</span><span class='line'><span class="sr">        border: 0px;</span>
-</span><span class='line'><span class="sr">        vertical-align: bottom;</span>
-</span><span class='line'><span class="sr">        line-height: 0px;</span>
-</span><span class='line'><span class="sr">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>当然，和上一篇博客类似，为了覆盖Octopress的默认表格样式，我们需要在<code>sass/custom/_styles.scss</code>文件中添加如下代码：</p>
+
+<p><figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.mahjongTableElement</span><span class="p">{</span>
+</span><span class='line'>        <span class="na">border</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>        <span class="na">vertical-align</span><span class="o">:</span> <span class="no">bottom</span><span class="p">;</span>
+</span><span class='line'>        <span class="na">line-height</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></p>
 
 <h2>三、功能测试：</h2>
@@ -450,8 +459,10 @@
 其中，继承自<code>Liquid::Block</code>的插件属于语句块类型的，即用一个开始标识符和一个结束标识符将要显示的内容包裹起来，比如<code>blockquote.rb</code>；而继承自<code>Liquid::Tag</code>的插件属于标签类型的，不需要用两个标识符包裹，比如<code>image_tag.rb</code>。考虑到我们的功能，我们需要选用的是后一种类型，即继承自<code>Liquid::Tag</code>。<br/>
 我们还发现，我们的插件需要写的函数包括<code>initialize(tag_name, markup, tokens)</code>函数，我们的<code>cardName</code>就是通过<code>markup</code>参数传递进来的。在该函数中，我们需要对传进来的参数进行解析。<br/>
 我们还需要写一个<code>render(context)</code>函数，这个函数执行的结果就是对应的html标签。<br/>
-注意到这些点之后，我写出的插件代码如下：
-<figure class='code'><figcaption><span>mahjong.rb</p></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+注意到这些点之后，我写出的插件代码如下：</p>
+
+<p><figure class='code'><figcaption><span>mahjong.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -581,73 +592,66 @@
 <span class='line-number'>128</span>
 <span class='line-number'>129</span>
 <span class='line-number'>130</span>
-<span class='line-number'>131</span>
-<span class='line-number'>132</span>
-<span class='line-number'>133</span>
-<span class='line-number'>134</span>
-<span class='line-number'>135</span>
-<span class='line-number'>136</span>
-<span class='line-number'>137</span>
-<span class='line-number'>138</span>
-<span class='line-number'>139</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">Title</span><span class="p">:</span> <span class="no">Simple</span> <span class="no">Mahjong</span> <span class="n">tag</span> <span class="k">for</span> <span class="no">Jekyll</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="sr">/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;Author: smwlover&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="sr">&lt;h1&gt;Title: Simple Mahjong tag for Jekyll&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">Syntax</span><span class="p">:</span> <span class="p">{</span><span class="o">%</span> <span class="n">raw</span> <span class="sx">%}<strong>错误：缺少m、p、s、j标签</strong></span><span class="p">{</span><span class="o">%</span> <span class="n">endraw</span> <span class="sx">%}&lt;/h1&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">Author</span><span class="p">:</span> <span class="n">smwlover</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;p&gt;#&lt;/p&gt;</span>
+</span><span class='line'><span class="sr">&lt;h1&gt;Syntax: {% mahjong cardName %}&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;h1&gt;Examples:&lt;/h1&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="c1">#&lt;/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;h1&gt;</span><span class="p">{</span><span class="o">%</span> <span class="n">mahjong</span> <span class="mi">1</span><span class="n">m</span> <span class="sx">%}</span> <span class="err">表示一万</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">Examples</span><span class="p">:</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;{% mahjong 5!s %} 表示红五索（日麻中的红宝牌）&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="sr">&lt;h1&gt;{% mahjong 1m %} 表示一万&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="p">{</span><span class="o">%</span> <span class="n">raw</span> <span class="sx">%}<img class="mahjong" src="/images/mahjong/yoko/21.png"/></span><span class="p">{</span><span class="o">%</span> <span class="n">endraw</span> <span class="sx">%} 表示横置的三饼（日麻中吃、碰、杠的横置）&lt;/h1&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="p">{</span><span class="o">%</span> <span class="n">mahjong</span> <span class="mi">5</span><span class="o">!</span><span class="n">s</span> <span class="sx">%} 表示红五索（日麻中的红宝牌）&lt;/h1&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;h1&gt;字牌用数字1-7加j表示。其中1-4分别对应东、南、西、北，5-7则对应白、发、中。&lt;/h1&gt;</span>
+</span><span class='line'><span class="sx">&lt;h1&gt;{% mahjong 3$p %}</span> <span class="err">表示横置的三饼（日麻中吃、碰、杠的横置）</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;h1&gt;暗牌用数字0加m、s、p或j中的任何一个都可以表示。&lt;/h1&gt;</span>
+</span><span class='line'><span class="sr">&lt;h1&gt;字牌用数字1-7加j表示。其中1-4分别对应东、南、西、北，5-7则对应白、发、中。&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;p&gt;module Jekyll&lt;/p&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="err">暗牌用数字</span><span class="mi">0</span><span class="err">加</span><span class="n">m</span><span class="err">、</span><span class="n">s</span><span class="err">、</span><span class="nb">p</span><span class="err">或</span><span class="n">j</span><span class="err">中的任何一个都可以表示。</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;p&gt;  class MahjongTag &amp;lt; Liquid::Tag</span>
-</span><span class='line'><span class="sx">    def initialize(tag_name, markup, tokens)</span>
-</span><span class='line'><span class="sx">        @curFlag = -1 #m, s, p或j对应0, 1, 2, 3</span>
-</span><span class='line'><span class="sx">        @cardNumber = -1 #牌的编号</span>
-</span><span class='line'><span class="sx">        @isAkaDora = false #是否是红宝牌</span>
-</span><span class='line'><span class="sx">        @isRotated = false #是否是横置的牌</span>
-</span><span class='line'><span class="sx">        @successful = true #解析是否成功</span>
-</span><span class='line'><span class="sx">        @path = &amp;ldquo;&amp;rdquo; #存储解析的结果&lt;/p&gt;</span>
+</span><span class='line'><span class="sr">&lt;p&gt;module Jekyll&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">&lt;pre&gt;&lt;code&gt;    str = &quot;</span><span class="si">#{</span><span class="n">markup</span><span class="sx">}</span><span class="s2">&quot;.strip</span>
-</span><span class='line'><span class="s2">    strLen = str.size</span>
-</span><span class='line'><span class="s2">    strReversed = str.reverse</span>
-</span><span class='line'><span class="s2">    count = 0</span>
-</span><span class='line'><span class="s2">    while count &amp;lt; strLen do</span>
-</span><span class='line'><span class="s2">        curChar = strReversed[count]</span>
-</span><span class='line'><span class="s2">        if count == 0</span>
-</span><span class='line'><span class="s2">            if curChar == &quot;</span><span class="n">m</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">                @curFlag = 0</span>
-</span><span class='line'><span class="s2">            elsif curChar == &quot;</span><span class="n">s</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">                @curFlag = 1</span>
-</span><span class='line'><span class="s2">            elsif curChar == &quot;</span><span class="nb">p</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">                @curFlag = 2</span>
-</span><span class='line'><span class="s2">            elsif curChar == &quot;</span><span class="n">j</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">                @curFlag = 3</span>
-</span><span class='line'><span class="s2">            else</span>
-</span><span class='line'><span class="s2">                @path = &quot;</span><span class="err">缺少</span><span class="n">m</span><span class="err">、</span><span class="nb">p</span><span class="err">、</span><span class="n">s</span><span class="err">、</span><span class="n">j</span><span class="err">标签</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">                @successful = false</span>
-</span><span class='line'><span class="s2">                break</span>
-</span><span class='line'><span class="s2">            end</span>
-</span><span class='line'><span class="s2">        else</span>
-</span><span class='line'><span class="s2">            if @cardNumber &amp;gt;= 0 #如果重复声明了牌的编号</span>
-</span><span class='line'><span class="s2">                @path = &quot;</span><span class="err">重复声明了牌的编号</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">                @successful = false</span>
-</span><span class='line'><span class="s2">                break</span>
-</span><span class='line'><span class="s2">            end</span>
-</span><span class='line'><span class="s2">            if curChar == &quot;</span><span class="vg">$&quot;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">class</span> <span class="nc">MahjongTag</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@curFlag</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">#m, s, p或j对应0, 1, 2, 3</span>
+</span><span class='line'>        <span class="vi">@cardNumber</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">#牌的编号</span>
+</span><span class='line'>        <span class="vi">@isAkaDora</span> <span class="o">=</span> <span class="kp">false</span> <span class="c1">#是否是红宝牌</span>
+</span><span class='line'>        <span class="vi">@isRotated</span> <span class="o">=</span> <span class="kp">false</span> <span class="c1">#是否是横置的牌</span>
+</span><span class='line'>        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span> <span class="c1">#解析是否成功</span>
+</span><span class='line'>        <span class="vi">@path</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="c1">#存储解析的结果&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>    <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>    <span class="n">strLen</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">size</span>
+</span><span class='line'>    <span class="n">strReversed</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">reverse</span>
+</span><span class='line'>    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="k">while</span> <span class="n">count</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">strLen</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">curChar</span> <span class="o">=</span> <span class="n">strReversed</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>            <span class="k">if</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span>
+</span><span class='line'>                <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>            <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;s&quot;</span>
+</span><span class='line'>                <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'>            <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;p&quot;</span>
+</span><span class='line'>                <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span class='line'>            <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;j&quot;</span>
+</span><span class='line'>                <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span class='line'>            <span class="k">else</span>
+</span><span class='line'>                <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;缺少m、p、s、j标签&quot;</span>
+</span><span class='line'>                <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                <span class="k">break</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="k">if</span> <span class="vi">@cardNumber</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">0</span> <span class="c1">#如果重复声明了牌的编号</span>
+</span><span class='line'>                <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;重复声明了牌的编号&quot;</span>
+</span><span class='line'>                <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                <span class="k">break</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>            <span class="k">if</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span>
 </span><span class='line'>                <span class="vi">@isRotated</span> <span class="o">=</span> <span class="kp">true</span>
 </span><span class='line'>            <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span>
 </span><span class='line'>                <span class="vi">@isAkaDora</span> <span class="o">=</span> <span class="kp">true</span>
@@ -718,19 +722,27 @@
 </span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;mahjong&amp;rsquo;, Jekyll::MahjongTag)</span>
-</span><span class='line'><span class="sr">&lt;code&gt;</span>
-</span><span class='line'><span class="sr">对于我来讲，相对于实现代码本身的逻辑，学习Ruby语法是更加困难的事情。关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以``@``开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过``</span><span class="si">#{</span><span class="n">expression</span><span class="si">}</span><span class="sr">``的方式直接使用一个变量或表达式的值。  </span>
-</span><span class='line'><span class="sr">需要注意到的是，在上面的代码中，我生成html的时候，为每个image增加了一个属性``class=&quot;mahjong&quot;``。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：  </span>
-</span><span class='line'><span class="sr">&amp;lt;img src=&quot;http:/</span><span class="o">/</span><span class="n">smwlover</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">mahjong</span><span class="o">/</span><span class="n">tate</span><span class="o">/</span><span class="mi">1</span><span class="o">.</span><span class="n">png</span><span class="s2">&quot; /&amp;gt;  </span>
-</span><span class='line'><span class="s2">为了覆盖这种默认的显示效果，我为每个image添加一个属性``class=&quot;</span><span class="n">mahjong</span><span class="s2">&quot;``，并且在``sass/custom/_styles.scss``文件中添加了分类器：</span>
-</span><span class='line'><span class="s2">&lt;/code&gt;scss _styles.scss</span>
-</span><span class='line'><span class="s2">.mahjong{</span>
-</span><span class='line'><span class="s2">        border: 0px;</span>
-</span><span class='line'><span class="s2">        border-radius: 0px;</span>
-</span><span class='line'><span class="s2">        box-shadow: none;</span>
-</span><span class='line'><span class="s2">}</span>
-</span></code></pre></td></tr></table></div></figure>
-这样，我们就可以看到没有边框与阴影的麻将牌了。</p>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>对于我来讲，在短时间内学习Ruby语法是一件比实现代码逻辑更加困难的事情。关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以<code>@</code>开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过<code>#{expression}</code>的方式直接使用一个变量或表达式的值。<br/>
+需要注意到的是，在上面的代码中，我生成html的时候，为每个image增加了一个属性<code>class="mahjong"</code>。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：<br/>
+<img src="http://smwlover.github.io/images/mahjong/tate/1.png" /><br/>
+为了覆盖这种默认的显示效果，我为每个image添加一个属性<code>class="mahjong"</code>，并且在<code>sass/custom/_styles.scss</code>文件中添加了分类器：</p>
+
+<p><figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.mahjong</span><span class="p">{</span>
+</span><span class='line'>        <span class="na">border</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>        <span class="na">border-radius</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>        <span class="na">box-shadow</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>这样，我们就可以看到没有边框与阴影的麻将牌了。</p>
 
 <h2>三、效果测试</h2>
 
