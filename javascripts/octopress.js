@@ -112,6 +112,16 @@ $('document').ready(function() {
   addCodeLineNumbers();
   getNav();
   addSidebarToggler();
+  
+  //Expand:
+  $(".expandtitle").click(function(){
+		$(this).next().toggle();
+		var content = $(this).html();
+		if(content == "展开")
+			$(this).html("隐藏");
+		else
+			$(this).html("展开");
+  });
 });
 
 // iOS scaling bug fix

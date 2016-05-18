@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Octopress插件开发：点击展开与折叠 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="通过Ruby语言开发了一款Octopress插件，用于折叠和展开一些内容。">
+  <meta name="keywords" content="octopress, 插件, ruby, smwlover, html">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/05/17/expand-plugin/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Octopress插件开发：点击展开与折叠</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-17T22:07:17+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:07 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://smwlover.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>对于我的每一篇博文，一定存在那么一坨内容，有些人想去了解，而有些人不想去了解。如果这一坨内容直接显示在网页上，对于那些不想去了解的人未免是一种煎熬。在这种情况下，给读者一个可以将这些内容展开与折叠的按钮是再好不过的选择了。想了解的人，点击“展开”按钮再去阅读就可以；不想了解的人就不需要点击“展开”按钮，也不需要忍受这种煎熬了。这次我就开发了一个用来实现这种功能的插件。</p>
+
+<!--more-->
+
+
+<p>之前我开发的几款插件都是<code>Tag</code>型插件，但是这次<code>Tag</code>型插件就不能实现我们想要的功能了。我们需要使用<code>Block</code>型插件（姑且命名为<code>{% expand %}</code>），将要显示的内容用<code>{% expand title %}</code>和<code>{% endexpand %}</code>包裹起来。</p>
+
+<h2>Javascript部分</h2>
+
+<p>为了实现显示和隐藏效果，我用到了一些jQuery相关的函数。这些函数包括：<br/>
+<code>$(this).next()</code>：获取当前对象的下一个兄弟对象；<br/>
+<code>$(this).parent()</code>：获取当前对象的父级对象；<br/>
+<code>$(this).html()</code>：获取当前对象显示的内容；<br/>
+<code>$(this).html("text")</code>：将当前对象显示的内容修改为<code>text</code>；<br/>
+<code>$(this).toggle()</code>：切换当前对象的显示与隐藏状态（<code>display</code>属性）；<br/>
+<code>$(this).click(function(){})</code>：定义当前对象被点击时执行的函数。<br/>
+有了上面这些内容作为基础，我们可以想象出对应的html代码的结构。首先加入一个按钮（假设该按钮拥有属性<code>class="expandtitle"</code>），然后在该按钮之后加入一个<code>&lt;div&gt;&lt;/div&gt;</code>块，二者位于同一层级。<br/>
+我们可以在<code>source/javascripts/octopress.js</code>文件中找到<code>$('document').ready(...)</code>一行，加入下面的代码：</p>
+
+<figure class='code'><figcaption><span>octopress.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;document&#39;</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">//该函数中已经有了一些内容，不用管它，直接在这些内容后面添加。</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//Expand:</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.expandtitle&quot;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">next</span><span class="p">().</span><span class="nx">toggle</span><span class="p">();</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">if</span><span class="p">(</span><span class="nx">content</span> <span class="o">==</span> <span class="s2">&quot;展开&quot;</span><span class="p">)</span>
+</span><span class='line'>          <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;隐藏&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;展开&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这段代码指的是对所有<code>class="expandtitle"</code>的对象，添加一个点击时触发的函数：该函数切换了当前对象下一个兄弟对象的显示与隐藏状态，并且修改了当前对象对应的html文本。</p>
+
+<h2>插件实现部分</h2>
+
+<p>在插件目录下新建<code>expand.rb</code>，之前已经说过了，我们新建的类需要继承自<code>Liquid::Block</code>。我参照了<code>blockquote</code>插件的实现方法，首先在<code>initialize</code>函数中通过变量<code>markup</code>获取<code>title</code>部分，然后在<code>render</code>函数中通过调用<code>super</code>获得已经解析好的<code>content</code>部分，最后将两部分整合到一段html代码中。完整的代码如下：</p>
+
+<figure class='code'><figcaption><span>expand.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Expand</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Block</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="vi">@title</span> <span class="o">=</span> <span class="n">str</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">expand</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;a href=</span><span class="se">\&quot;</span><span class="s2">javascript:void(0)</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">float: right;</span><span class="se">\&quot;</span><span class="s2"> class=</span><span class="se">\&quot;</span><span class="s2">expandtitle</span><span class="se">\&quot;</span><span class="s2">&gt;展开&lt;/a&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">expandcontent</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">display: none;</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="k">super</span><span class="si">}</span><span class="s2">&lt;/div&gt;&lt;/div&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;expand&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">Expand</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在对应的html代码中，我用<code>&lt;a&gt;&lt;/a&gt;</code>表示按钮，该按钮拥有如下属性：<br/>
+<code>href="javascript:void(0)"</code>：这其实是一个死链接，不指向任何地方。其实不加这句话，代码也可以正常工作，但是鼠标移到该按钮上不会显示出手形。给该按钮添加一个超链接，可以让鼠标移动到上面的时候显示出手形，更加符合用户的习惯。<br/>
+<code>style="float: right;"</code>：这段代码使得该按钮一直位于一行的最右侧。<br/>
+<code>class="expandtitle"</code>：对应我们在<code>source/javascripts/octopress.js</code>文件中增加的代码，使该按钮在点击时触发效果。</p>
+
+<p>按钮的下一个兄弟对象则是需要隐藏或展开的部分，我用<code>&lt;div&gt;&lt;/div&gt;</code>表示，并且<code>style="display: none;"</code>保证其初始状态是隐藏的。</p>
+
+<h2>样式表调节部分</h2>
+
+<p>照例，样式表调节的部分仍在<code>_styles.scss</code>文件中完成，每个人可以根据自己的喜好定义<code>.expand</code>和<code>.expandcontent</code>的样式。我定义的样式如下：</p>
+
+<div class="expand">定制<code>.expand</code>和<code>.expandcontent</code>的样式<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Expand Plugin:</span>
+</span><span class='line'><span class="nc">.expand</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">border-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-style</span><span class="o">:</span> <span class="no">solid</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-color</span><span class="o">:</span> <span class="mh">#bbbbbb</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-radius</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">1</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.expandcontent</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">margin</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-top-style</span><span class="o">:</span> <span class="no">dashed</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-top-color</span><span class="o">:</span> <span class="mh">#bbbbbb</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-top-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+</div></div>
+
+
+<p>有些人可能想将一段行内代码或整个代码段隐藏起来，这当然是可以的，但是它们显示的外观可能并不令人满意。我们可以在<code>_styles.scss</code>文件中，定制<code>div.expand</code>类型元素或<code>.expandcontent</code>类型元素中的行内代码或代码段的样式表：</p>
+
+<div class="expand">定制行内代码或代码段的样式<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.expandcontent</span> <span class="o">&gt;</span> <span class="nt">figure</span><span class="nc">.code</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">0</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.expandcontent</span> <span class="o">&gt;</span> <span class="nt">code</span><span class="o">,</span> <span class="nt">div</span><span class="nc">.expand</span> <span class="o">&gt;</span> <span class="nt">code</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">display</span><span class="o">:</span> <span class="no">inline</span><span class="o">-</span><span class="no">block</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">background</span><span class="o">:</span> <span class="mh">#fff</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">font-size</span><span class="o">:</span> <span class="mf">.8</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">line-height</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.5</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">color</span><span class="o">:</span> <span class="mh">#555</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#ddd</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">border-radius</span><span class="o">:</span> <span class="mf">.4</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">padding</span><span class="o">:</span> <span class="mi">0</span> <span class="mf">.3</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">margin</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+</div></div>
+
+
+<h2>局限性</h2>
+
+<p>插件的基本开发过程大致就是这样，就像上面所说的，该插件支持将一些内容折叠起来。可折叠的内容包括一段文本、一张图片或者一段代码段（因为Octopress支持插件嵌套）。但是该插件有一点局限性存在：<br/>
+在本插件内部，除去用<code>{% plugin_name parameters %}</code>调用插件的语法之外，其余的markdown语法（包括用两个空格换行，或者用三个反引号引用一段代码段）都不适用了。笔者原以为在调用完父类的<code>super</code>函数后，这类语法同样也可以被转化为相应的html代码，但是好像并不是这样，貌似这类语法的解析方式和普通的插件是不一样的。有兴趣的读者可以在代码中加上<code>print super</code>并调用<code>rake generate</code>查看一下输出结果，<del>反正我是不知道为什么会有那样的输出</del>。<br/>
+在这里，我提供了几种<span class="mask">曲线救国的</span>方案来解决上面的问题：<br/>
+1. 要在本插件内部换行，直接写<code>&lt;br/&gt;</code>吧；<br/>
+2. 要在本插件内部添加代码段，不要用三个反引号，改用<code>codeblock</code>吧；<br/>
+3. 要在本插件内部添加行内代码，不要用反引号，直接写成<code>&lt;code&gt;...&lt;/code&gt;</code>吧，或者把下面的<code>code.rb</code>文件加入到插件目录下后，用<code>{% code ... %}</code>吧。</p>
+
+<figure class='code'><figcaption><span>code.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">CodeTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;code&gt;</span><span class="si">#{</span><span class="vi">@code</span><span class="si">}</span><span class="s2">&lt;/code&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">CodeTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>最终效果</h2>
+
+<div class="expand">开发感想<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+总体来讲，开发这个插件的重点还是html层次结构以及jQuery逻辑的实现。<br/>
+至于Octopress为什么不能正确解析插件内部的一些markdown语法，这东西太<ruby><rb>高端</rb><rp>(</rp><rt class="rubytagrt">扯淡</rt><rp>)</rp></ruby>了，我反正不想管了。<br/>
+要换行的时候就加个<code>&lt;br/&gt;</code>吧，反正就五个字符，也不会累死人。
+</div></div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-17T22:07:17+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:07 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/kai-fa/'>开发</a>, <a class='category' href='/blog/categories/bi-ji/'>笔记</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/16/more-plugins/" title="Previous Post: 更多Octopress插件来袭">&laquo; 更多Octopress插件来袭</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (4)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (5)</a></li>
+
+  </ul>
+</section><section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/17/expand-plugin/">Octopress插件开发：点击展开与折叠</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/14/mahjong-plugin/">Octopress插件设计：mahjong</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/14/how-to-build-my-own-blog/">如何搭建基于Octopress的博客</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_310_430_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="310" height="430" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/05/17/expand-plugin/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/05/17/expand-plugin/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>
