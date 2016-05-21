@@ -122,6 +122,9 @@ $('document').ready(function() {
 		else
 			$(this).html("展开");
   });
+  
+  //Lyrics:
+  getLRCNum();
 });
 
 // iOS scaling bug fix
