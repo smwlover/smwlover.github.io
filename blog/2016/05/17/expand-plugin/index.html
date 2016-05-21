@@ -122,7 +122,7 @@
 						curNumber = totNumber;
 						loadXMLDoc("/lyrics/" + curNumber + ".txt");
 					}else{
-						var splited = text.split("\r\n");
+						var splited = text.split("\n");
 						$("#ctnt").html(splited[0]);
 						$("#trslt").html(splited[1]);
 						$("#song").html(splited[2] + "《" + splited[3] + "》");
