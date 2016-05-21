@@ -72,6 +72,72 @@
 </ul>
 
 </nav>
+  <div class="lyrics">
+	<a class="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a class="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = totNumber;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\r\n");
+						$("#ctnt").html(splited[0]);
+						$("#trslt").html(splited[1]);
+						$("#song").html(splited[2] + "《" + splited[3] + "》");
+						$("#song").attr("href", splited[4]); 
+					}
+				}
+			}
+		}
+	</script>
+	<div class="lyricsContent" style="padding-top: 22px; padding-left: 50px; padding-right: 50px; background-color: rgba(0, 0, 0, 0);">
+		<h3 class="content" id="ctnt"></h3>
+		<p class="translate" id="trslt"></p>
+		<p class="from" style="float: right">————<a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
   <div id="main">
     <div id="content">
       <div class="blog-index">
