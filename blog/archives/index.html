@@ -139,6 +139,8 @@ May 16 2016 posted in 开发, 笔记 &hellip;">
 						$("#song").attr("href", splited[4]); 
 						
 						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
 						adjustPos();
 					}
 				}
@@ -349,9 +351,17 @@ May 16 2016 posted in 开发, 笔记 &hellip;">
    (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
    (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
    
+   string x;
+   if(Sys.ie)
+	x="ie";
+else if(Sys.firefox)
+x="firef";
+else if(Sys.chrome)
+x="chrome";
+   
    if (Sys.ie || Sys.firefox || Sys.chrome){
 		document.write('<section>');
-		document.write('<h1>歌曲列表</h1>');
+		document.write('<h1>歌曲列表' + x + '</h1>');
 		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_310_430_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="310" height="430" wmode="opaque"></embed>');
 		document.write('</section>');
    }
