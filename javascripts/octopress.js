@@ -125,6 +125,9 @@ $('document').ready(function() {
   
   //Lyrics:
   getLRCNum();
+  $(window).resize(function(){
+	   adjustPos();
+  });
 });
 
 // iOS scaling bug fix

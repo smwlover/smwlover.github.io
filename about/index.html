@@ -72,9 +72,9 @@
 </ul>
 
 </nav>
-  <div class="lyrics">
-	<a class="leftArrow" onclick="last();" href="javascript:void(0)"></a>
-	<a class="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
 	<script type="text/javascript">
 		var xmlhttp;
 		var totNumber = -1;
@@ -82,6 +82,12 @@
 		
 		function getLRCNum(){
 			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
 		}
 		
 		function last(){
@@ -123,19 +129,23 @@
 						loadXMLDoc("/lyrics/" + curNumber + ".txt");
 					}else{
 						var splited = text.split("\n");
-						$("#ctnt").html(splited[0]);
-						$("#trslt").html(splited[1]);
-						$("#song").html(splited[2] + "《" + splited[3] + "》");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
 						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						adjustPos();
 					}
 				}
 			}
 		}
 	</script>
-	<div class="lyricsContent" style="padding-top: 22px; padding-left: 50px; padding-right: 50px; background-color: rgba(0, 0, 0, 0);">
-		<h3 class="content" id="ctnt"></h3>
-		<p class="translate" id="trslt"></p>
-		<p class="from" style="float: right">————<a id="song" href="javascript:void(0)"></a></p>
+	<div id="lyricsContent"">
+		<h3 id="lyric"></h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
 	</div>
 </div>
   <div id="main">
