@@ -125,7 +125,7 @@
 					var text = xmlhttp.responseText;
 					if(totNumber < 0){ //如果是获取歌词数量;
 						totNumber = parseInt(text);
-						curNumber = totNumber;
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
 						loadXMLDoc("/lyrics/" + curNumber + ".txt");
 					}else{
 						var splited = text.split("\n");
@@ -474,15 +474,19 @@
 <section>
   <h1>文章分类</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (4)</a></li>
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (6)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (7)</a></li>
 <li class='category'><a href='/blog/categories/suan-fa/'>算法 (1)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/lyric-bar/">在自己的博客中加入歌词栏</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/20/binary-manipulation/">位运算的Tricks</a>
@@ -500,12 +504,38 @@
         <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2016/05/14/mahjong-plugin/">Octopress插件设计：mahjong</a>
-      </li>
-    
   </ul>
 </section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
 <!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
 <script type="text/javascript">
    var Sys = {};

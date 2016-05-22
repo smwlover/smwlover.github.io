@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 开发 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/kai-fa/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-22T13:46:19+08:00</updated>
+  <updated>2016-05-22T19:01:31+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,456 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[在自己的博客中加入歌词栏]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/22/lyric-bar/"/>
+    <updated>2016-05-22T16:38:34+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/22/lyric-bar</id>
+    <content type="html"><![CDATA[<p>很久之前我就有将自己喜欢的歌曲分享给别人的梦想，而现在正值我的博客搭建完成，我终于可以通过在博客中加入歌词栏实现我的梦想了。这篇文章就来简单介绍一下在博客中添加歌词栏的流程。</p>
+
+<!--more-->
+
+
+<h2>一、添加html文件</h2>
+
+<p>首先，在<code>source/_includes/custom/</code>路径下新建<code>lyrics.html</code>文件，我们要添加的歌词栏就是在该文件中实现的。该文件的内容暂且按下不表，我们首先要让我们添加的html文件在博客中显示出来。<br/>
+我们知道，<code>source/_layouts/default.html</code>文件定义了博客页面的基本框架，当我们需要添加一些内容的时候，可以修改该文件，这样在博客的任何页面，我们添加的内容都可以显示出来。如大家所见，本博客中歌词栏的位置位于导航栏的下面，正文部分的上面。通过查看<code>default.html</code>文件，我们发现，<code>{% include navigation.html %}</code> 一行对应着博客的导航栏，而我们要加入的<code>lyrics.html</code>，则应该放在这一行的下面。<br/>
+在这一行的下面加入<code>{% include custom/lyrics.html %}</code>一行，这样一来，我们添加的歌词栏就在博客页面中找到了自己的归属。</p>
+
+<h2>二、歌词栏的实现</h2>
+
+<p>关于歌词栏，我的想法是这样的：中间部分显示歌词，包括日文原文、中文译文以及歌曲名称和歌手名称，其中歌曲名称是一个超链接，指向网易云音乐中对应歌曲的页面。两侧分别是两个按钮，即切换到上一句歌词和下一句歌词。<br/>
+我在<code>source/</code>文件夹下新建了<code>lyrics/</code>文件夹，歌词栏显示的每句歌词都对应着该文件夹下的一个txt文件，文件名形如<code>1.txt</code>、<code>2.txt</code>这样。除了这些歌词文件，该文件夹下还有一个<code>num.txt</code>文件，记录着当前歌词的总数量。在博客页面第一次加载的时候，首先访问<code>num.txt</code>文件，获取歌词总数量<code>totNumber</code>，然后随机生成一个介于<code>1</code>到<code>totNumber</code>之间的数字<code>curNumber</code>，并且访问<code>[curNumber].txt</code>文件，将该文件对应的歌词显示在歌词栏中。每当点击上一句歌词或下一句歌词按钮时，将<code>curNumber</code>减一或加一，并且访问对应的文件并且更新歌词栏的信息。<br/>
+那么问题来了：<strong>如何访问服务器端的一个文件呢？</strong>我们需要用到XMLHttpRequest。通过XMLHttpRequest，我们可以实现很多功能，比如：<br/>
+1. 在不重新加载页面的情况下更新网页；<br/>
+2. 在页面已加载后从服务器请求数据；<br/>
+3. 在页面已加载后从服务器接收数据；<br/>
+4. 在后台向服务器发送数据。<br/>
+而我们则是利用了第二点“在页面已加载后从服务器请求数据”的功能。相关代码如下：</p>
+
+<p><figure class='code'><figcaption><span>XMLHttpRequest的使用 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">XMLHttpRequest</span><span class="p">){</span> <span class="c1">// code for Firefox, Opera, IE7, etc.</span>
+</span><span class='line'>        <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">){</span> <span class="c1">// code for IE6, IE5</span>
+</span><span class='line'>        <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">Microsoft</span><span class="p">.</span><span class="nx">XMLHTTP</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">){</span>
+</span><span class='line'>        <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="nx">state_change</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">GET</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">state_change</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">){</span> <span class="c1">// 4=&amp;ldquo;loaded&amp;rdquo;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">){</span> <span class="c1">// 200=&amp;ldquo;OK&amp;rdquo;</span>
+</span><span class='line'>            <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在上述代码中，<code>onreadystatechange</code>是一个事件句柄，它的值是一个函数名称。当我们建立的<code>XMLHttpRequest</code>对象的状态发生改变后，会触发此函数。该对象的状态从0到4进行变化，其中状态为4意味着请求完成，然后我们才可以进行后续处理。<br/>
+在该对象状态发生改变后，如果是请求完成状态，我们就可以通过该对象的<code>status</code>属性判断我们的请求是否成功。<code>status</code>属性对应着该请求的http状态代码，如果成功，状态代码即为<code>200</code>。如果成功，我们即可通过<code>responseText</code>属性获得我们请求的内容。<br/>
+明确了XMLHttpRequest的作用，完整的html代码也就呼之欲出：</p>
+
+<p><figure class='code'><figcaption><span>lyrics.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;lyrics&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">id=</span><span class="s">&quot;leftArrow&quot;</span> <span class="na">onclick=</span><span class="s">&quot;last();&quot;</span> <span class="na">href=</span><span class="s">&quot;javascript:void(0)&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">id=</span><span class="s">&quot;rightArrow&quot;</span> <span class="na">onclick=</span><span class="s">&quot;next();&quot;</span> <span class="na">href=</span><span class="s">&quot;javascript:void(0)&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">xmlhttp</span><span class="p">;</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">totNumber</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">curNumber</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">getLRCNum</span><span class="p">(){</span>
+</span><span class='line'>            <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/num.txt&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">adjustPos</span><span class="p">(){</span>
+</span><span class='line'>            <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#lyrics&quot;</span><span class="p">).</span><span class="nx">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">45</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#leftArrow&quot;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s2">&quot;margin-top&quot;</span><span class="p">,</span> <span class="nx">pos</span><span class="p">);</span>
+</span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#rightArrow&quot;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s2">&quot;margin-top&quot;</span><span class="p">,</span> <span class="nx">pos</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">last</span><span class="p">(){</span>
+</span><span class='line'>            <span class="nx">curNumber</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nx">curNumber</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>                <span class="nx">curNumber</span> <span class="o">=</span> <span class="nx">totNumber</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/&quot;</span> <span class="o">+</span> <span class="nx">curNumber</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">next</span><span class="p">(){</span>
+</span><span class='line'>            <span class="nx">curNumber</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nx">curNumber</span> <span class="o">&gt;</span> <span class="nx">totNumber</span><span class="p">)</span>
+</span><span class='line'>                <span class="nx">curNumber</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/&quot;</span> <span class="o">+</span> <span class="nx">curNumber</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
+</span><span class='line'>            <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">XMLHttpRequest</span><span class="p">){</span> <span class="c1">// code for Firefox, Opera, IE7, etc.</span>
+</span><span class='line'>                <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">){</span> <span class="c1">// code for IE6, IE5</span>
+</span><span class='line'>                <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="s2">&quot;Microsoft.XMLHTTP&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">){</span>
+</span><span class='line'>                <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="nx">state_change</span><span class="p">;</span>
+</span><span class='line'>                <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>                <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">state_change</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">){</span> <span class="c1">// 4=&quot;loaded&quot;</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">){</span> <span class="c1">// 200=&quot;OK&quot;</span>
+</span><span class='line'>                    <span class="c1">//处理传回的数据：</span>
+</span><span class='line'>                    <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
+</span><span class='line'>                    <span class="k">if</span><span class="p">(</span><span class="nx">totNumber</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">//如果是获取歌词数量;</span>
+</span><span class='line'>                        <span class="nx">totNumber</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+</span><span class='line'>                        <span class="nx">curNumber</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">totNumber</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>                        <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/&quot;</span> <span class="o">+</span> <span class="nx">curNumber</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">);</span>
+</span><span class='line'>                    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                        <span class="kd">var</span> <span class="nx">splited</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">);</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#lyric&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">splited</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#translate&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">splited</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#singer&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;————&quot;</span> <span class="o">+</span> <span class="nx">splited</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#song&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;「&quot;</span> <span class="o">+</span> <span class="nx">splited</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;」&quot;</span><span class="p">);</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#song&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">,</span> <span class="nx">splited</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'>                        <span class="c1">//调节两个按钮的位置：</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#leftArrow&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#rightArrow&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+</span><span class='line'>                        <span class="nx">adjustPos</span><span class="p">();</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;lyricsContent&quot;</span><span class="err">&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;h3</span> <span class="na">id=</span><span class="s">&quot;lyric&quot;</span><span class="nt">&gt;&lt;/h3&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">&quot;translate&quot;</span><span class="nt">&gt;&lt;/p&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">&quot;from&quot;</span><span class="nt">&gt;&lt;span</span> <span class="na">id=</span><span class="s">&quot;singer&quot;</span><span class="nt">&gt;&lt;/span&gt;&lt;a</span> <span class="na">id=</span><span class="s">&quot;song&quot;</span> <span class="na">href=</span><span class="s">&quot;javascript:void(0)&quot;</span><span class="nt">&gt;&lt;/a&gt;&lt;/p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>我们注意到，<code>getLRCNum()</code>函数是用来获取歌词总数量的，需要在文档加载完成时调用。<code>source/javascripts/octopress.js</code>文件中的<code>$('document').ready(function())</code>函数是用来定义文档加载完成时所触发的函数的，我们需要在该函数的末尾调用<code>getLRCNum()</code>函数，确保在文档加载完成时，可以立刻获取当前歌词的总数量。<br/>
+然后，<code>last()</code>和<code>next()</code>函数则是分别在两个按钮被按下时触发的，它们更改了<code>curNumber</code>的值，并且请求了新的歌词内容。在新的歌词内容请求完成后，我们利用jQuery动态地改变了歌词栏内部的一些html标签所显示的文本及其<code>href</code>属性，并且通过<code>adjustPos()</code>函数调节了两个按钮的位置，使其在垂直方向上一直处于正中央。</p>
+
+<h2>三、定制css样式表</h2>
+
+<p>当然，为了显示出正常的效果，我们需要对html文件中涉及到的标签定制css样式表。这些工作仍然是在<code>sass/custom/_styles.scss</code>文件中完成的。由于笔者不是学美工出身，最后显示的效果或多或少会缺乏美感，这里贴出我个人定制的样式表，仅供抛砖引玉之用。</p>
+
+<p><div class="expand">我个人定制的样式表<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Lyrics:&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">lyrics</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-bottom-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-bottom-style</span><span class="o">:</span> <span class="no">solid</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-bottom-color</span><span class="o">:</span> <span class="nf">rgb</span><span class="p">(</span><span class="mi">140</span><span class="o">,</span> <span class="mi">140</span><span class="o">,</span> <span class="mi">140</span><span class="p">);</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">lyricsContent</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">padding-top</span><span class="o">:</span> <span class="mi">22</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding-bottom</span><span class="o">:</span> <span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding-left</span><span class="o">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding-right</span><span class="o">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-color</span><span class="o">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">leftArrow</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">width</span><span class="o">:</span> <span class="mi">30</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">height</span><span class="o">:</span> <span class="mi">90</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-image</span><span class="o">:</span> <span class="sx">url(&quot;/images/lyrics_left.png&quot;)</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">float</span><span class="o">:</span> <span class="no">left</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">leftArrow</span><span class="nd">:hover</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">background-position</span><span class="o">:</span> <span class="mi">-30</span><span class="kt">px</span> <span class="mi">0</span><span class="kt">px</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">rightArrow</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">width</span><span class="o">:</span> <span class="mi">30</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">height</span><span class="o">:</span> <span class="mi">90</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-image</span><span class="o">:</span> <span class="sx">url(&quot;/images/lyrics_right.png&quot;)</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">float</span><span class="o">:</span> <span class="no">right</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">rightArrow</span><span class="nd">:hover</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">background-position</span><span class="o">:</span> <span class="mi">-30</span><span class="kt">px</span> <span class="mi">0</span><span class="kt">px</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">lyric</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">font-family</span><span class="o">:</span> <span class="n">MS</span> <span class="n">Mincho</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">28</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">6</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span> <span class="c1">//居中显示</span>
+</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">32</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">translate</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">font-family</span><span class="o">:</span> <span class="n">KaiTi</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">22</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">6</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span> <span class="c1">//居中显示</span>
+</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">26</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">from</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">font-family</span><span class="o">:</span> <span class="n">MS</span> <span class="n">gothic</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">20</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-weight</span><span class="o">:</span> <span class="no">bold</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">right</span><span class="p">;</span> <span class="c1">//向右对齐</span>
+</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">24</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+</div></div></p>
+
+<h2>四、总结与展望</h2>
+
+<p>本文简单介绍了我为博客添加歌词栏的流程。在歌词栏添加好后，如果要添加新的歌词，只需要改动两个地方：首先是更新<code>source/lyrics/num.txt</code>中记录的歌词总数；其次是在<code>source/lyrics/</code>目录下建立一个新的文件保存要添加的歌词。已经写好的html代码和javascript代码均不需改动。这样的歌词栏已经大致满足了我的要求，但是必须承认，它还有一些可以改进的地方，在这里列出三点：<br/>
+1. 不需要利用一个额外的文件<code>num.txt</code>来存储歌词总数，而是直接通过文件夹下的文件数量获得歌词总数。我相信肯定有相关的API可供调用，但是到目前为止还仍未找到。<br/>
+2. 完善多分辨率支持，使得歌词栏在电脑、平板和手机上都可以正常显示。<br/>
+3. 改进css样式表，使得歌词栏的外观更加漂亮。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Octopress插件开发：点击展开与折叠]]></title>
