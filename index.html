@@ -9,7 +9,7 @@
   <meta name="author" content="smwlover">
 
   
-  <meta name="description" content="很久之前我就有将自己喜欢的歌曲分享给别人的梦想，而现在正值我的博客搭建完成，我终于可以通过在博客中加入歌词栏实现我的梦想了。这篇文章就来简单介绍一下在博客中添加歌词栏的流程。 ">
+  <meta name="description" content="RMQ是Random Maximum/Minimum Query的简称，顾名思义，是求解区间最值的问题。假设有一个无序的数组arr（大小为n），给定两个下标l和r，让我们求出arr[l]到arr[r]之间元素的最大值或最小值（我们称之为一次查询，即query），我们当然可以直接遍历这些元素， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -154,6 +154,40 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-23T15:02:32+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>3:02 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>RMQ是Random Maximum/Minimum Query的简称，顾名思义，是求解区间最值的问题。假设有一个无序的数组<code>arr</code>（大小为<code>n</code>），给定两个下标<code>l</code>和<code>r</code>，让我们求出<code>arr[l]</code>到<code>arr[r]</code>之间元素的最大值或最小值（我们称之为一次查询，即query），我们当然可以直接遍历这些元素，然后将结果输出。但是如果query的次数不是仅仅只有一次，而是成百上千次，难道我们每次输出对应结果的时候都需要遍历一遍相应的区间吗？</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/05/23/rmq-st/">继续阅读 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -420,13 +454,17 @@
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (7)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (1)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (2)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/22/lyric-bar/">在自己的博客中加入歌词栏</a>
@@ -442,10 +480,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/15/mahjong-plugin-2/">Octopress插件设计：mahjong(2)</a>
       </li>
     
   </ul>
