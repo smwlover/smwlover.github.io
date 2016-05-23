@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 算法 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-23T16:13:26+08:00</updated>
+  <updated>2016-05-23T16:27:48+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -31,7 +31,7 @@
 
 <h2>二、算法概述</h2>
 
-<p>上文提到过，RMQ-ST算法需要进行一个<code>O(nlogn)</code>的预处理步骤。该步骤建立了一个表格<code>table</code>，其中：<br/>
+<p>上文提到过，RMQ-ST算法需要进行一个<code>O(nlogn)</code>的预处理步骤，该步骤建立了一个表格<code>table</code>（ST是Sparse Table的简称，该算法被命名为RMQ-ST算法正是由此而来），其中：<br/>
 <code>table[i][0]</code>等于<code>arr[i]</code>；<br/>
 <code>table[i][1]</code>等于<code>arr[i]</code>到<code>arr[i+1]</code>之间元素（共<code>2</code>个元素）的最小值；<br/>
 <code>table[i][2]</code>等于<code>arr[i]</code>到<code>arr[i+3]</code>之间元素（共<code>4</code>个元素）的最小值；<br/>
