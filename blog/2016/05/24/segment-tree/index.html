@@ -1,0 +1,664 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>RMQ问题（二）：线段树 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="对线段树这种数据结构的描述">
+  <meta name="keywords" content="rmq, random, query, segment, tree, smwlover">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/05/24/segment-tree/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\n");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
+						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
+						adjustPos();
+					}
+				}
+			}
+		}
+	</script>
+	<div id="lyricsContent"">
+		<h3 id="lyric"></h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">RMQ问题（二）：线段树</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-24T20:00:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后，线段树可以在<code>O(logn)</code>的时间内进行更新（ST算法要进行更新，相当于重新生成一遍Sparse Table，其时间复杂度为<code>O(nlogn)</code>），并且对于每次查询，也可以在<code>O(logn)</code>的时间内给出答案。</p>
+
+<!--more-->
+
+
+<h2>一、概述</h2>
+
+<p>本文还是以求一段区间中元素的最小值问题为例，建立线段树这种数据结构。<br/>
+线段树首先是一棵普通的二叉树，每个节点都有指向自己的左右儿子的指针。但在此基础上，线段树的每个节点还表示一个区间<code>[l,r]</code>。如果<code>l</code>等于<code>r</code>，该节点就是一个叶子节点；否则该节点就是一个中间节点，其左儿子表示这个区间的前半部分<code>[l,(l+r)/2]</code>，其右儿子表示这个区间的后半部分<code>[(l+r)/2+1,r]</code>。线段树的根节点表示的是原数组对应的整个区间<code>[1,n]</code>。<br/>
+于是我们可以在脑海中大致勾勒出线段树的节点对应的数据结构<code>Node</code>的轮廓：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">Node</span><span class="p">{</span>
+</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span> <span class="c1">//指向左儿子的指针</span>
+</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span> <span class="c1">//指向右儿子的指针</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">leftIndex</span><span class="p">;</span> <span class="c1">//所表示区间的左边界</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">rightIndex</span><span class="p">;</span> <span class="c1">//所表示区间的右边界</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">minVal</span><span class="p">;</span> <span class="c1">//所表示区间中元素的最小值</span>
+</span><span class='line'>  <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">leftIndex</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">rightIndex</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">minVal</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">left</span><span class="p">(</span><span class="nb">NULL</span><span class="p">),</span> <span class="n">right</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>二、线段树的初始化</h2>
+
+<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个节点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个节点对应的区间如下图所示（图片来自hihoCoder）：<br/>
+<img src="/images/blogimg/4.png"><br/>
+构建完基本结构之后，下一步操作是计算每个节点对应的区间中元素的最小值。对于叶子节点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间节点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子节点的值，再根据子节点的值计算父节点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">SegmentTree</span><span class="p">{</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">root</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="nf">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="nf">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="nf">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="nf">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">SegmentTree</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">){}</span> <span class="c1">//Do not copy it!</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>  <span class="n">SegmentTree</span><span class="p">();</span>
+</span><span class='line'>  <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="nf">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Node</span><span class="o">*</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">left</span><span class="p">]);</span>
+</span><span class='line'>  <span class="k">else</span><span class="p">{</span>
+</span><span class='line'>      <span class="n">Node</span><span class="o">*</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>      <span class="n">res</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>      <span class="n">res</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">){</span>
+</span><span class='line'>      <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">){</span>
+</span><span class='line'>      <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">()</span><span class="o">:</span> <span class="n">root</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//由一个数组构造一个线段树：</span>
+</span><span class='line'><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>      <span class="n">root</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子节点的最小值</span>
+</span><span class='line'>  <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子节点的最小值</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>三、线段树的更新</h2>
+
+<p>所谓更新，就是在对应的数组<code>arr</code>中某个元素的值发生变化时，更新该线段树上的节点所记录的最小值。我们可以想象一下受影响的节点包括哪些：首先这个发生变化的元素对应的叶子节点的值肯定要更新，然后是叶子节点的父节点、叶子节点的祖父节点……最后是根节点。由于其他节点对应的区间没有包含该元素，因此其值不受影响。<br/>
+也就是说，我只需要找到从根节点到该叶子节点的路径，然后倒序更新该路径上节点的值就可以了。由于根节点到叶子节点的路径上节点数目为<code>O(logn)</code>，所以更新线段树的时间复杂度为<code>O(logn)</code>。代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//在更新一个元素的值的时候，用类似二分查找的方法更新查找路径上节点的值。</span>
+</span><span class='line'><span class="c1">//具体更新的方法是利用递归，先更新子节点，再根据子节点更新之后的值更新父节点。</span>
+</span><span class='line'><span class="c1">//这一步操作的复杂度是O(nlogn)。</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">index</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">){</span>
+</span><span class='line'>      <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">middle</span><span class="p">){</span>
+</span><span class='line'>      <span class="c1">//查找左子树：</span>
+</span><span class='line'>      <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>      <span class="c1">//查找右子树：</span>
+</span><span class='line'>      <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="c1">//更新该节点的最小值：</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>  <span class="n">updateNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>四、线段树的查询：</h2>
+
+<p>还是以上面所建立的10个元素的线段树为例：如果要查询的区间就是<code>[1,10]</code>，那么我们直接取出根节点记录的最小值就可以了。但如果不是<code>[1,10]</code>呢？又分为三种情况：<br/>
+首先，要查询的区间完全位于左子树，这个时候我们对左子树进行递归调用，获取查询结果即可；其次，要查询的区间完全位于右子树，类似地，我们对右子树进行递归调用；最后，要查询的区间横跨左右子树，这个时候，我们只能把这个区间<code>[l,r]</code>分为两部分，第一部分<code>[l,middle]</code>完全位于左子树中，第二部分<code>[middle+1,r]</code>完全位于右子树中，对两部分都进行递归调用，然后取两部分结果中较小的那一个。这一步的时间复杂度仍然是<code>O(logn)</code>，代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">left</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&gt;</span> <span class="n">middle</span> <span class="o">&amp;&amp;</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;=</span> <span class="n">middle</span> <span class="o">&amp;&amp;</span> <span class="n">right</span> <span class="o">&lt;=</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">else</span><span class="p">{</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">leftMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">rightMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nf">min</span><span class="p">(</span><span class="n">leftMin</span><span class="p">,</span> <span class="n">rightMin</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>五、总结</h2>
+
+<p>相比于RMQ-ST算法处理每次查询的<code>O(1)</code>时间复杂度，线段树在这方面要略逊一筹。但是，在原数组发生变化时，线段树可以做到更快地更新；并且线段树适用的场合也比RMQ-ST算法要广（求区间元素之和也可以用到线段树）。在求区间元素之和的问题上，还有一种数据结构也可以达到初始化是<code>O(n)</code>、更新和查询都是<code>O(logn)</code>复杂度的效率，那就是<strong>树状数组</strong>。并且这种数据结构实现起来比较小巧轻便，不像线段树这么庞大，动辄就递归调用。关于树状数组，之后我会在博客中介绍。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-24T20:00:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/bi-ji/'>笔记</a>, <a class='category' href='/blog/categories/suan-fa/'>算法</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/23/rmq-st/" title="Previous Post: RMQ问题（一）：RMQ-ST算法">&laquo; RMQ问题（一）：RMQ-ST算法</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (1)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (9)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (3)</a></li>
+
+  </ul>
+</section><section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/lyric-bar/">在自己的博客中加入歌词栏</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/20/binary-manipulation/">位运算的Tricks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/17/expand-plugin/">Octopress插件开发：点击展开与折叠</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_310_430_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="310" height="430" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/05/24/segment-tree/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/05/24/segment-tree/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>

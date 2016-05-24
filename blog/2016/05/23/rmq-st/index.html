@@ -202,7 +202,7 @@
 
 <p>说了这么半天，<code>table</code>到底是怎么生成的呢？其实，<code>table</code>的生成利用了<strong>动态规划</strong>的思想。当我们想要求出<code>table[i][k]</code>的值时，我们的想法是将长度为<code>2^k</code>的当前区间分为两半，每一半长度为<code>2^(k-1)</code>，然后分别获得两半的最小值，并取出两个最小值中较小的那一个。而这两半的最小值，则是我们已经计算出来的<code>table[i][k-1]</code>以及<code>table[i+2^(k-1)][k-1]</code>。我们可以写出该动态规划的状态转移方程：<br/>
 <code>F(i, 0) = arr[i]</code>；<br/>
-<code>F(i, k) = min(F(i, k-1), F(i+2^(k-1), k-1)</code>对于<code>k&gt;0</code>。<br/>
+<code>F(i, k) = min(F(i, k-1), F(i+2^(k-1), k-1))</code>对于<code>k&gt;0</code>。<br/>
 这个预处理的步骤其实就是生成一个<code>nlogn</code>大小的表格的步骤，所以时间复杂度为<code>O(nlogn)</code>，空间复杂度也为<code>O(nlogn)</code>。</p>
 
 <h2>四、完整代码</h2>
@@ -309,7 +309,10 @@
 
 <h2>五、展望</h2>
 
-<p>RMQ-ST算法高效地解决了RMQ问题，但是，对于解决其他种类的query问题就没有头绪了。比如：输入两个下标<code>i</code>和<code>j</code>，求这之间所有元素之和。这个时候，就要轮到<strong>线段树</strong>或者<strong>树状数组</strong>出马了。我将会在之后的文章中介绍这两种算法。</p>
+<p>RMQ-ST算法高效地解决了RMQ问题，但是，该算法也有一些局限性：<br/>
+1. 如果输入数据可能会多次发生变化，该算法在每次变化后，都需要重新生成一次Sparse Table，时间复杂度为<code>O(nlogn)</code>，比较耗时；<br/>
+2. 如果询问的内容不只局限于最大/最小值，而是涉及到其他内容（比如一段区间内元素的和），该算法便无法解决；<br/>
+这个时候，就要轮到<strong>线段树</strong>或者<strong>树状数组</strong>出马了。我将会在之后的文章中介绍这两种算法。</p>
 </div>
 
 
@@ -349,6 +352,8 @@
         <a class="basic-alignment left" href="/blog/2016/05/22/lyric-bar/" title="Previous Post: 在自己的博客中加入歌词栏">&laquo; 在自己的博客中加入歌词栏</a>
       
       
+        <a class="basic-alignment right" href="/blog/2016/05/24/segment-tree/" title="Next Post: RMQ问题（二）：线段树">RMQ问题（二）：线段树 &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -381,14 +386,19 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (1)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (9)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (3)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
@@ -404,10 +414,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/17/expand-plugin/">Octopress插件开发：点击展开与折叠</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
       </li>
     
   </ul>

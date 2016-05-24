@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[分类: 数据结构 | 美柑の部屋]]></title>
+  <link href="http://smwlover.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
+  <link href="http://smwlover.github.io/"/>
+  <updated>2016-05-24T21:48:39+08:00</updated>
+  <id>http://smwlover.github.io/</id>
+  <author>
+    <name><![CDATA[smwlover]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[RMQ问题（二）：线段树]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/24/segment-tree/"/>
+    <updated>2016-05-24T20:00:09+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/24/segment-tree</id>
+    <content type="html"><![CDATA[<p>在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后，线段树可以在<code>O(logn)</code>的时间内进行更新（ST算法要进行更新，相当于重新生成一遍Sparse Table，其时间复杂度为<code>O(nlogn)</code>），并且对于每次查询，也可以在<code>O(logn)</code>的时间内给出答案。</p>
+
+<!--more-->
+
+
+<h2>一、概述</h2>
+
+<p>本文还是以求一段区间中元素的最小值问题为例，建立线段树这种数据结构。<br/>
+线段树首先是一棵普通的二叉树，每个节点都有指向自己的左右儿子的指针。但在此基础上，线段树的每个节点还表示一个区间<code>[l,r]</code>。如果<code>l</code>等于<code>r</code>，该节点就是一个叶子节点；否则该节点就是一个中间节点，其左儿子表示这个区间的前半部分<code>[l,(l+r)/2]</code>，其右儿子表示这个区间的后半部分<code>[(l+r)/2+1,r]</code>。线段树的根节点表示的是原数组对应的整个区间<code>[1,n]</code>。<br/>
+于是我们可以在脑海中大致勾勒出线段树的节点对应的数据结构<code>Node</code>的轮廓：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">Node</span><span class="p">{</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">left</span><span class="p">;</span> <span class="c1">//指向左儿子的指针</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">right</span><span class="p">;</span> <span class="c1">//指向右儿子的指针</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">leftIndex</span><span class="p">;</span> <span class="c1">//所表示区间的左边界</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rightIndex</span><span class="p">;</span> <span class="c1">//所表示区间的右边界</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span><span class="p">;</span> <span class="c1">//所表示区间中元素的最小值</span>
+</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">leftIndex</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">rightIndex</span><span class="o">&amp;</span><span class="n">reg</span><span class="p">;,</span> <span class="n">minVal</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">left</span><span class="p">(</span><span class="nb">NULL</span><span class="p">),</span> <span class="n">right</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>二、线段树的初始化</h2>
+
+<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个节点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个节点对应的区间如下图所示（图片来自hihoCoder）：<br/>
+<img src="/images/blogimg/4.png"><br/>
+构建完基本结构之后，下一步操作是计算每个节点对应的区间中元素的最小值。对于叶子节点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间节点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子节点的值，再根据子节点的值计算父节点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">SegmentTree</span><span class="p">{</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">root</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">node</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">SegmentTree</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">s</span><span class="p">){}</span> <span class="c1">//Do not copy it!</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">left</span><span class="p">]);</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">res</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">res</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'><span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">()</span><span class="o">:</span> <span class="n">root</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">//由一个数组构造一个线段树：</span>
+</span><span class='line'><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">root</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子节点的最小值</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子节点的最小值</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>三、线段树的更新</h2>
+
+<p>所谓更新，就是在对应的数组<code>arr</code>中某个元素的值发生变化时，更新该线段树上的节点所记录的最小值。我们可以想象一下受影响的节点包括哪些：首先这个发生变化的元素对应的叶子节点的值肯定要更新，然后是叶子节点的父节点、叶子节点的祖父节点……最后是根节点。由于其他节点对应的区间没有包含该元素，因此其值不受影响。<br/>
+也就是说，我只需要找到从根节点到该叶子节点的路径，然后倒序更新该路径上节点的值就可以了。由于根节点到叶子节点的路径上节点数目为<code>O(logn)</code>，所以更新线段树的时间复杂度为<code>O(logn)</code>。代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//在更新一个元素的值的时候，用类似二分查找的方法更新查找路径上节点的值。</span>
+</span><span class='line'><span class="c1">//具体更新的方法是利用递归，先更新子节点，再根据子节点更新之后的值更新父节点。</span>
+</span><span class='line'><span class="c1">//这一步操作的复杂度是O(nlogn)。</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">index</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">index</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">middle</span><span class="p">){</span>
+</span><span class='line'>        <span class="c1">//查找左子树：</span>
+</span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="c1">//查找右子树：</span>
+</span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//更新该节点的最小值：</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">updateNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>四、线段树的查询：</h2>
+
+<p>还是以上面所建立的10个元素的线段树为例：如果要查询的区间就是<code>[1,10]</code>，那么我们直接取出根节点记录的最小值就可以了。但如果不是<code>[1,10]</code>呢？又分为三种情况：<br/>
+首先，要查询的区间完全位于左子树，这个时候我们对左子树进行递归调用，获取查询结果即可；其次，要查询的区间完全位于右子树，类似地，我们对右子树进行递归调用；最后，要查询的区间横跨左右子树，这个时候，我们只能把这个区间<code>[l,r]</code>分为两部分，第一部分<code>[l,middle]</code>完全位于左子树中，第二部分<code>[middle+1,r]</code>完全位于右子树中，对两部分都进行递归调用，然后取两部分结果中较小的那一个。这一步的时间复杂度仍然是<code>O(logn)</code>，代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">left</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">middle</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">right</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">middle</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">right</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">leftMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rightMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nf">min</span><span class="p">(</span><span class="n">leftMin</span><span class="p">,</span> <span class="n">rightMin</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>五、总结</h2>
+
+<p>相比于RMQ-ST算法处理每次查询的<code>O(1)</code>时间复杂度，线段树在这方面要略逊一筹。但是，在原数组发生变化时，线段树可以做到更快地更新；并且线段树适用的场合也比RMQ-ST算法要广（求区间元素之和也可以用到线段树）。在求区间元素之和的问题上，还有一种数据结构也可以达到初始化是<code>O(n)</code>、更新和查询都是<code>O(logn)</code>复杂度的效率，那就是<strong>树状数组</strong>。并且这种数据结构实现起来比较小巧轻便，不像线段树这么庞大，动辄就递归调用。关于树状数组，之后我会在博客中介绍。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 笔记 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/bi-ji/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-23T16:27:48+08:00</updated>
+  <updated>2016-05-24T21:48:39+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,298 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RMQ问题（二）：线段树]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/24/segment-tree/"/>
+    <updated>2016-05-24T20:00:09+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/24/segment-tree</id>
+    <content type="html"><![CDATA[<p>在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后，线段树可以在<code>O(logn)</code>的时间内进行更新（ST算法要进行更新，相当于重新生成一遍Sparse Table，其时间复杂度为<code>O(nlogn)</code>），并且对于每次查询，也可以在<code>O(logn)</code>的时间内给出答案。</p>
+
+<!--more-->
+
+
+<h2>一、概述</h2>
+
+<p>本文还是以求一段区间中元素的最小值问题为例，建立线段树这种数据结构。<br/>
+线段树首先是一棵普通的二叉树，每个节点都有指向自己的左右儿子的指针。但在此基础上，线段树的每个节点还表示一个区间<code>[l,r]</code>。如果<code>l</code>等于<code>r</code>，该节点就是一个叶子节点；否则该节点就是一个中间节点，其左儿子表示这个区间的前半部分<code>[l,(l+r)/2]</code>，其右儿子表示这个区间的后半部分<code>[(l+r)/2+1,r]</code>。线段树的根节点表示的是原数组对应的整个区间<code>[1,n]</code>。<br/>
+于是我们可以在脑海中大致勾勒出线段树的节点对应的数据结构<code>Node</code>的轮廓：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">Node</span><span class="p">{</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">left</span><span class="p">;</span> <span class="c1">//指向左儿子的指针</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">right</span><span class="p">;</span> <span class="c1">//指向右儿子的指针</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">leftIndex</span><span class="p">;</span> <span class="c1">//所表示区间的左边界</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rightIndex</span><span class="p">;</span> <span class="c1">//所表示区间的右边界</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span><span class="p">;</span> <span class="c1">//所表示区间中元素的最小值</span>
+</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">leftIndex</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">rightIndex</span><span class="o">&amp;</span><span class="n">reg</span><span class="p">;,</span> <span class="n">minVal</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">left</span><span class="p">(</span><span class="nb">NULL</span><span class="p">),</span> <span class="n">right</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>二、线段树的初始化</h2>
+
+<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个节点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个节点对应的区间如下图所示（图片来自hihoCoder）：<br/>
+<img src="/images/blogimg/4.png"><br/>
+构建完基本结构之后，下一步操作是计算每个节点对应的区间中元素的最小值。对于叶子节点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间节点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子节点的值，再根据子节点的值计算父节点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">SegmentTree</span><span class="p">{</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">root</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">node</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">SegmentTree</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">s</span><span class="p">){}</span> <span class="c1">//Do not copy it!</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">left</span><span class="p">]);</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">Node</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">res</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">res</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'><span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">()</span><span class="o">:</span> <span class="n">root</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">//由一个数组构造一个线段树：</span>
+</span><span class='line'><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">root</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子节点的最小值</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子节点的最小值</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>三、线段树的更新</h2>
+
+<p>所谓更新，就是在对应的数组<code>arr</code>中某个元素的值发生变化时，更新该线段树上的节点所记录的最小值。我们可以想象一下受影响的节点包括哪些：首先这个发生变化的元素对应的叶子节点的值肯定要更新，然后是叶子节点的父节点、叶子节点的祖父节点……最后是根节点。由于其他节点对应的区间没有包含该元素，因此其值不受影响。<br/>
+也就是说，我只需要找到从根节点到该叶子节点的路径，然后倒序更新该路径上节点的值就可以了。由于根节点到叶子节点的路径上节点数目为<code>O(logn)</code>，所以更新线段树的时间复杂度为<code>O(logn)</code>。代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//在更新一个元素的值的时候，用类似二分查找的方法更新查找路径上节点的值。</span>
+</span><span class='line'><span class="c1">//具体更新的方法是利用递归，先更新子节点，再根据子节点更新之后的值更新父节点。</span>
+</span><span class='line'><span class="c1">//这一步操作的复杂度是O(nlogn)。</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">index</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">index</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">middle</span><span class="p">){</span>
+</span><span class='line'>        <span class="c1">//查找左子树：</span>
+</span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="c1">//查找右子树：</span>
+</span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//更新该节点的最小值：</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">updateNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>四、线段树的查询：</h2>
+
+<p>还是以上面所建立的10个元素的线段树为例：如果要查询的区间就是<code>[1,10]</code>，那么我们直接取出根节点记录的最小值就可以了。但如果不是<code>[1,10]</code>呢？又分为三种情况：<br/>
+首先，要查询的区间完全位于左子树，这个时候我们对左子树进行递归调用，获取查询结果即可；其次，要查询的区间完全位于右子树，类似地，我们对右子树进行递归调用；最后，要查询的区间横跨左右子树，这个时候，我们只能把这个区间<code>[l,r]</code>分为两部分，第一部分<code>[l,middle]</code>完全位于左子树中，第二部分<code>[middle+1,r]</code>完全位于右子树中，对两部分都进行递归调用，然后取两部分结果中较小的那一个。这一步的时间复杂度仍然是<code>O(logn)</code>，代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">left</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">middle</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">right</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">middle</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">right</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">leftMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rightMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nf">min</span><span class="p">(</span><span class="n">leftMin</span><span class="p">,</span> <span class="n">rightMin</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>五、总结</h2>
+
+<p>相比于RMQ-ST算法处理每次查询的<code>O(1)</code>时间复杂度，线段树在这方面要略逊一筹。但是，在原数组发生变化时，线段树可以做到更快地更新；并且线段树适用的场合也比RMQ-ST算法要广（求区间元素之和也可以用到线段树）。在求区间元素之和的问题上，还有一种数据结构也可以达到初始化是<code>O(n)</code>、更新和查询都是<code>O(logn)</code>复杂度的效率，那就是<strong>树状数组</strong>。并且这种数据结构实现起来比较小巧轻便，不像线段树这么庞大，动辄就递归调用。关于树状数组，之后我会在博客中介绍。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RMQ问题（一）：RMQ-ST算法]]></title>
@@ -47,7 +339,7 @@
 
 <p>说了这么半天，<code>table</code>到底是怎么生成的呢？其实，<code>table</code>的生成利用了<strong>动态规划</strong>的思想。当我们想要求出<code>table[i][k]</code>的值时，我们的想法是将长度为<code>2^k</code>的当前区间分为两半，每一半长度为<code>2^(k-1)</code>，然后分别获得两半的最小值，并取出两个最小值中较小的那一个。而这两半的最小值，则是我们已经计算出来的<code>table[i][k-1]</code>以及<code>table[i+2^(k-1)][k-1]</code>。我们可以写出该动态规划的状态转移方程：<br/>
 <code>F(i, 0) = arr[i]</code>；<br/>
-<code>F(i, k) = min(F(i, k-1), F(i+2^(k-1), k-1)</code>对于<code>k&gt;0</code>。<br/>
+<code>F(i, k) = min(F(i, k-1), F(i+2^(k-1), k-1))</code>对于<code>k&gt;0</code>。<br/>
 这个预处理的步骤其实就是生成一个<code>nlogn</code>大小的表格的步骤，所以时间复杂度为<code>O(nlogn)</code>，空间复杂度也为<code>O(nlogn)</code>。</p>
 
 <h2>四、完整代码</h2>
@@ -165,7 +457,10 @@
 
 <h2>五、展望</h2>
 
-<p>RMQ-ST算法高效地解决了RMQ问题，但是，对于解决其他种类的query问题就没有头绪了。比如：输入两个下标<code>i</code>和<code>j</code>，求这之间所有元素之和。这个时候，就要轮到<strong>线段树</strong>或者<strong>树状数组</strong>出马了。我将会在之后的文章中介绍这两种算法。</p>
+<p>RMQ-ST算法高效地解决了RMQ问题，但是，该算法也有一些局限性：<br/>
+1. 如果输入数据可能会多次发生变化，该算法在每次变化后，都需要重新生成一次Sparse Table，时间复杂度为<code>O(nlogn)</code>，比较耗时；<br/>
+2. 如果询问的内容不只局限于最大/最小值，而是涉及到其他内容（比如一段区间内元素的和），该算法便无法解决；<br/>
+这个时候，就要轮到<strong>线段树</strong>或者<strong>树状数组</strong>出马了。我将会在之后的文章中介绍这两种算法。</p>
 ]]></content>
   </entry>
   
@@ -1344,311 +1639,6 @@
 至于Octopress为什么不能正确解析插件内部的一些markdown语法，这东西太<ruby><rb>高端</rb><rp>(</rp><rt class="rubytagrt">扯淡</rt><rp>)</rp></ruby>了，我反正不想管了。<br/>
 要换行的时候就加个<code>&lt;br/&gt;</code>吧，反正就五个字符，也不会累死人。
 </div></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[更多Octopress插件来袭]]></title>
-    <link href="http://smwlover.github.io/blog/2016/05/16/more-plugins/"/>
-    <updated>2016-05-16T19:18:17+08:00</updated>
-    <id>http://smwlover.github.io/blog/2016/05/16/more-plugins</id>
-    <content type="html"><![CDATA[<p>有需求才会有动力，在上两篇博客中，因为我想介绍关于日麻的内容，所以我开发了两款用于显示日麻图片的插件<code>mahjong</code>和<code>majonglist</code>。然而今天，我在逛<a href="https://zh.moegirl.org/Mainpage">萌娘百科</a>时发现里面有一些很cool的东西，这么cool的东西能够搬到自己的博客中来不是极好的吗？所以，我又开发了三个简易的Octopress插件。</p>
-
-<!--more-->
-
-
-<h2>第一个插件：删除线</h2>
-
-<p><del>其实这个东西根本没必要写成插件的</del>   ←就是这样的效果。<br/>
-之前说到过，所谓Octopress的插件，其实就是把我们在markdown文件中写的内容转化为html的工具，要写关于删除线的插件，就要先弄明白删除线在html里是怎么表示的。我随便找了一个有删除线的萌娘百科网页，通过F12键查看源代码……<br/>
-<img src="/images/blogimg/1.png"><br/>
-可以发现，删除线什么的，就是用<code>&lt;del&gt;</code>和<code>&lt;/del&gt;</code>标签括起来嘛！所以写markdown的时候直接手动加上这样的两个标签就可以了，也不麻烦，<del>根本用不着什么插件嘛</del>。<br/>
-不过，写就写了，语法是<code>{% delete sentence %}</code>。看看代码吧，反正就几行：</p>
-
-<p><figure class='code'><figcaption><span>delete.rb </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  class DeleteTag &amp;lt; Liquid::Tag</span>
-</span><span class='line'><span class="sr">    def initialize(tag_name, markup, tokens)</span>
-</span><span class='line'><span class="sr">        @content = &amp;ldquo;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="sr">&amp;rdquo;.strip</span>
-</span><span class='line'><span class="sr">        super</span>
-</span><span class='line'><span class="sr">    end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>    <span class="s2">&quot;&amp;lt;del&amp;gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&amp;lt;/del&amp;gt;&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;delete&amp;rsquo;, Jekyll::DeleteTag)</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h2>第二个插件：36K钛合金防剧透屏障</h2>
-
-<p><span class="mask">这是什么中二爆表的名字</span> ←就是这样的效果。<br/>
-同理，我们要查看一下相应的html是怎么写的，我找到的网页如下：<br/>
-<img src="/images/blogimg/2.png"><br/>
-我们可以发现，这是一种特殊类别的<code>&lt;span&gt;</code>，在css分类器中为这种<code>&lt;span&gt;</code>定义了特殊的样式表，使得文字颜色和背景色相同，就可以达到“防剧透屏障”的效果。我们也照葫芦画瓢，开发一个语法为<code>{% mask sentence %}</code>的插件：</p>
-
-<p><figure class='code'><figcaption><span>mask.rb </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  class MaskTag &amp;lt; Liquid::Tag</span>
-</span><span class='line'><span class="sr">    def initialize(tag_name, markup, tokens)</span>
-</span><span class='line'><span class="sr">        @content = &amp;ldquo;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="sr">&amp;rdquo;.strip</span>
-</span><span class='line'><span class="sr">        super</span>
-</span><span class='line'><span class="sr">    end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>    <span class="s2">&quot;&amp;lt;span class=</span><span class="se">\&quot;</span><span class="s2">mask</span><span class="se">\&quot;</span><span class="s2">&amp;gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&amp;lt;/span&amp;gt;&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;mask&amp;rsquo;, Jekyll::MaskTag)</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>我们定义了一种类别叫<code>mask</code>，然后我们需要到<code>sass/custom/_styles.scss</code>中定义<code>mask</code>对应的样式：</p>
-
-<p><figure class='code'><figcaption><span>_styles.scss </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Mask Plugin:</span>
-</span><span class='line'><span class="nc">.mask</span><span class="p">{</span>
-</span><span class='line'>        <span class="na">background-color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
-</span><span class='line'>        <span class="na">color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
-</span><span class='line'>        <span class="na">text-shadow</span><span class="o">:</span> <span class="no">none</span> <span class="nv">!important</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h2>第三个插件：写作xx读作xx</h2>
-
-<p>不知道大家看过《<ruby><rb>Clannad</rb><rp>(</rp><rt class="rubytagrt">人生</rt><rp>)</rp></ruby>》没有？ ←就是这样的效果。当然，这种效果还可以用来对日语进行注音，比如“<ruby><rb>学</rb><rp>(</rp><rt class="rubytagrt">がっ</rt><rp>)</rp></ruby><ruby><rb>校</rb><rp>(</rp><rt class="rubytagrt">こう</rt><rp>)</rp></ruby>”。<br/>
-日语中，经常见到用假名在汉字上方标明读音的情况，这种情况叫振假名（<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>）。又因为日文印刷时以五号格大小的振假名为标准，并且五号格大小的文字在印刷行业被简称为ruby，所以振假名也有“<ruby><rb>ルビー</rb><rp>(</rp><rt class="rubytagrt">ruby</rt><rp>)</rp></ruby>”的别称。所以，我把这个插件的名字叫做<code>rubytag</code>。<br/>
-同样，我找到了萌娘百科的一个网页，观察振假名的具体实现方式：<br/>
-<img src="/images/blogimg/3.png"><br/>
-可以发现，这种效果正是利用html一个叫做<code>&lt;ruby&gt;</code>的标签实现的。其中，<code>&lt;rb&gt;&lt;/rb&gt;</code>中的内容是下面的文字，<code>&lt;rt&gt;&lt;/rt&gt;</code>中的内容是上面的标注。通过调查发现，一般情况下，<code>&lt;rp&gt;&lt;/rp&gt;</code>中的内容是不显示的，但是在不支持<code>&lt;ruby&gt;</code>标签的浏览器中，<code>&lt;rp&gt;(&lt;/rp&gt;</code>和<code>&lt;rp&gt;)&lt;/rp&gt;</code>中的内容就会显示出来，使得标注不是显示在文字上方，而是显示在由<code>&lt;rp&gt;</code>组成的一对括号中，效果类似于“学(がっ)校(こう)”。<br/>
-总体来讲，这个插件的逻辑比上面两个插件要复杂一些，但是比起前面的<code>mahjonglist</code>来还是较为简单的。我定义了本插件的语法为<code>{% rubytag word1[-tag1]/word2[-tag2]/... %}</code>，其中不同的单词之间用<code>/</code>分割，每个单词及其注音则用<code>-</code>分割。本插件允许不带注音的单词，这种情况下该单词就会被当成一个普通文本来显示。<br/>
-实现本插件的代码如下，总体来讲就是一个<code>string.split</code>函数的调用过程：</p>
-
-<p><figure class='code'><figcaption><span>rubytag.rb </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  class RubyTag &amp;lt; Liquid::Tag&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>    <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span>
-</span><span class='line'>    <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>    <span class="vi">@result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>    <span class="n">arr</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>    <span class="k">while</span> <span class="n">count</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">word</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
-</span><span class='line'>        <span class="n">word</span><span class="o">.</span><span class="n">strip!</span>
-</span><span class='line'>        <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">size</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span>
-</span><span class='line'>            <span class="n">parts</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-</span><span class='line'>            <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">2</span>
-</span><span class='line'>                <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;每组对应关系中内容太多&quot;</span>
-</span><span class='line'>                <span class="k">break</span>
-</span><span class='line'>            <span class="k">elsif</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="mi">2</span>
-</span><span class='line'>                <span class="n">html</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'>                <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
-</span><span class='line'>            <span class="k">else</span>
-</span><span class='line'>                <span class="n">rb</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'>                <span class="n">rt</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
-</span><span class='line'>                <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&amp;lt;ruby&amp;gt;&amp;lt;rb&amp;gt;</span><span class="si">#{</span><span class="n">rb</span><span class="si">}</span><span class="s2">&amp;lt;/rb&amp;gt;&amp;lt;rp&amp;gt;(&amp;lt;/rp&amp;gt;&amp;lt;rt class=</span><span class="se">\&quot;</span><span class="s2">rubytagrt</span><span class="se">\&quot;</span><span class="s2">&amp;gt;</span><span class="si">#{</span><span class="n">rt</span><span class="si">}</span><span class="s2">&amp;lt;/rt&amp;gt;&amp;lt;rp&amp;gt;)&amp;lt;/rp&amp;gt;&amp;lt;/ruby&amp;gt;&quot;</span>
-</span><span class='line'>                <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
-</span><span class='line'>            <span class="k">end</span>
-</span><span class='line'>        <span class="k">end</span>
-</span><span class='line'>        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>    <span class="k">super</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">if</span> <span class="vi">@successful</span>
-</span><span class='line'>        <span class="vi">@result</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>        <span class="s2">&quot;&amp;lt;strong&amp;gt;错误：</span><span class="si">#{</span><span class="vi">@information</span><span class="si">}</span><span class="s2">&amp;lt;/strong&amp;gt;&quot;</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;rubytag&amp;rsquo;, Jekyll::RubyTag)</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>由于默认的日文标注字体太丑陋，我新定义了一种标注类别<code>rubytagrt</code>，将其字体改为较美观的微软雅黑。当然这一步仍然需要修改<code>_styles.scss</code>：</p>
-
-<p><figure class='code'><figcaption><span>_styles.scss </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Rubytag Plugin:</span>
-</span><span class='line'><span class="nc">.rubytagrt</span><span class="p">{</span>
-</span><span class='line'>        <span class="na">font-family</span><span class="o">:</span> <span class="n">microsoft</span> <span class="n">yahei</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>到此为止，这个插件的开发就告一段落，那么我们可以输入各种各样的用例，测试插件的显示效果了：<br/>
-1. 正常情况：<code>{% rubytag 明日-あした %}</code>会显示成<ruby><rb>明日</rb><rp>(</rp><rt class="rubytagrt">あした</rt><rp>)</rp></ruby>；<br/>
-2. 包含多个单词的情况：<code>{% rubytag 明-みょう/日-にち %}</code>会显示成<ruby><rb>明</rb><rp>(</rp><rt class="rubytagrt">みょう</rt><rp>)</rp></ruby><ruby><rb>日</rb><rp>(</rp><rt class="rubytagrt">にち</rt><rp>)</rp></ruby>；<br/>
-3. 包含多个单词，但是有些单词没有标注的情况：<code>{% rubytag 振-ふ/り/仮-が/名-な %}</code>会显示成<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>；<br/>
-4. 错误情况：<code>{% rubytag 明-みょう-日-にち %}</code>会显示成<strong>错误：每组对应关系中内容太多</strong>。</p>
-
-<h3>Octopress插件的嵌套浅析</h3>
-
-<p>在插件测试中，我发现了一个神奇的事情：本插件可以嵌套在一些<code>Block</code>类型的Octopress插件中使用。比如下面的例子，我就将本插件嵌套进了<code>blockquote</code>插件中：</p>
-
-<p><blockquote><p><ruby><rb>迷</rb><rp>(</rp><rt class="rubytagrt">まよ</rt><rp>)</rp></ruby>いはないよ、<ruby><rb>固</rb><rp>(</rp><rt class="rubytagrt">かた</rt><rp>)</rp></ruby>く<ruby><rb>決</rb><rp>(</rp><rt class="rubytagrt">き</rt><rp>)</rp></ruby>めたから。<ruby><rb>涙</rb><rp>(</rp><rt class="rubytagrt">なみだ</rt><rp>)</rp></ruby>は<ruby><rb>見</rb><rp>(</rp><rt class="rubytagrt">み</rt><rp>)</rp></ruby>せないと<ruby><rb>誓</rb><rp>(</rp><rt class="rubytagrt">ちか</rt><rp>)</rp></ruby>った。<br/>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。</p><footer><strong>阿万音铃羽</strong> <cite>虹色の光りの中で</cite></footer></blockquote></p>
-
-<p>对应的markdown文件如下：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{% blockquote 阿万音铃羽, 虹色の光りの中で %}
-</span><span class='line'>{% rubytag 迷-まよ/いはないよ、/固-かた/く/決-き/めたから。/涙-なみだ/は/見-み/せないと/誓-ちか/った。 %}
-</span><span class='line'>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。
-</span><span class='line'>{% endblockquote %}</span></code></pre></td></tr></table></div></figure></p>
-
-<p>关于产生这种现象的原因，我研究了一下<code>blockquote.rb</code>，可以发现，在该代码的47行处有这样的一段话：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">quote</span> <span class="o">=</span> <span class="n">paragraphize</span><span class="p">(</span><span class="k">super</span><span class="p">)</span>
-</span><span class='line'>    <span class="c1">#以下省略</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>那么这个<code>super</code>究竟代表什么呢？通过查阅资料发现，Ruby中<code>super</code>指<strong>调用父类的同名函数，并将本函数的所有参数传入父类的同名函数</strong>。上面的代码中调用的就是其父类的<code>render(context)</code>函数。我们可以在这一行代码的前面加入<code>print super</code>，然后运行<code>rake generate</code>，看看其父类的<code>render(context)</code>函数究竟会返回什么。我们发现，输出的结果正是将嵌套在其内部的标识符<code>rubytag</code>解析完成之后的结果：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ruby>&lt;rb>迷&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">まよ&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>いはないよ、&lt;ruby>&lt;rb>固&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">かた&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>く&lt;ruby>&lt;rb>決&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">き&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>めたから。&lt;ruby>&lt;rb>涙&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">なみだ&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>は&lt;ruby>&lt;rb>見&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">み&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>せないと&lt;ruby>&lt;rb>誓&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">ちか&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>った。
-</span><span class='line'>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。</span></code></pre></td></tr></table></div></figure></p>
-
-<p>通过这个结果，我们可以得出一个猜想：在<code>Block</code>类型标识符的解析过程中，Octopress会先解析被该标识符包裹的内容，如果这些内容中有子标识符存在，那么先解析它们并且将它们转化为html代码，然后才是对该<code>Block</code>类型标识符本身的解析。<br/>
-对于<code>blockquote.rb</code>来讲，它在<code>render(context)</code>函数中通过<code>super</code>获得对其包裹的内容的解析结果，然后再通过<code>paragraphize(super)</code>对这个结果进行进一步的处理，该函数的代码如下：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">paragraphize</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
-</span><span class='line'>    <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="c1">#{input.lstrip.rstrip.gsub(/\n\n/, &amp;lsquo;&lt;/p&gt;&lt;p&gt;&amp;rsquo;).gsub(/\n/, &amp;lsquo;&lt;br/&gt;&amp;rsquo;)}&lt;/p&gt;&amp;rdquo;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>通过观察这段代码，我们发现，该函数对其包裹的内容的处理至少涉及三个方面：<br/>
-1. 在其包裹的内容前后添加<code>&lt;p&gt;</code>和<code>&lt;/p&gt;</code>标签；<br/>
-2. 将其包裹的内容中的<code>\n\n</code>替换为<code>&lt;/p&gt;&lt;p&gt;</code>标签；<br/>
-3. 将其包裹的内容中的<code>\n</code>替换为<code>&lt;br/&gt;</code>标签。<br/>
-说到这里，我忽然想到，在写markdown文件的时候，我们其实经常用到一个插件去嵌套其他插件，那就是<code>{% raw %}</code>。那么<code>{% raw %}</code>是如何避免解析被其包裹的内容的呢？笔者观察了<code>raw.rb</code>，但还是没有研究出答案。</p>
-
-<h2>总结与展望：</h2>
-
-<p>还是那句话，有需求才会有动力。获取某天，我又偶然间发现了什么想搬到自己博客中来的东西，于是又开发了一个新的Octopress插件呢。这也是有可能的，不是么？</p>
 ]]></content>
   </entry>
   

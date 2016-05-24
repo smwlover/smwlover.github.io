@@ -9,7 +9,7 @@
   <meta name="author" content="smwlover">
 
   
-  <meta name="description" content="RMQ是Random Maximum/Minimum Query的简称，顾名思义，是求解区间最值的问题。假设有一个无序的数组arr（大小为n），给定两个下标l和r，让我们求出arr[l]到arr[r]之间元素的最大值或最小值（我们称之为一次查询，即query），我们当然可以直接遍历这些元素， &hellip;">
+  <meta name="description" content="在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -154,6 +154,40 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-24T20:00:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后，线段树可以在<code>O(logn)</code>的时间内进行更新（ST算法要进行更新，相当于重新生成一遍Sparse Table，其时间复杂度为<code>O(nlogn)</code>），并且对于每次查询，也可以在<code>O(logn)</code>的时间内给出答案。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/05/24/segment-tree/">继续阅读 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -393,41 +427,9 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/14/how-to-build-my-own-blog/">如何搭建基于Octopress的博客</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-14T13:29:41+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>1:29 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>本文介绍了我在Windows操作系统下，从零开始搭建基于Octopress的博客，并且为自己的博客添加一些个性化内容的简要流程。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/05/14/how-to-build-my-own-blog/">继续阅读 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/posts/2">&larr; 之前的文章</a>
     
     <a href="/blog/archives">文档列表</a>
     
@@ -453,14 +455,19 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (1)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (9)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (3)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
@@ -476,10 +483,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/17/expand-plugin/">Octopress插件开发：点击展开与折叠</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/16/more-plugins/">更多Octopress插件来袭</a>
       </li>
     
   </ul>
