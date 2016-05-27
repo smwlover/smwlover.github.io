@@ -9,7 +9,7 @@
   <meta name="author" content="smwlover">
 
   
-  <meta name="description" content="在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后 &hellip;">
+  <meta name="description" content="这篇文章介绍了一种叫做树状数组（Binary Indexed Tree）的数据结构，与之前提到的线段树一样，这种数据结构可以解决“求区间内元素之和”的Random Query问题，并且其初始化的时间复杂度是O(n)、更新和查询的时间复杂度都是O(logn)。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -154,6 +154,40 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/27/binary-indexed-tree/">Random Query之树状数组</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-27T14:09:26+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>2:09 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这篇文章介绍了一种叫做树状数组（Binary Indexed Tree）的数据结构，与之前提到的线段树一样，这种数据结构可以解决“求区间内元素之和”的Random Query问题，并且其初始化的时间复杂度是<code>O(n)</code>、更新和查询的时间复杂度都是<code>O(logn)</code>。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/05/27/binary-indexed-tree/">继续阅读 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -393,40 +427,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/14/mahjong-plugin/">Octopress插件设计：mahjong</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-14T22:22:20+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:22 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>我接触日本麻将（简称日麻），是从《天才麻将少女》这部动漫开始的，从那之后便跳进日麻的坑中无法自拔，到现在为止已经将近一年了。在这一年中，我对日本麻将也有了一些自己的理解与感悟，我也很希望将这些东西在我的博客上与大家分享。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/05/14/mahjong-plugin/">继续阅读 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; 之前的文章</a>
@@ -455,15 +455,19 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (1)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (2)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (9)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (3)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (10)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (4)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/27/binary-indexed-tree/">Random Query之树状数组</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
@@ -479,10 +483,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/20/binary-manipulation/">位运算的Tricks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/17/expand-plugin/">Octopress插件开发：点击展开与折叠</a>
       </li>
     
   </ul>
@@ -542,6 +542,9 @@
     </li>
     <li>
       <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
     </li>
   </ul>
 </section>

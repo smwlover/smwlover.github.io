@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 数据结构 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-24T21:48:39+08:00</updated>
+  <updated>2016-05-27T20:07:01+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,194 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Random Query之树状数组]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree/"/>
+    <updated>2016-05-27T14:09:26+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree</id>
+    <content type="html"><![CDATA[<p>这篇文章介绍了一种叫做树状数组（Binary Indexed Tree）的数据结构，与之前提到的线段树一样，这种数据结构可以解决“求区间内元素之和”的Random Query问题，并且其初始化的时间复杂度是<code>O(n)</code>、更新和查询的时间复杂度都是<code>O(logn)</code>。</p>
+
+<!--more-->
+
+
+<h2>一、概览</h2>
+
+<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：<br/>
+<code>e[1] = a[1]</code><br/>
+<code>e[2] = a[1] + a[2]</code><br/>
+<code>e[3] = a[3]</code><br/>
+<code>e[4] = a[1] + a[2] + a[3] + a[4]</code><br/>
+<code>e[5] = a[5]</code><br/>
+<code>e[6] = a[5] + a[6]</code><br/>
+<code>e[7] = a[7]</code><br/>
+<code>e[8] = a[1] + a[2] + a[3] + a[4] + ... + a[8]</code></p>
+
+<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：<br/>
+<img src="/images/blogimg/5.png"></p>
+
+<h2>二、查询</h2>
+
+<p>那么树状数组<code>e</code>和原数组<code>a</code>到底有什么对应关系呢？我们可以设想：<strong>对于一个正整数<code>num</code>，我们可以求得一个最大的非负整数，它满足：该整数小于<code>num</code>，且二进制表示中末尾的0个数比<code>num</code>多</strong>。举几个例子：如果<code>num=5</code>，我们所求得的整数就应该是4；如果<code>num=6</code>，我们所求得的整数仍然是4；如果<code>num=8</code>，我们所求得的整数就应该是0。<br/>
+我们把我们所求得的整数记作<code>prev(num)</code>，然后我们就得到了树状数组<code>e</code>和原数组<code>a</code>的对应关系：<code>e[num] = a[prev(num)+1] + ... + a[num]</code>。</p>
+
+<h4>prev(num)的求法</h4>
+
+<p>我们定义一个函数<code>lowbit(num)</code>，该函数的结果保留了<code>num</code>最低位的1，而将它左边的所有位全部清零。比如对于<code>num=5</code>，<code>lowbit(num) = 1</code>；对于<code>num=6</code>，<code>lowbit(num) = 2</code>；对于<code>num=8</code>，<code>lowbit(num) = 8</code>。该函数的实现如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">lowbit</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">num</span> <span class="o">^</span> <span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>观察上面代码我们知道，<code>(num-1)</code>是将<code>num</code>最低位的1变成0，然后将这一位右边的0全部变成1，这一位左边的部分不变。<code>num^(num-1)</code>则将这一位左边的部分全部清零，并将这一位和这一位右边的所有位全部变为1。最后，将<code>num^(num-1)</code>与<code>num</code>按位与，这一位左边的所有位在<code>num^(num-1)</code>中是0，所以在最终结果中是0；这一位右边的所有位在<code>num</code>中是0，所以在最终结果中是0；只有这一位本身在<code>num^(num-1)</code>和<code>num</code>中都是1，所以在结果中也是1。这样就达到了只保留<code>num</code>最低位的1的效果。<br/>
+有了<code>lowbit(num)</code>，计算<code>prev(num)</code>也就水到渠成：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">prev</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">num</span> <span class="o">-</span> <span class="n">lowbit</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h4>查询的方法</h4>
+
+<p>给定一个下标<code>i</code>，我们如何求<code>sum(i) = a[1]+...+a[i]</code>？<br/>
+通过访问数组<code>e</code>，我们可以得到<code>e[i] = a[prev(i)+1]+...+a[i]</code>，在这个基础上，只要求出<code>sum(prev(i))</code>，将这个值加上<code>e[i]</code>，就得到了我们要求的<code>sum(i)</code>。不难看出，这是一个重复的子过程，我们可以利用递归或者迭代轻易地实现：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span> <span class="c1">//输出a[1]+&amp;hellip;+a[i]的值。</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">res</span> <span class="o">+=</span> <span class="n">sumArr</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">^</span> <span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">index</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">index</span> <span class="o">-=</span> <span class="n">lowBit</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在定义了<code>sum</code>函数之后，对于每次查询，输入下标<code>i</code>和<code>j</code>，要输出这之间元素之和，代码就比较简单了：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">sumRange</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">sum</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>对照着上面的图片我们可以看出，在求<code>sum(i)</code>的过程中，最坏情况下我们要迭代<code>log(i)</code>次。所以对于每次查询，其时间复杂度可以认为是<code>O(logn)</code>。</p>
+
+<h2>三、初始化</h2>
+
+<p>与刚才定义<code>prev(num)</code>同样，我们可以定义<code>next(num)</code>，该函数输出<strong>比<code>num</code>大的、第一个二进制末尾的0比<code>num</code>多的整数</strong>。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">next</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">num</span> <span class="o">+</span> <span class="n">lowbit</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>树状数组初始化的流程可以简要叙述为：<br/>
+1. 对于所有的<code>i</code>，令 <code>e[i] = a[i]</code>。<br/>
+2. 令<code>i</code>从<code>1</code>到<code>n</code>递增，对于每个<code>i</code>，如果<code>next(i)</code>没有越界，令<code>e[next(i)] += e[i]</code>。<br/>
+这就完成了树状数组的初始化，可以观察数组长度为6的情况：</p>
+
+<table class="blogTable">
+<tr><td></td><td>e[1]</td><td>e[2]</td><td>e[3]</td><td>e[4]</td><td>e[5]</td><td>e[6]</td></tr>
+<tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=1，next(i)=2：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=2，next(i)=4：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=3，next(i)=4：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=4，next(i)=8：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=5，next(i)=6：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr>
+<tr><td>i=6，next(i)=8：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr>
+</table>
+
+
+<p><br/>
+对应的代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//初始化sumArr：</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">sumArr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">^</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">nextIndex</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">lowBit</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">nextIndex</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">sumArr</span><span class="p">[</span><span class="n">nextIndex</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sumArr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>可以发现，树状数组的初始化相当于两次遍历，所以时间复杂度为<code>O(n)</code>。</p>
+
+<h2>四、更新</h2>
+
+<p>假设我们要修改下标为<code>i</code>的元素<code>a[i]</code>的值，我们只需要更改数组<code>e</code>中的一部分值，这一点和线段树是相同的。<br/>
+对照上面的图片，找到下标为<code>i</code>的列然后从下往上看，我们很容易发现需要修改的元素都是哪些。比如在上面的图中，对于<code>i=9</code>而言，要修改的元素分别是<code>e[9]</code>、<code>e[10]</code>、<code>e[12]</code>和<code>e[16]</code>。我们可以发现，它们正好对应着<code>9</code>、<code>next(9)</code>、<code>next(next(9))</code>……<br/>
+由此我们可以总结出更新树状数组的代码：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//val是新的值</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">val</span> <span class="o">-</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="c1">//计算一个相对于原值的变化量</span>
+</span><span class='line'>    <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">size</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">sumArr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">^</span> <span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">index</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">index</span> <span class="o">+=</span> <span class="n">lowBit</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>与查询一样，在最坏情况下我们要迭代<code>log(i)</code>次。所以对于每次更新，其时间复杂度也可以认为是<code>O(logn)</code>。</p>
+
+<h2>五、总结</h2>
+
+<p>树状数组本质上是按照二分对数组进行分组，其初始化的时间复杂度为<code>O(n)</code>，更新和查询的时间复杂度都是<code>O(logn)</code>。与线段树相比，树状数组能够解决的问题类型有限，它不能解决线段树能够解决的查询最大/最小值类问题。但是相对于线段树而言的好处是，它的实现较为简单，并且虽然用大O表示时二者的时间复杂度相同，但是树状数组前面乘以的常数项较小，所以总体上其效率还是要高于线段树的。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RMQ问题（二）：线段树]]></title>

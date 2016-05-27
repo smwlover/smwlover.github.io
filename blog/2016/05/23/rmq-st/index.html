@@ -261,48 +261,48 @@
 </span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="nf">getLog</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span> <span class="c1">//返回logn</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">while</span><span class="p">(</span><span class="n">n</span><span class="p">){</span>
-</span><span class='line'>      <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">count</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">n</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="nf">getPower</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span> <span class="c1">//返回2^n。</span>
-</span><span class='line'>  <span class="k">return</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">count</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span> <span class="c1">//输入数组的总大小。</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span> <span class="c1">//输入数组的总大小。</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">));</span>
-</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="c1">//输入数组的内容，这里直接将内容填充到表格的第一行中了。</span>
-</span><span class='line'>      <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">));</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="c1">//输入数组的内容，这里直接将内容填充到表格的第一行中了。</span>
+</span><span class='line'>        <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">power1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">power2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">,</span> <span class="n">power1</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">power2</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">//利用动态规划填充表格的其余内容。</span>
-</span><span class='line'>      <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">power2</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>          <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="n">power1</span><span class="p">]);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">power1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">power2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">,</span> <span class="n">power1</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">power2</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">//利用动态规划填充表格的其余内容。</span>
+</span><span class='line'>        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">power2</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="n">power1</span><span class="p">]);</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">queryCount</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">queryCount</span><span class="p">);</span> <span class="c1">//输入查询总量。</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">logT</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">T</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">queryCount</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span> <span class="c1">//计算每个查询。</span>
-</span><span class='line'>      <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">left</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">len</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">logT</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">T</span> <span class="o">=</span> <span class="n">getPower</span><span class="p">(</span><span class="n">logT</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">right</span><span class="o">-</span><span class="n">T</span><span class="p">]));</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">queryCount</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">queryCount</span><span class="p">);</span> <span class="c1">//输入查询总量。</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">logT</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">T</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">queryCount</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span> <span class="c1">//计算每个查询。</span>
+</span><span class='line'>        <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">left</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">len</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">logT</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">T</span> <span class="o">=</span> <span class="n">getPower</span><span class="p">(</span><span class="n">logT</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">right</span><span class="o">-</span><span class="n">T</span><span class="p">]));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -386,15 +386,19 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (5)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (1)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (2)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (9)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (3)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (10)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (4)</a></li>
 
   </ul>
 </section><section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/27/binary-indexed-tree/">Random Query之树状数组</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
@@ -410,10 +414,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/20/binary-manipulation/">位运算的Tricks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/17/expand-plugin/">Octopress插件开发：点击展开与折叠</a>
       </li>
     
   </ul>
@@ -473,6 +473,9 @@
     </li>
     <li>
       <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
     </li>
   </ul>
 </section>

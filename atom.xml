@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-24T21:48:39+08:00</updated>
+  <updated>2016-05-27T20:07:01+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,201 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Random Query之树状数组]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree/"/>
+    <updated>2016-05-27T14:09:26+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree</id>
+    <content type="html"><![CDATA[<p>这篇文章介绍了一种叫做树状数组（Binary Indexed Tree）的数据结构，与之前提到的线段树一样，这种数据结构可以解决“求区间内元素之和”的Random Query问题，并且其初始化的时间复杂度是<code>O(n)</code>、更新和查询的时间复杂度都是<code>O(logn)</code>。</p>
+
+<!--more-->
+
+
+<h2>一、概览</h2>
+
+<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：<br/>
+<code>e[1] = a[1]</code><br/>
+<code>e[2] = a[1] + a[2]</code><br/>
+<code>e[3] = a[3]</code><br/>
+<code>e[4] = a[1] + a[2] + a[3] + a[4]</code><br/>
+<code>e[5] = a[5]</code><br/>
+<code>e[6] = a[5] + a[6]</code><br/>
+<code>e[7] = a[7]</code><br/>
+<code>e[8] = a[1] + a[2] + a[3] + a[4] + ... + a[8]</code></p>
+
+<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：<br/>
+<img src="http://smwlover.github.io/images/blogimg/5.png"></p>
+
+<h2>二、查询</h2>
+
+<p>那么树状数组<code>e</code>和原数组<code>a</code>到底有什么对应关系呢？我们可以设想：<strong>对于一个正整数<code>num</code>，我们可以求得一个最大的非负整数，它满足：该整数小于<code>num</code>，且二进制表示中末尾的0个数比<code>num</code>多</strong>。举几个例子：如果<code>num=5</code>，我们所求得的整数就应该是4；如果<code>num=6</code>，我们所求得的整数仍然是4；如果<code>num=8</code>，我们所求得的整数就应该是0。<br/>
+我们把我们所求得的整数记作<code>prev(num)</code>，然后我们就得到了树状数组<code>e</code>和原数组<code>a</code>的对应关系：<code>e[num] = a[prev(num)+1] + ... + a[num]</code>。</p>
+
+<h4>prev(num)的求法</h4>
+
+<p>我们定义一个函数<code>lowbit(num)</code>，该函数的结果保留了<code>num</code>最低位的1，而将它左边的所有位全部清零。比如对于<code>num=5</code>，<code>lowbit(num) = 1</code>；对于<code>num=6</code>，<code>lowbit(num) = 2</code>；对于<code>num=8</code>，<code>lowbit(num) = 8</code>。该函数的实现如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">lowbit</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">num</span> <span class="o">^</span> <span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>观察上面代码我们知道，<code>(num-1)</code>是将<code>num</code>最低位的1变成0，然后将这一位右边的0全部变成1，这一位左边的部分不变。<code>num^(num-1)</code>则将这一位左边的部分全部清零，并将这一位和这一位右边的所有位全部变为1。最后，将<code>num^(num-1)</code>与<code>num</code>按位与，这一位左边的所有位在<code>num^(num-1)</code>中是0，所以在最终结果中是0；这一位右边的所有位在<code>num</code>中是0，所以在最终结果中是0；只有这一位本身在<code>num^(num-1)</code>和<code>num</code>中都是1，所以在结果中也是1。这样就达到了只保留<code>num</code>最低位的1的效果。<br/>
+有了<code>lowbit(num)</code>，计算<code>prev(num)</code>也就水到渠成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">prev</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">num</span> <span class="o">-</span> <span class="n">lowbit</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>查询的方法</h4>
+
+<p>给定一个下标<code>i</code>，我们如何求<code>sum(i) = a[1]+...+a[i]</code>？<br/>
+通过访问数组<code>e</code>，我们可以得到<code>e[i] = a[prev(i)+1]+...+a[i]</code>，在这个基础上，只要求出<code>sum(prev(i))</code>，将这个值加上<code>e[i]</code>，就得到了我们要求的<code>sum(i)</code>。不难看出，这是一个重复的子过程，我们可以利用递归或者迭代轻易地实现：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span> <span class="c1">//输出a[1]+...+a[i]的值。</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">res</span> <span class="o">+=</span> <span class="n">sumArr</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">^</span> <span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">index</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">index</span> <span class="o">-=</span> <span class="n">lowBit</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在定义了<code>sum</code>函数之后，对于每次查询，输入下标<code>i</code>和<code>j</code>，要输出这之间元素之和，代码就比较简单了：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">sumRange</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">sum</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对照着上面的图片我们可以看出，在求<code>sum(i)</code>的过程中，最坏情况下我们要迭代<code>log(i)</code>次。所以对于每次查询，其时间复杂度可以认为是<code>O(logn)</code>。</p>
+
+<h2>三、初始化</h2>
+
+<p>与刚才定义<code>prev(num)</code>同样，我们可以定义<code>next(num)</code>，该函数输出<strong>比<code>num</code>大的、第一个二进制末尾的0比<code>num</code>多的整数</strong>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">next</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">num</span> <span class="o">+</span> <span class="n">lowbit</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>树状数组初始化的流程可以简要叙述为：<br/>
+1. 对于所有的<code>i</code>，令 <code>e[i] = a[i]</code>。<br/>
+2. 令<code>i</code>从<code>1</code>到<code>n</code>递增，对于每个<code>i</code>，如果<code>next(i)</code>没有越界，令<code>e[next(i)] += e[i]</code>。<br/>
+这就完成了树状数组的初始化，可以观察数组长度为6的情况：</p>
+
+<table class="blogTable">
+<tr><td></td><td>e[1]</td><td>e[2]</td><td>e[3]</td><td>e[4]</td><td>e[5]</td><td>e[6]</td></tr>
+<tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=1，next(i)=2：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=2，next(i)=4：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=3，next(i)=4：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=4，next(i)=8：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr>
+<tr><td>i=5，next(i)=6：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr>
+<tr><td>i=6，next(i)=8：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr>
+</table>
+
+
+<p><br/>
+对应的代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//初始化sumArr：</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">sumArr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">^</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">nextIndex</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">lowBit</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">nextIndex</span> <span class="o">&lt;=</span> <span class="n">size</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">sumArr</span><span class="p">[</span><span class="n">nextIndex</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sumArr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以发现，树状数组的初始化相当于两次遍历，所以时间复杂度为<code>O(n)</code>。</p>
+
+<h2>四、更新</h2>
+
+<p>假设我们要修改下标为<code>i</code>的元素<code>a[i]</code>的值，我们只需要更改数组<code>e</code>中的一部分值，这一点和线段树是相同的。<br/>
+对照上面的图片，找到下标为<code>i</code>的列然后从下往上看，我们很容易发现需要修改的元素都是哪些。比如在上面的图中，对于<code>i=9</code>而言，要修改的元素分别是<code>e[9]</code>、<code>e[10]</code>、<code>e[12]</code>和<code>e[16]</code>。我们可以发现，它们正好对应着<code>9</code>、<code>next(9)</code>、<code>next(next(9))</code>……<br/>
+由此我们可以总结出更新树状数组的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//val是新的值</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">val</span> <span class="o">-</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="c1">//计算一个相对于原值的变化量</span>
+</span><span class='line'>    <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">size</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">sumArr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">^</span> <span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">index</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">index</span> <span class="o">+=</span> <span class="n">lowBit</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>与查询一样，在最坏情况下我们要迭代<code>log(i)</code>次。所以对于每次更新，其时间复杂度也可以认为是<code>O(logn)</code>。</p>
+
+<h2>五、总结</h2>
+
+<p>树状数组本质上是按照二分对数组进行分组，其初始化的时间复杂度为<code>O(n)</code>，更新和查询的时间复杂度都是<code>O(logn)</code>。与线段树相比，树状数组能够解决的问题类型有限，它不能解决线段树能够解决的查询最大/最小值类问题。但是相对于线段树而言的好处是，它的实现较为简单，并且虽然用大O表示时二者的时间复杂度相同，但是树状数组前面乘以的常数项较小，所以总体上其效率还是要高于线段树的。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RMQ问题（二）：线段树]]></title>
@@ -38,12 +233,12 @@
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 </pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">Node</span><span class="p">{</span>
-</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span> <span class="c1">//指向左儿子的指针</span>
-</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span> <span class="c1">//指向右儿子的指针</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">leftIndex</span><span class="p">;</span> <span class="c1">//所表示区间的左边界</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">rightIndex</span><span class="p">;</span> <span class="c1">//所表示区间的右边界</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">minVal</span><span class="p">;</span> <span class="c1">//所表示区间中元素的最小值</span>
-</span><span class='line'>  <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">leftIndex</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">rightIndex</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">minVal</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">left</span><span class="p">(</span><span class="nb">NULL</span><span class="p">),</span> <span class="n">right</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){}</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span> <span class="c1">//指向左儿子的指针</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span> <span class="c1">//指向右儿子的指针</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">leftIndex</span><span class="p">;</span> <span class="c1">//所表示区间的左边界</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rightIndex</span><span class="p">;</span> <span class="c1">//所表示区间的右边界</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span><span class="p">;</span> <span class="c1">//所表示区间中元素的最小值</span>
+</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">leftIndex</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">rightIndex</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">minVal</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">left</span><span class="p">(</span><span class="nb">NULL</span><span class="p">),</span> <span class="n">right</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){}</span>
 </span><span class='line'><span class="p">};</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -111,46 +306,46 @@
 <span class='line-number'>55</span>
 </pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">SegmentTree</span><span class="p">{</span>
 </span><span class='line'><span class="k">private</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">root</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="nf">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">);</span>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="nf">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>  <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">SegmentTree</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">){}</span> <span class="c1">//Do not copy it!</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">*</span> <span class="n">root</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Node</span><span class="o">*</span> <span class="nf">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">SegmentTree</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">){}</span> <span class="c1">//Do not copy it!</span>
 </span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">SegmentTree</span><span class="p">();</span>
-</span><span class='line'>  <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">);</span>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="nf">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">);</span>
 </span><span class='line'><span class="p">};</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">Node</span><span class="o">*</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">constructTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">left</span><span class="p">]);</span>
-</span><span class='line'>  <span class="k">else</span><span class="p">{</span>
-</span><span class='line'>      <span class="n">Node</span><span class="o">*</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>      <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">res</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">res</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">left</span><span class="p">]);</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">Node</span><span class="o">*</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">res</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">res</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">initializeMin</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">){</span>
-</span><span class='line'>      <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">){</span>
-</span><span class='line'>      <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">initializeMin</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">()</span><span class="o">:</span> <span class="n">root</span><span class="p">(</span><span class="nb">NULL</span><span class="p">){</span>
@@ -158,11 +353,11 @@
 </span><span class='line'>
 </span><span class='line'><span class="c1">//由一个数组构造一个线段树：</span>
 </span><span class='line'><span class="n">SegmentTree</span><span class="o">::</span><span class="n">SegmentTree</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-</span><span class='line'>      <span class="n">root</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子节点的最小值</span>
-</span><span class='line'>  <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子节点的最小值</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">root</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子节点的最小值</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子节点的最小值</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -209,34 +404,34 @@
 </span><span class='line'><span class="c1">//具体更新的方法是利用递归，先更新子节点，再根据子节点更新之后的值更新父节点。</span>
 </span><span class='line'><span class="c1">//这一步操作的复杂度是O(nlogn)。</span>
 </span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">index</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">){</span>
-</span><span class='line'>      <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">middle</span><span class="p">){</span>
-</span><span class='line'>      <span class="c1">//查找左子树：</span>
-</span><span class='line'>      <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>      <span class="c1">//查找右子树：</span>
-</span><span class='line'>      <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="c1">//更新该节点的最小值：</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
-</span><span class='line'>  <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">index</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">middle</span><span class="p">){</span>
+</span><span class='line'>        <span class="c1">//查找左子树：</span>
+</span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="c1">//查找右子树：</span>
+</span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//更新该节点的最小值：</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span> <span class="o">=</span> <span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
-</span><span class='line'>  <span class="n">updateNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">updateNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -270,27 +465,27 @@
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
 </pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">queryNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">left</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span> <span class="o">==</span> <span class="n">left</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&gt;</span> <span class="n">middle</span> <span class="o">&amp;&amp;</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="n">middle</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;=</span> <span class="n">middle</span> <span class="o">&amp;&amp;</span> <span class="n">right</span> <span class="o">&lt;=</span> <span class="n">middle</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">else</span><span class="p">{</span>
-</span><span class='line'>      <span class="kt">int</span> <span class="n">leftMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
-</span><span class='line'>      <span class="kt">int</span> <span class="n">rightMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nf">min</span><span class="p">(</span><span class="n">leftMin</span><span class="p">,</span> <span class="n">rightMin</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">leftIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">rightIndex</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">middle</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&gt;</span> <span class="n">middle</span> <span class="o">&amp;&amp;</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;=</span> <span class="n">middle</span> <span class="o">&amp;&amp;</span> <span class="n">right</span> <span class="o">&lt;=</span> <span class="n">middle</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">leftMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">rightMin</span> <span class="o">=</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">middle</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nf">min</span><span class="p">(</span><span class="n">leftMin</span><span class="p">,</span> <span class="n">rightMin</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">query</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queryNode</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -394,48 +589,48 @@
 </span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="nf">getLog</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span> <span class="c1">//返回logn</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">while</span><span class="p">(</span><span class="n">n</span><span class="p">){</span>
-</span><span class='line'>      <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">count</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">n</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="nf">getPower</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span> <span class="c1">//返回2^n。</span>
-</span><span class='line'>  <span class="k">return</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">count</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span> <span class="c1">//输入数组的总大小。</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span> <span class="c1">//输入数组的总大小。</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">));</span>
-</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="c1">//输入数组的内容，这里直接将内容填充到表格的第一行中了。</span>
-</span><span class='line'>      <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">));</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="c1">//输入数组的内容，这里直接将内容填充到表格的第一行中了。</span>
+</span><span class='line'>        <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">power1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">power2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">,</span> <span class="n">power1</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">power2</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">//利用动态规划填充表格的其余内容。</span>
-</span><span class='line'>      <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">power2</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>          <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="n">power1</span><span class="p">]);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">power1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">power2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">,</span> <span class="n">power1</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">power2</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">//利用动态规划填充表格的其余内容。</span>
+</span><span class='line'>        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">power2</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="n">power1</span><span class="p">]);</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">queryCount</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">queryCount</span><span class="p">);</span> <span class="c1">//输入查询总量。</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">logT</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">T</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">queryCount</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span> <span class="c1">//计算每个查询。</span>
-</span><span class='line'>      <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">left</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">len</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">logT</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">T</span> <span class="o">=</span> <span class="n">getPower</span><span class="p">(</span><span class="n">logT</span><span class="p">);</span>
-</span><span class='line'>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">right</span><span class="o">-</span><span class="n">T</span><span class="p">]));</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">queryCount</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">queryCount</span><span class="p">);</span> <span class="c1">//输入查询总量。</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">logT</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">T</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">queryCount</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span> <span class="c1">//计算每个查询。</span>
+</span><span class='line'>        <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%d%d&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">left</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">len</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">logT</span> <span class="o">=</span> <span class="n">getLog</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">T</span> <span class="o">=</span> <span class="n">getPower</span><span class="p">(</span><span class="n">logT</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">logT</span><span class="p">][</span><span class="n">right</span><span class="o">-</span><span class="n">T</span><span class="p">]));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -1328,7 +1523,7 @@
 
 <h2>总结</h2>
 
-<p>本篇文章总结了二进制和位运算的一些用途。其实，位运算还有很多其他的妙用，包括快速幂算法、树状数组等。有时间我会继续在博客上介绍这些内容。</p>
+<p>本篇文章总结了二进制和位运算的一些用途。其实，位运算还有很多其他的妙用，包括快速幂算法、<a href="http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree/">树状数组</a>等。有时间我会继续在博客上介绍这些内容。</p>
 ]]></content>
   </entry>
   
@@ -2164,7 +2359,7 @@
 </span><span class='line'>  
 </span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 </span><span class='line'>      <span class="k">if</span> <span class="vi">@successful</span>
-</span><span class='line'>          <span class="vi">@result</span>
+</span><span class='line'>          <span class="vi">@result</span> <span class="o">+</span> <span class="s2">&quot;&lt;br/&gt;&quot;</span>
 </span><span class='line'>      <span class="k">else</span>
 </span><span class='line'>          <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@information</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
 </span><span class='line'>      <span class="k">end</span>
@@ -2262,10 +2457,10 @@
 <h3>正常情况下的测试：</h3>
 
 <ul>
-<li><code>{% mahjonglist 12345m888s22255j %}</code>会显示成：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/4.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/5.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td></tr></table></li>
-<li>当然多张牌不连写也是可以的，比如<code>{% mahjonglist 12m345m8s8s8s222j55j %}</code>显示的内容应该与上面一条相同：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/4.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/5.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td></tr></table></li>
-<li>再测试鸣牌的情况，包括明杠与暗杠，比如<code>{% mahjonglist 4567p-2$13m-44$44s-0660j %}</code>会显示成：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/24.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/25.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/back.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/33.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/33.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/back.png"/></td></tr></table></li>
-<li>可以再测试一下加杠的情况，比如<code>{% mahjonglist 12345!67m-2/22/2p-11/11/j %}</code>会显示成：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/4.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/aka5m.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/7.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/20.png"/></td><td class="mahjongTableElement"><table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/20.png"/></td></tr><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/20.png"/></td></tr></table></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/20.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/28.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/28.png"/></td><td class="mahjongTableElement"><table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/28.png"/></td></tr><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/28.png"/></td></tr></table></td></tr></table></li>
+<li><code>{% mahjonglist 12345m888s22255j %}</code>会显示成：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/4.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/5.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td></tr></table><br/></li>
+<li>当然多张牌不连写也是可以的，比如<code>{% mahjonglist 12m345m8s8s8s222j55j %}</code>显示的内容应该与上面一条相同：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/4.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/5.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/17.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/29.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/32.png"/></td></tr></table><br/></li>
+<li>再测试鸣牌的情况，包括明杠与暗杠，比如<code>{% mahjonglist 4567p-2$13m-44$44s-0660j %}</code>会显示成：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/24.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/25.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/13.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/back.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/33.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/33.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/back.png"/></td></tr></table><br/></li>
+<li>可以再测试一下加杠的情况，比如<code>{% mahjonglist 12345!67m-2/22/2p-11/11/j %}</code>会显示成：<table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/1.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/2.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/3.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/4.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/aka5m.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/7.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/20.png"/></td><td class="mahjongTableElement"><table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/20.png"/></td></tr><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/20.png"/></td></tr></table></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/20.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/28.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/28.png"/></td><td class="mahjongTableElement"><table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/28.png"/></td></tr><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/28.png"/></td></tr></table></td></tr></table><br/></li>
 </ul>
 
 
@@ -2288,7 +2483,7 @@
 <table><tr><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/21.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/22.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/aka5p.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/23.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/15.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/16.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/separator.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/yoko/8.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/6.png"/></td><td class="mahjongTableElement"><img class="mahjong" src="http://smwlover.github.io/images/mahjong/tate/7.png"/></td></tr></table>
 
 
-<p>  <br/>
+<p><br/>
 那么我也可以开始轻轻松松地写关于日麻的博文了，行くよ！</p>
 ]]></content>
   </entry>
