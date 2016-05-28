@@ -206,7 +206,7 @@
 
 <h2>二、插件开发</h2>
 
-<p>根据插件的语法，我们知道该插件仍然需要继承自<code>Liquid::Block</code>。在插件中，我们将用户的Markdown代码转换为html语言。表格的标题可以从<code>initialize</code>函数中的<code>markup</code>变量获得；而表格的内容则需要在<code>render</code>函数中调用<code>super</code>来获得。获得了表格的内容后，我们需要对其进行分割：首先按照字符<code>\n</code>分割，将表格的每行分离出来；然后对于每行的内容，再按照字符<code>|</code>分割，将表格的每个单元分离出来。<br/>
+<p>根据插件的语法，我们知道该插件仍然需要继承自<code>Liquid::Block</code>。在插件中，我们将用户的Markdown代码转换为html语言。表格的标题可以从<code>initialize</code>函数中的<code>markup</code>变量获得；而表格的内容则需要在<code>render</code>函数中调用<code>super</code>来获得。获得了表格的内容后，我们需要对其进行分割：首先按照字符<code>\n</code>分割，将表格的每行分离出来；然后对于每行内容，按照字符<code>|</code>分割，将表格的每个单元分离出来。<br/>
 需要额外考虑的有两点。第一，表格内容的第一行需要当做表头处理，所以要使用<code>th</code>标签而不是<code>td</code>标签；第二，为了使表格更加美观，我为表格的奇数行和偶数行设置了不同的背景色，所以在处理的时候，要为奇数行和偶数行对应的<code>tr</code>设置不同的<code>class</code>属性，以便在css中设置不同的样式。<br/>
 插件对应的ruby代码如下：</p>
 
