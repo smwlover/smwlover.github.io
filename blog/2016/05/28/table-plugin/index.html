@@ -1,0 +1,613 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Octopress插件：表格 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="通过Ruby语言开发了一个Octopress插件，可以在文章中显示表格。">
+  <meta name="keywords" content="octopress, 插件, ruby, smwlover, html">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/05/28/table-plugin/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\n");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
+						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
+						adjustPos();
+					}
+				}
+			}
+		}
+	</script>
+	<div id="lyricsContent"">
+		<h3 id="lyric"></h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Octopress插件：表格</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-28T20:28:07+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:28 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>很多Markdown语法都支持在文章中嵌入表格，但是Octopress竟然不支持。为了使得在文章中插入表格更加方便，我开发了一个插件<code>table</code>。在这篇文章中我简要介绍一下该插件的开发流程。</p>
+
+<!--more-->
+
+
+<h2>一、概述</h2>
+
+<p>简单的html表格由<code>table</code>标签以及一个或多个<code>tr</code>、<code>th</code>或<code>td</code>标签组成，其中<code>tr</code>标签定义表格行，<code>th</code>标签定义表头，<code>td</code>标签定义表格单元。<br/>
+我将本插件的语法定义为<code>{% table title %} content {% endtable %}</code>，其中<code>content</code>代表表格内容，由多行构成，<code>content</code>的一行对应着表格中的一行，这一行中的不同单元用字符<code>|</code>分割。<code>content</code>的第一行对应着表头。比如表格：</p>
+
+<table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table>
+
+
+<p>对应的Markdown文件的代码为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{% table 歌曲列表 %}
+</span><span class='line'>歌曲名称 | 歌手名称
+</span><span class='line'>Hacking to the Gate | いとうかなこ
+</span><span class='line'>コネクト | ClariS
+</span><span class='line'>Magia | Kalafina
+</span><span class='line'>secret arms | Ray
+</span><span class='line'>{% endtable %}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>二、插件开发</h2>
+
+<p>根据插件的语法，我们知道该插件仍然需要继承自<code>Liquid::Block</code>。在插件中，我们将用户的Markdown代码转换为html语言。表格的标题可以从<code>initialize</code>函数中的<code>markup</code>变量获得；而表格的内容则需要在<code>render</code>函数中调用<code>super</code>来获得。获得了表格的内容后，我们需要对其进行分割：首先按照字符<code>\n</code>分割，将表格的每行分离出来；然后对于每行的内容，再按照字符<code>|</code>分割，将表格的每个单元分离出来。<br/>
+需要额外考虑的有两点。第一，表格内容的第一行需要当做表头处理，所以要使用<code>th</code>标签而不是<code>td</code>标签；第二，为了使表格更加美观，我为表格的奇数行和偶数行设置了不同的背景色，所以在处理的时候，要为奇数行和偶数行对应的<code>tr</code>设置不同的<code>class</code>属性，以便在css中设置不同的样式。<br/>
+插件对应的ruby代码如下：</p>
+
+<figure class='code'><figcaption><span>table.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Table</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Block</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>      <span class="vi">@title</span> <span class="o">=</span> <span class="n">str</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>      <span class="n">content</span> <span class="o">=</span> <span class="k">super</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>      <span class="n">rows</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>      <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">rows</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>          <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>          <span class="n">columns</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">colCount</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>          <span class="n">colhtml</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>          <span class="k">while</span> <span class="n">colCount</span> <span class="o">&lt;</span> <span class="n">columns</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>              <span class="n">element</span> <span class="o">=</span> <span class="n">columns</span><span class="o">[</span><span class="n">colCount</span><span class="o">]</span>
+</span><span class='line'>              <span class="n">element</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>              
+</span><span class='line'>              <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>                  <span class="n">colhtml</span> <span class="o">=</span> <span class="n">colhtml</span> <span class="o">+</span> <span class="s2">&quot;&lt;th&gt;</span><span class="si">#{</span><span class="n">element</span><span class="si">}</span><span class="s2">&lt;/th&gt;&quot;</span>
+</span><span class='line'>              <span class="k">else</span>
+</span><span class='line'>                  <span class="n">colhtml</span> <span class="o">=</span> <span class="n">colhtml</span> <span class="o">+</span> <span class="s2">&quot;&lt;td&gt;</span><span class="si">#{</span><span class="n">element</span><span class="si">}</span><span class="s2">&lt;/td&gt;&quot;</span>
+</span><span class='line'>              <span class="k">end</span>
+</span><span class='line'>              <span class="n">colCount</span> <span class="o">=</span> <span class="n">colCount</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>          
+</span><span class='line'>          <span class="c1">#判断是奇数还是偶数</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span class='line'>              <span class="vi">@res</span> <span class="o">=</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;tr&gt;</span><span class="si">#{</span><span class="n">colhtml</span><span class="si">}</span><span class="s2">&lt;/tr&gt;&quot;</span>
+</span><span class='line'>          <span class="k">else</span>
+</span><span class='line'>              <span class="vi">@res</span> <span class="o">=</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;tr class=</span><span class="se">\&quot;</span><span class="s2">alt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">colhtml</span><span class="si">}</span><span class="s2">&lt;/tr&gt;&quot;</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>          <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">Table</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>三、定制样式表</h2>
+
+<p>还是老样子，我们在<code>_styles.scss</code>中定制样式表，要定制的部分包括单元格的样式、表头的样式、奇数行和偶数行的背景色以及表格标题的样式等。我定义的样式表如下：</p>
+
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//blogTable</span>
+</span><span class='line'><span class="nc">.blogTable</span> <span class="p">{</span>
+</span><span class='line'>  <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">27</span><span class="mf">.6</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.blogTable</span> <span class="nt">td</span><span class="o">,</span> <span class="nc">.blogTable</span> <span class="nt">th</span><span class="p">{</span>
+</span><span class='line'>  <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#888888</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">padding</span><span class="o">:</span> <span class="mi">3</span><span class="kt">px</span> <span class="mi">7</span><span class="kt">px</span> <span class="mi">2</span><span class="kt">px</span> <span class="mi">7</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.blogTable</span> <span class="nt">th</span> <span class="p">{</span> <span class="c1">//表头的样式需要额外定制</span>
+</span><span class='line'>  <span class="na">padding-top</span><span class="o">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">padding-bottom</span><span class="o">:</span> <span class="mi">4</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">background-color</span><span class="o">:</span> <span class="mh">#aaaaaa</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">font-family</span><span class="o">:</span> <span class="n">SimHei</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">font-weight</span><span class="o">:</span> <span class="mi">600</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.blogTable</span> <span class="nt">tr</span><span class="nc">.alt</span> <span class="nt">td</span> <span class="p">{</span> <span class="c1">//偶数行的背景色需要额外定制</span>
+</span><span class='line'>  <span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.blogTable</span> <span class="nt">caption</span> <span class="p">{</span> <span class="c1">//标题栏的样式</span>
+</span><span class='line'>  <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">font-family</span><span class="o">:</span> <span class="n">KaiTi</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.1</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">font-weight</span><span class="o">:</span> <span class="no">bold</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>有些人可能想在表格单元中显示一小段行内代码段，为了使其正常显示，我们需要为<code>blogTable</code>内的<code>code</code>元素定制样式表：</p>
+
+<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.blogTable</span> <span class="nt">code</span><span class="p">{</span>
+</span><span class='line'>  <span class="na">display</span><span class="o">:</span> <span class="no">inline</span><span class="o">-</span><span class="no">block</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">background</span><span class="o">:</span> <span class="mh">#fff</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">font-size</span><span class="o">:</span> <span class="mf">.8</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">line-height</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.5</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">color</span><span class="o">:</span> <span class="mh">#555</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#ddd</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">border-radius</span><span class="o">:</span> <span class="mf">.4</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">padding</span><span class="o">:</span> <span class="mi">0</span> <span class="mf">.3</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>  <span class="na">margin</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-28T20:28:07+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:28 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/kai-fa/'>开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/27/binary-indexed-tree/" title="Previous Post: Random Query之树状数组">&laquo; Random Query之树状数组</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (2)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (5)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (4)</a></li>
+
+  </ul>
+</section><section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/27/binary-indexed-tree/">Random Query之树状数组</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/lyric-bar/">在自己的博客中加入歌词栏</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_310_430_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="310" height="430" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/05/28/table-plugin/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/05/28/table-plugin/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>
