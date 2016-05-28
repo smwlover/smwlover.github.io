@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 数据结构 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-27T20:16:30+08:00</updated>
+  <updated>2016-05-28T17:15:18+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -128,20 +128,9 @@
 2. 令<code>i</code>从<code>1</code>到<code>n</code>递增，对于每个<code>i</code>，如果<code>next(i)</code>没有越界，令<code>e[next(i)] += e[i]</code>。<br/>
 这就完成了树状数组的初始化，可以观察数组长度为6的情况：</p>
 
-<table class="blogTable">
-<tr><td></td><td>e[1]</td><td>e[2]</td><td>e[3]</td><td>e[4]</td><td>e[5]</td><td>e[6]</td></tr>
-<tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr>
-<tr><td>i=1，next(i)=2：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr>
-<tr><td>i=2，next(i)=4：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr>
-<tr><td>i=3，next(i)=4：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr>
-<tr><td>i=4，next(i)=8：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr>
-<tr><td>i=5，next(i)=6：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr>
-<tr><td>i=6，next(i)=8：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr>
-</table>
+<p><table class="blogTable"><caption>长度为6的树状数组初始化的过程</caption><tr><th>当前状态</th><th>e[1]</th><th>e[2]</th><th>e[3]</th><th>e[4]</th><th>e[5]</th><th>e[6]</th></tr><tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=1</code>，<code>next(i)=2</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=2</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=3</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=4</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=5</code>，<code>next(i)=6</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr><tr><td><code>i=6</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr></table></p>
 
-
-<p><br/>
-对应的代码如下：</p>
+<p>对应的代码如下：</p>
 
 <p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
