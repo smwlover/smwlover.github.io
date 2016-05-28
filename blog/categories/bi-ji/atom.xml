@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 笔记 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/bi-ji/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-05-28T17:15:18+08:00</updated>
+  <updated>2016-05-28T17:17:00+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -642,456 +642,6 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[在自己的博客中加入歌词栏]]></title>
-    <link href="http://smwlover.github.io/blog/2016/05/22/lyric-bar/"/>
-    <updated>2016-05-22T16:38:34+08:00</updated>
-    <id>http://smwlover.github.io/blog/2016/05/22/lyric-bar</id>
-    <content type="html"><![CDATA[<p>很久之前我就有将自己喜欢的歌曲分享给别人的梦想，而现在正值我的博客搭建完成，我终于可以通过在博客中加入歌词栏实现我的梦想了。这篇文章就来简单介绍一下在博客中添加歌词栏的流程。</p>
-
-<!--more-->
-
-
-<h2>一、添加html文件</h2>
-
-<p>首先，在<code>source/_includes/custom/</code>路径下新建<code>lyrics.html</code>文件，我们要添加的歌词栏就是在该文件中实现的。该文件的内容暂且按下不表，我们首先要让我们添加的html文件在博客中显示出来。<br/>
-我们知道，<code>source/_layouts/default.html</code>文件定义了博客页面的基本框架，当我们需要添加一些内容的时候，可以修改该文件，这样在博客的任何页面，我们添加的内容都可以显示出来。如大家所见，本博客中歌词栏的位置位于导航栏的下面，正文部分的上面。通过查看<code>default.html</code>文件，我们发现，<code>{% include navigation.html %}</code> 一行对应着博客的导航栏，而我们要加入的<code>lyrics.html</code>，则应该放在这一行的下面。<br/>
-在这一行的下面加入<code>{% include custom/lyrics.html %}</code>一行，这样一来，我们添加的歌词栏就在博客页面中找到了自己的归属。</p>
-
-<h2>二、歌词栏的实现</h2>
-
-<p>关于歌词栏，我的想法是这样的：中间部分显示歌词，包括日文原文、中文译文以及歌曲名称和歌手名称，其中歌曲名称是一个超链接，指向网易云音乐中对应歌曲的页面。两侧分别是两个按钮，即切换到上一句歌词和下一句歌词。<br/>
-我在<code>source/</code>文件夹下新建了<code>lyrics/</code>文件夹，歌词栏显示的每句歌词都对应着该文件夹下的一个txt文件，文件名形如<code>1.txt</code>、<code>2.txt</code>这样。除了这些歌词文件，该文件夹下还有一个<code>num.txt</code>文件，记录着当前歌词的总数量。在博客页面第一次加载的时候，首先访问<code>num.txt</code>文件，获取歌词总数量<code>totNumber</code>，然后随机生成一个介于<code>1</code>到<code>totNumber</code>之间的数字<code>curNumber</code>，并且访问<code>[curNumber].txt</code>文件，将该文件对应的歌词显示在歌词栏中。每当点击上一句歌词或下一句歌词按钮时，将<code>curNumber</code>减一或加一，并且访问对应的文件并且更新歌词栏的信息。<br/>
-那么问题来了：<strong>如何访问服务器端的一个文件呢？</strong>我们需要用到XMLHttpRequest。通过XMLHttpRequest，我们可以实现很多功能，比如：<br/>
-1. 在不重新加载页面的情况下更新网页；<br/>
-2. 在页面已加载后从服务器请求数据；<br/>
-3. 在页面已加载后从服务器接收数据；<br/>
-4. 在后台向服务器发送数据。<br/>
-而我们则是利用了第二点“在页面已加载后从服务器请求数据”的功能。相关代码如下：</p>
-
-<p><figure class='code'><figcaption><span>XMLHttpRequest的使用 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
-</span><span class='line'>    <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">XMLHttpRequest</span><span class="p">){</span> <span class="c1">// code for Firefox, Opera, IE7, etc.</span>
-</span><span class='line'>        <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">){</span> <span class="c1">// code for IE6, IE5</span>
-</span><span class='line'>        <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">Microsoft</span><span class="p">.</span><span class="nx">XMLHTTP</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">){</span>
-</span><span class='line'>        <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="nx">state_change</span><span class="p">;</span>
-</span><span class='line'>        <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">GET</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-</span><span class='line'>        <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">state_change</span><span class="p">(){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">){</span> <span class="c1">// 4=&amp;ldquo;loaded&amp;rdquo;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">){</span> <span class="c1">// 200=&amp;ldquo;OK&amp;rdquo;</span>
-</span><span class='line'>            <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>在上述代码中，<code>onreadystatechange</code>是一个事件句柄，它的值是一个函数名称。当我们建立的<code>XMLHttpRequest</code>对象的状态发生改变后，会触发此函数。该对象的状态从0到4进行变化，其中状态为4意味着请求完成，然后我们才可以进行后续处理。<br/>
-在该对象状态发生改变后，如果是请求完成状态，我们就可以通过该对象的<code>status</code>属性判断我们的请求是否成功。<code>status</code>属性对应着该请求的http状态代码，如果成功，状态代码即为<code>200</code>。如果成功，我们即可通过<code>responseText</code>属性获得我们请求的内容。<br/>
-明确了XMLHttpRequest的作用，完整的html代码也就呼之欲出：</p>
-
-<p><figure class='code'><figcaption><span>lyrics.html </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;lyrics&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">id=</span><span class="s">&quot;leftArrow&quot;</span> <span class="na">onclick=</span><span class="s">&quot;last();&quot;</span> <span class="na">href=</span><span class="s">&quot;javascript:void(0)&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">id=</span><span class="s">&quot;rightArrow&quot;</span> <span class="na">onclick=</span><span class="s">&quot;next();&quot;</span> <span class="na">href=</span><span class="s">&quot;javascript:void(0)&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">xmlhttp</span><span class="p">;</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">totNumber</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">curNumber</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">getLRCNum</span><span class="p">(){</span>
-</span><span class='line'>            <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/num.txt&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">adjustPos</span><span class="p">(){</span>
-</span><span class='line'>            <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#lyrics&quot;</span><span class="p">).</span><span class="nx">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">45</span><span class="p">;</span>
-</span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#leftArrow&quot;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s2">&quot;margin-top&quot;</span><span class="p">,</span> <span class="nx">pos</span><span class="p">);</span>
-</span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#rightArrow&quot;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s2">&quot;margin-top&quot;</span><span class="p">,</span> <span class="nx">pos</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">last</span><span class="p">(){</span>
-</span><span class='line'>            <span class="nx">curNumber</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nx">curNumber</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>                <span class="nx">curNumber</span> <span class="o">=</span> <span class="nx">totNumber</span><span class="p">;</span>
-</span><span class='line'>            <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/&quot;</span> <span class="o">+</span> <span class="nx">curNumber</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">next</span><span class="p">(){</span>
-</span><span class='line'>            <span class="nx">curNumber</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nx">curNumber</span> <span class="o">&gt;</span> <span class="nx">totNumber</span><span class="p">)</span>
-</span><span class='line'>                <span class="nx">curNumber</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>            <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/&quot;</span> <span class="o">+</span> <span class="nx">curNumber</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
-</span><span class='line'>            <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">XMLHttpRequest</span><span class="p">){</span> <span class="c1">// code for Firefox, Opera, IE7, etc.</span>
-</span><span class='line'>                <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">){</span> <span class="c1">// code for IE6, IE5</span>
-</span><span class='line'>                <span class="nx">xmlhttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="s2">&quot;Microsoft.XMLHTTP&quot;</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">){</span>
-</span><span class='line'>                <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="nx">state_change</span><span class="p">;</span>
-</span><span class='line'>                <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-</span><span class='line'>                <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">state_change</span><span class="p">(){</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">){</span> <span class="c1">// 4=&quot;loaded&quot;</span>
-</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">){</span> <span class="c1">// 200=&quot;OK&quot;</span>
-</span><span class='line'>                    <span class="c1">//处理传回的数据：</span>
-</span><span class='line'>                    <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
-</span><span class='line'>                    <span class="k">if</span><span class="p">(</span><span class="nx">totNumber</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">//如果是获取歌词数量;</span>
-</span><span class='line'>                        <span class="nx">totNumber</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-</span><span class='line'>                        <span class="nx">curNumber</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">totNumber</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>                        <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="s2">&quot;/lyrics/&quot;</span> <span class="o">+</span> <span class="nx">curNumber</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">);</span>
-</span><span class='line'>                    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                        <span class="kd">var</span> <span class="nx">splited</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">);</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#lyric&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">splited</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#translate&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">splited</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#singer&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;————&quot;</span> <span class="o">+</span> <span class="nx">splited</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#song&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;「&quot;</span> <span class="o">+</span> <span class="nx">splited</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;」&quot;</span><span class="p">);</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#song&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">,</span> <span class="nx">splited</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span>
-</span><span class='line'>
-</span><span class='line'>                        <span class="c1">//调节两个按钮的位置：</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#leftArrow&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
-</span><span class='line'>                        <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#rightArrow&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
-</span><span class='line'>                        <span class="nx">adjustPos</span><span class="p">();</span>
-</span><span class='line'>                    <span class="p">}</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;lyricsContent&quot;</span><span class="err">&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;h3</span> <span class="na">id=</span><span class="s">&quot;lyric&quot;</span><span class="nt">&gt;&lt;/h3&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">&quot;translate&quot;</span><span class="nt">&gt;&lt;/p&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">&quot;from&quot;</span><span class="nt">&gt;&lt;span</span> <span class="na">id=</span><span class="s">&quot;singer&quot;</span><span class="nt">&gt;&lt;/span&gt;&lt;a</span> <span class="na">id=</span><span class="s">&quot;song&quot;</span> <span class="na">href=</span><span class="s">&quot;javascript:void(0)&quot;</span><span class="nt">&gt;&lt;/a&gt;&lt;/p&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>我们注意到，<code>getLRCNum()</code>函数是用来获取歌词总数量的，需要在文档加载完成时调用。<code>source/javascripts/octopress.js</code>文件中的<code>$('document').ready(function())</code>函数是用来定义文档加载完成时所触发的函数的，我们需要在该函数的末尾调用<code>getLRCNum()</code>函数，确保在文档加载完成时，可以立刻获取当前歌词的总数量。<br/>
-然后，<code>last()</code>和<code>next()</code>函数则是分别在两个按钮被按下时触发的，它们更改了<code>curNumber</code>的值，并且请求了新的歌词内容。在新的歌词内容请求完成后，我们利用jQuery动态地改变了歌词栏内部的一些html标签所显示的文本及其<code>href</code>属性，并且通过<code>adjustPos()</code>函数调节了两个按钮的位置，使其在垂直方向上一直处于正中央。</p>
-
-<h2>三、定制css样式表</h2>
-
-<p>当然，为了显示出正常的效果，我们需要对html文件中涉及到的标签定制css样式表。这些工作仍然是在<code>sass/custom/_styles.scss</code>文件中完成的。由于笔者不是学美工出身，最后显示的效果或多或少会缺乏美感，这里贴出我个人定制的样式表，仅供抛砖引玉之用。</p>
-
-<p><div class="expand">我个人定制的样式表<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
-<figure class='code'><figcaption><span>_styles.scss </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Lyrics:&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">lyrics</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">border-bottom-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">border-bottom-style</span><span class="o">:</span> <span class="no">solid</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">border-bottom-color</span><span class="o">:</span> <span class="nf">rgb</span><span class="p">(</span><span class="mi">140</span><span class="o">,</span> <span class="mi">140</span><span class="o">,</span> <span class="mi">140</span><span class="p">);</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">lyricsContent</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">padding-top</span><span class="o">:</span> <span class="mi">22</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">padding-bottom</span><span class="o">:</span> <span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">padding-left</span><span class="o">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">padding-right</span><span class="o">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">background-color</span><span class="o">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="p">);</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">leftArrow</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">width</span><span class="o">:</span> <span class="mi">30</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">height</span><span class="o">:</span> <span class="mi">90</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">background-image</span><span class="o">:</span> <span class="sx">url(&quot;/images/lyrics_left.png&quot;)</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">float</span><span class="o">:</span> <span class="no">left</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">leftArrow</span><span class="nd">:hover</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">background-position</span><span class="o">:</span> <span class="mi">-30</span><span class="kt">px</span> <span class="mi">0</span><span class="kt">px</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">rightArrow</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">width</span><span class="o">:</span> <span class="mi">30</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">height</span><span class="o">:</span> <span class="mi">90</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">background-image</span><span class="o">:</span> <span class="sx">url(&quot;/images/lyrics_right.png&quot;)</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">float</span><span class="o">:</span> <span class="no">right</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">rightArrow</span><span class="nd">:hover</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">background-position</span><span class="o">:</span> <span class="mi">-30</span><span class="kt">px</span> <span class="mi">0</span><span class="kt">px</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">lyric</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">font-family</span><span class="o">:</span> <span class="n">MS</span> <span class="n">Mincho</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">28</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">6</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span> <span class="c1">//居中显示</span>
-</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">32</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">translate</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">font-family</span><span class="o">:</span> <span class="n">KaiTi</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">22</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">6</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span> <span class="c1">//居中显示</span>
-</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">26</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">h1</span><span class="o">&gt;</span><span class="nt">from</span><span class="p">{</span><span class="na">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">&lt;pre&gt;&lt;code&gt;</span><span class="err">    </span><span class="na">font-family</span><span class="o">:</span> <span class="n">MS</span> <span class="n">gothic</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">20</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">font-weight</span><span class="o">:</span> <span class="no">bold</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">right</span><span class="p">;</span> <span class="c1">//向右对齐</span>
-</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">24</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-</div></div></p>
-
-<h2>四、总结与展望</h2>
-
-<p>本文简单介绍了我为博客添加歌词栏的流程。在歌词栏添加好后，如果要添加新的歌词，只需要改动两个地方：首先是更新<code>source/lyrics/num.txt</code>中记录的歌词总数；其次是在<code>source/lyrics/</code>目录下建立一个新的文件保存要添加的歌词。已经写好的html代码和javascript代码均不需改动。这样的歌词栏已经大致满足了我的要求，但是必须承认，它还有一些可以改进的地方，在这里列出三点：<br/>
-1. 不需要利用一个额外的文件<code>num.txt</code>来存储歌词总数，而是直接通过文件夹下的文件数量获得歌词总数。我相信肯定有相关的API可供调用，但是到目前为止还仍未找到。<br/>
-2. 完善多分辨率支持，使得歌词栏在电脑、平板和手机上都可以正常显示。<br/>
-3. 改进css样式表，使得歌词栏的外观更加漂亮。</p>
-]]></content>
-  </entry>
-  
-  <entry>
     <title type="html"><![CDATA[位运算的Tricks]]></title>
     <link href="http://smwlover.github.io/blog/2016/05/20/binary-manipulation/"/>
     <updated>2016-05-20T20:08:18+08:00</updated>
@@ -1577,6 +1127,527 @@
 <h2>总结</h2>
 
 <p>本篇文章总结了二进制和位运算的一些用途。其实，位运算还有很多其他的妙用，包括快速幂算法、<a href="/blog/2016/05/27/binary-indexed-tree/">树状数组</a>等。有时间我会继续在博客上介绍这些内容。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[如何搭建基于Octopress的博客]]></title>
+    <link href="http://smwlover.github.io/blog/2016/05/14/how-to-build-my-own-blog/"/>
+    <updated>2016-05-14T13:29:41+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/05/14/how-to-build-my-own-blog</id>
+    <content type="html"><![CDATA[<p>本文介绍了我在Windows操作系统下，从零开始搭建基于Octopress的博客，并且为自己的博客添加一些个性化内容的简要流程。</p>
+
+<!--more-->
+
+
+<h2>一、准备工作</h2>
+
+<ul>
+<li>安装Git for Windows：可以到<a href="https://git-scm.com/">Git官网</a>下载安装。</li>
+<li>安装Ruby：可以到<a href="http://rubyinstaller.org/downloads/">Ruby官网</a>下载安装，我所下载的Ruby版本是2.2.4。</li>
+<li>安装Python2.7：可以到<a href="https://www.python.org/downloads/">Python官网</a>下载安装，安装后运行<code>easy_install pygments</code>安装代码高亮脚本。</li>
+<li>需要注意的是，安装上述工具的过程中，<strong>最好都勾选上“添加到系统环境变量”一项，</strong>否则需要稍后自己手动设置。</li>
+</ul>
+
+
+<h2>二、安装Octopress</h2>
+
+<p>我们可以直接从Github上将Octopress的对应源代码clone下来并进行安装：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> &lt;the_directory_of_your_blog&gt;
+</span><span class='line'>git clone git://github.com/imathis/octopress.git
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>此时在<code>the_directory_of_your_blog/</code>目录下应该有一个名为<code>octopress</code>的文件夹了。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd </span>octopress
+</span><span class='line'>gem install bundle
+</span><span class='line'>bundle install
+</span><span class='line'>rake install
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>这样就算完成了Octopress的安装流程。为了测试是否成功，我们可以在命令行中执行<code>rake preview</code>，然后在浏览器中输入<code>localhost:4000</code>。如果安装顺利，我们便可以看到自己博客的“雏形”了。</p>
+
+<h2>三、部署到Github</h2>
+
+<p>当然刚才我们只是可以在本地访问自己的博客，为了让它可以被互联网中的用户访问到，我们可以将其部署到Github上。<br/>
+首先我们在Github上新建一个Repository，命名为<code>username.github.io</code>。<br/>
+然后我们就可以进行部署工作了，以本博客为例（我的Github账号为smwlover，新建的Repository名称为<code>smwlover.github.io</code>）：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>rake setup_github_pages
+</span><span class='line'>&lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://github.com/smwlover/smwlover.github.io&quot;</span>&gt;https://github.com/smwlover/smwlover.github.io&lt;/a&gt;
+</span><span class='line'>rake deploy
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p><strong>注意：在执行</strong><code>rake deploy</code><strong>之前，请确认自己有访问对应Repository的权限。</strong></p>
+
+<h2>四、常用操作：</h2>
+
+<ul>
+<li><code>rake new_post['article title']</code>可以用来新建一篇博文，该命令会在<code>source/_posts/</code>文件夹下生成一个对应的markdown文件，我们可以打开该文件，编辑博文的内容。</li>
+<li><code>rake install['theme name']</code>可以用来安装一个新的Octopress主题。</li>
+<li><code>rake preview</code>可以用来对博客进行预览，通过浏览器访问<code>localhost:4000</code>即可。</li>
+<li><code>rake generate</code>可以用来生成博客对应的静态网页，生成到<code>public/</code>目录下。</li>
+<li><code>rake deploy</code>则将博客对应的静态网页部署到Github上。</li>
+</ul>
+
+
+<h2>五、个性化之_config.yml</h2>
+
+<p>在Octopress的根目录下，我们可以看到一个名为<code>_config.yml</code>的文件，该文件包含了自己博客的一些最基本的配置。<br/>
+1. <code>title:</code>对应博客的标题，<code>subtitle:</code>对应博客的副标题，<code>author:</code>则会显示在博客的页脚处。我们可以尝试着修改它们对应的值，然后观察产生的效果。<strong>注意：在修改的时候，一定要注意冒号后面有一个半角的空格，否则会出错。以下同理。</strong><br/>
+2. <code>default_asides:</code>中的内容会在侧边栏按照顺序依次显示。<br/>
+3. <code>github_user:</code>对应我们的Github用户名，如果我们设置在侧边栏中显示Github条目，Octopress会自动获取该用户创建的Repository的信息。<br/>
+4. <code>disqus_short_name:</code>对应我们的Disqus用户名，Octopress默认支持Disqus评论系统，它会在每篇博文的最底部显示该用户所对应的评论信息。</p>
+
+<h2>六、个性化之自定义侧边栏</h2>
+
+<p>上面已经提到，在<code>default_asides:</code>中可以添加侧边栏中要显示的内容。Octopress默认支持的内容位于<code>source/_includes/asides/</code>目录下，我们自己添加的内容则最好放在<code>source/_includes/custom/asides/</code>目录下。下面我会简单介绍一下我的博客中“博客简介”、“歌曲列表”和“友情链接”的添加流程。</p>
+
+<h3>博客简介：</h3>
+
+<p>在<code>source/_includes/custom/asides/</code>目录下创建<code>about.html</code>，然后在<code>default_asides:</code>对应的数组中添加<code>custom/asides/about.html</code>。本博客的<code>about.html</code>内容如下：</p>
+
+<p><figure class='code'><figcaption><span>about.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;section&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;h1&gt;</span>博客简介<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>欢迎来到美柑的房间！<span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>……<span class="nt">&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;/section&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>歌曲列表：</h3>
+
+<p>在<code>source/_includes/custom/asides/</code>目录下创建<code>music.html</code>并且在<code>default_asides:</code>中添加对应路径。目前包括网易云音乐和虾米音乐在内的很多音乐平台都支持外链播放器的功能，我们只需要获取到html格式的外链，然后加入到<code>music.html</code>中即可。<br/>
+因为本博客利用的是虾米音乐的歌曲外链，在Safari浏览器下好像无法正常工作，所以我在<code>music.html</code>首先判断是否是Safari浏览器，如果不是再加入html内容：</p>
+
+<p><figure class='code'><figcaption><span>music.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">&lt;!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 --&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">Sys</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">ua</span> <span class="o">=</span> <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">ua</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/version\/([\d.]+).*safari/</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">s</span> <span class="o">?</span> <span class="nx">Sys</span><span class="p">.</span><span class="nx">safari</span> <span class="o">=</span> <span class="nx">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">Sys</span><span class="p">.</span><span class="nx">safari</span><span class="p">){</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;section&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;h1&gt;歌曲列表&lt;/h1&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;!-- 音乐平台的歌曲外链 --&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;&lt;/section&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>友情链接：</h3>
+
+<p>和上面的方法类似，先创建一个<code>friend.html</code>页面，然后向其中加入一些带有链接的条目，最后在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径即可，不再赘述。</p>
+
+<p><figure class='code'><figcaption><span>friend.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;section&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;h1&gt;</span>友情链接<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;li&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://music.163.com/#/playlist?id=60530487&quot;</span><span class="nt">&gt;</span>我的《命运石之门》歌单<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;li&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://wangshenghu.github.io&quot;</span><span class="nt">&gt;</span>Wangsheng Hu的个人博客<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'><span class="nt">&lt;/section&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>七、个性化之自定义样式</h2>
+
+<p>有关样式的所有内容都在<code>sass/</code>目录下，我们可以通过修改<code>sass/custom/_layout.scss</code>来修改博客的布局，比如调节侧边栏的宽度，或者调节标题的字体大小等。<br/>
+我们可以向<code>sass/custom/_styles.scss</code>文件中添加自定义背景图片的代码，对应的图片<code>background.png</code>则需要放置于<code>source/images/</code>目录下：</p>
+
+<p><figure class='code'><figcaption><span>_styles.scss <a href="http://octopress.org/docs/theme/styles/">http://octopress.org/docs/theme/styles/</a> Link </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nt">html</span> <span class="p">{</span>
+</span><span class='line'>        <span class="na">background</span><span class="o">:</span> <span class="mh">#555555</span> <span class="sx">url(&amp;ldquo;/images/background.png&amp;rdquo;)</span> <span class="no">fixed</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="nt">body</span> <span class="o">&gt;</span> <span class="nt">div</span> <span class="p">{</span>
+</span><span class='line'>        <span class="na">background-image</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="nt">body</span> <span class="o">&gt;</span> <span class="nt">div</span> <span class="o">&gt;</span> <span class="nt">div</span> <span class="p">{</span>
+</span><span class='line'>        <span class="na">background-image</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在添加完背景图片之后，我们可能会发现标题栏的背景色有些突兀，我们想要将标题栏的背景色修改为透明。经过百般寻找，我们发现标题栏的背景色在<code>sass/base/_theme.scss</code>中设置，直接将透明度修改为0即可：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nv">$header-bg</span><span class="o">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="mh">#333</span><span class="o">,</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">!default</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在标题栏透明之后，我们可能更喜欢导航栏的左上角和右上角更加圆滑一些，这时我们可以在<code>sass/custom/_styles.scss</code>添加如下代码：</p>
+
+<p><figure class='code'><figcaption><span>_styles.scss <a href="http://octopress.org/docs/theme/styles/">http://octopress.org/docs/theme/styles/</a> Link </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="k">@media</span> <span class="nt">only</span> <span class="nt">screen</span> <span class="nt">and</span> <span class="o">(</span><span class="nt">min-width</span><span class="nd">:</span> <span class="nt">1040px</span><span class="o">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">body</span> <span class="o">&gt;</span> <span class="nt">nav</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">@include</span><span class="nd"> border-top-radius</span><span class="p">(</span><span class="mf">.4</span><span class="kt">em</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">pre</span><span class="o">&gt;&lt;</span><span class="nt">code</span><span class="o">&gt;</span>    <span class="nt">body</span> <span class="k">&amp;</span><span class="nt">gt</span><span class="o">;</span> <span class="nt">footer</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">@include</span><span class="nd"> border-bottom-radius</span><span class="p">(</span><span class="mf">.4</span><span class="kt">em</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="nt">code</span><span class="o">&gt;&lt;/</span><span class="nt">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>八、在侧边栏中增加分类列表</h2>
+
+<p>如同本博客所示，侧边栏的分类列表会按照博文的类别对博文进行整理与归纳，十分方便。为了达到这样的效果，首先我们需要定义一个插件。Octopress的插件是以<code>plugins/*.rb</code>文件的形式存在的。我们要写的插件，需要归纳出所有博文的类型，然后显示出一系列形如<code>category_name (post_number)</code>的标签，并且还要定义每个标签指向的超链接位置。<br/>
+我们在<code>plugins/</code>目录下添加<code>category_list_tag.rb</code>文件，代码如下：</p>
+
+<p><figure class='code'><figcaption><span>category_list_tag.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">CategoryListTag</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">html</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="c1">#这是最终要生成的html。</span>
+</span><span class='line'>            <span class="n">categories</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">registers</span><span class="o">[</span><span class="ss">:site</span><span class="o">].</span><span class="n">categories</span><span class="o">.</span><span class="n">keys</span>
+</span><span class='line'>            <span class="n">categories</span><span class="o">.</span><span class="n">sort</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">category</span><span class="o">|</span> <span class="c1">#对于博文的每种类型catagory：</span>
+</span><span class='line'>                <span class="n">posts_in_category</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">registers</span><span class="o">[</span><span class="ss">:site</span><span class="o">].</span><span class="n">categories</span><span class="o">[</span><span class="n">category</span><span class="o">].</span><span class="n">size</span> <span class="c1">#获取该类型下有多少博文。</span>
+</span><span class='line'>                <span class="n">category_dir</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">registers</span><span class="o">[</span><span class="ss">:site</span><span class="o">].</span><span class="n">config</span><span class="o">[&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">category_dir</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">]</span> <span class="c1">#获取_config.yml文件中category_dir对应的路径，该路径默认是/blog/categories。&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>            <span class="c1">#这一步最为关键，category.to_url.downcase是当前类型catagory所对应的拼音（汉字无法识别）。</span>
+</span><span class='line'>            <span class="c1">#假设当前类型catagory为“笔记”，那么&#39;/#{category_dir}/#{category.to_url.downcase}/&#39;的值就是&#39;/blog/categories/bi-ji&#39;，这就是该标签的超链接指向的位置。</span>
+</span><span class='line'>            <span class="c1">#“#{category} (#{posts_in_category})”是该标签显示的内容，如“笔记 (2)”。</span>
+</span><span class='line'>            <span class="n">html</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s2">&quot;&amp;lt;li class=&#39;category&#39;&amp;gt;&amp;lt;a href=&#39;http://smwlover.github.io/</span><span class="si">#{</span><span class="n">category_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">category</span><span class="o">.</span><span class="n">to_url</span><span class="o">.</span><span class="n">downcase</span><span class="si">}</span><span class="s2">/&#39;&amp;gt;</span><span class="si">#{</span><span class="n">category</span><span class="si">}</span><span class="s2"> (</span><span class="si">#{</span><span class="n">posts_in_category</span><span class="si">}</span><span class="s2">)&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="n">html</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;Liquid::Template.register_tag(&amp;lsquo;category_list&amp;rsquo;, Jekyll::CategoryListTag)</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>然后，像之前往侧边栏添加内容时一样，我们在<code>source/_includes/custom/asides</code>目录下添加<code>category_list.html</code>文件，并且在<code>_config.yml</code>中的<code>default_asides:</code>中加入该文件的路径：</p>
+
+<p><figure class='code'><figcaption><span>category_list.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;section&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;h1&gt;</span>文章分类<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;ul</span> <span class="na">id=</span><span class="s">&quot;categories&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    {% category_list %}
+</span><span class='line'>  <span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'><span class="nt">&lt;/section&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>九、在首页添加“个人简介”（关于）选项卡：</h2>
+
+<p>我们可以在<code>source/_includes/custom/navigation.html</code>文件中自定义导航栏中选项卡的内容。为了加入“个人简介”选项卡，首先我们需要通过命令<code>rake new_page['about']</code>，在<code>source/</code>目录下创建一个<code>about/</code>目录，里面包含一个<code>index.markdown</code>文件。然后我们只需要在导航栏中添加一个指向该页面的标签即可：</p>
+
+<p><figure class='code'><figcaption><span>navigation.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;ul</span> <span class="na">class=</span><span class="s">&quot;main-navigation&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/&quot;</span><span class="nt">&gt;</span>博客主页<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/blog/archives&quot;</span><span class="nt">&gt;</span>文档列表<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/about&quot;</span><span class="nt">&gt;</span>个人简介<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>十、添加返回顶部按钮：</h2>
+
+<p>当自己的博文长度很长时，每次手动返回顶部就显得很不方便。我们可以在页面的右下角加入一个返回顶部按钮。首先，我们在<code>source/javascripts/</code>文件夹中加入<code>top.js</code>，这是实现返回顶部功能的代码：</p>
+
+<p><figure class='code'><figcaption><span>top.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">goTop</span><span class="p">(</span><span class="nx">acceleration</span><span class="p">,</span> <span class="nx">time</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>        <span class="nx">acceleration</span> <span class="o">=</span> <span class="nx">acceleration</span> <span class="o">||</span> <span class="mf">0.1</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">time</span> <span class="o">=</span> <span class="nx">time</span> <span class="o">||</span> <span class="mi">4</span><span class="p">;</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span>    <span class="kd">var</span> <span class="nx">x1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">y1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">x2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">y2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">x3</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">y3</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>            <span class="nx">x1</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">y1</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>            <span class="nx">x2</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">y2</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">x3</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">scrollX</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">y3</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">scrollY</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">x1</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">x2</span><span class="p">,</span> <span class="nx">x3</span><span class="p">));</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">y1</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">y2</span><span class="p">,</span> <span class="nx">y3</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">speed</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">window</span><span class="p">.</span><span class="nx">scrollTo</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">x</span> <span class="o">/</span> <span class="nx">speed</span><span class="p">),</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">y</span> <span class="o">/</span> <span class="nx">speed</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">x</span> <span class="o">&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">y</span> <span class="o">&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>            <span class="kd">var</span> <span class="nx">invokeFunction</span> <span class="o">=</span> <span class="s2">&quot;goTop(&quot;</span> <span class="o">+</span> <span class="nx">acceleration</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nx">time</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">invokeFunction</span><span class="p">,</span> <span class="nx">time</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>然后我们需要写一个按钮，该按钮可以调用这段代码。我们在<code>source/_includes/custom</code>文件夹下创建<code>totop.html</code>，代码如下：</p>
+
+<p><figure class='code'><figcaption><span>totop.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;full&quot;</span> <span class="na">style=</span><span class="s">&quot;position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">&quot;totop&quot;</span> <span class="na">href=</span><span class="s">&quot;#&quot;</span> <span class="na">onclick=</span><span class="s">&quot;goTop(); return false;&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;http://smwlover.github.io/javascripts/top.js&quot;</span> <span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>我们需要修改<code>source/_layouts/default.html</code>，使其包含进我们刚才写的<code>totop.html</code>：</p>
+
+<p><figure class='code'><figcaption><span>default.html </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">&lt;!-- 上面部分省略 --&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;&lt;footer</span> <span class="na">role=</span><span class="s">&quot;contentinfo&quot;</span><span class="nt">&gt;</span>{% include footer.html %}<span class="nt">&lt;/footer&gt;</span>
+</span><span class='line'>  {% include after_footer.html %}
+</span><span class='line'>  {% include custom/totop.html %}
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>最后，我们可以在<code>sass/custom/_styles.scss</code>中利用分类器自己定义该按钮的样式，包括鼠标悬浮时的效果等等。我定义的样式如下：</p>
+
+<p><figure class='code'><figcaption><span>_styles.scss </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//To Top:</span>
+</span><span class='line'><span class="nc">.totop</span><span class="p">{</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">block</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">width</span><span class="o">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">height</span><span class="o">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-image</span><span class="o">:</span> <span class="sx">url(&amp;ldquo;/images/top.png&amp;rdquo;)</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="nt">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nt">p</span><span class="o">&gt;</span><span class="nc">.totop</span><span class="nd">:hover</span><span class="p">{</span>
+</span><span class='line'>    <span class="na">background-position</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span> <span class="mi">-50</span><span class="kt">px</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>当然，我们需要将按钮对应的图片<code>top.png</code>放入<code>source/images/</code>路径下。</p>
+
+<h2>十一、优化加载速度：</h2>
+
+<p>到此为止，我们已经有了一个比较个性化的博客了，但是我们发现每次打开页面的速度相当慢，这是由于打开博客的时候有些条目需要访问Google的资源所致。我们可以将这些条目删除，使打开博客的速度快如闪电。<br/>
+1. 将<code>source/_includes/head.html</code>文件中的Google的jquery脚本地址改成<a href="http://developer.baidu.com/wiki/index.php?title=docs/cplat/libs">百度</a>的。<br/>
+2. 将<code>source/_includes/custom/head.html</code>文件中的Google Font请求注释掉。<br/>
+3. 将<code>_config.yml</code>文件中的twitter内容注释掉。</p>
+
+<h2>参考资料：</h2>
+
+<p><a href="http://wangshenghu.github.io/blog/2016/05/07/personal-settings-of-octopress/">Octopress的个性化设置</a><br/>
+<a href="https://segmentfault.com/markdown">Markdown编辑器语法指南</a><br/>
+<a href="http://octopress.org/docs/">Octopress官方文档</a></p>
 ]]></content>
   </entry>
   
