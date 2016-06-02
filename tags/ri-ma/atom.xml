@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[分类: 日麻 | 美柑の部屋]]></title>
-  <link href="http://smwlover.github.io/blog/categories/ri-ma/atom.xml" rel="self"/>
+  <title><![CDATA[标签：日麻 | 美柑の部屋]]></title>
+  <link href="http://smwlover.github.io/tags/ri-ma/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
   <updated>2016-06-02T20:50:38+08:00</updated>
   <id>http://smwlover.github.io/</id>

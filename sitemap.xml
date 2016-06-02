@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://smwlover.github.io/blog/2016/06/02/linked-list-problems/</loc>
+<lastmod>2016-06-02T16:11:10+08:00</lastmod>
+</url>
+<url>
 <loc>http://smwlover.github.io/blog/2016/05/28/table-plugin/</loc>
 <lastmod>2016-05-28T20:28:07+08:00</lastmod>
 </url>
@@ -67,5 +71,35 @@
 </url>
 <url>
 <loc>http://smwlover.github.io/blog/categories/shu-ju-jie-gou/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/octopress/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/ruby/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/ri-ma/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/ri-yu/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/c-plus-plus/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/wei-yun-suan/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/sui-ji-cha-xun/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/xian-duan-shu/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/shu-zhuang-shu-zu/</loc>
+</url>
+<url>
+<loc>http://smwlover.github.io/tags/lian-biao/</loc>
 </url>
 </urlset>

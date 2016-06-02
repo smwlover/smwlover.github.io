@@ -1,0 +1,671 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>面试常见问题盘点之链表 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="本文总结了面试中常见的一些关于链表的问题。">
+  <meta name="keywords" content="linked, list, 链表, smwlover">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/06/02/linked-list-problems/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\n");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
+						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
+						adjustPos();
+					}
+				}
+			}
+		}
+	</script>
+	<div id="lyricsContent"">
+		<h3 id="lyric"></h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">面试常见问题盘点之链表</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-06-02T16:11:10+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>4:11 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>链表是面试中经常被问到的一种数据结构，一是因为它实现简单，二是因为它的实现中涉及到指针操作，而一个人对指针操作的熟练程度很能够体现他的C++程序设计水平。这篇文章就来简单地盘点一下面试中经常会被问到的一些链表方面的问题。</p>
+
+<!--more-->
+
+
+<h2>一、删除一个给定的链表结点</h2>
+
+<p><strong>问题：</strong>给定单向链表的头指针和一个结点指针，定义一个函数在<code>O(1)</code>的平均时间复杂度内删除该结点。<br/>
+在链表中删除一个结点，我们需要知道该结点前驱结点的指针。但是现在只给出指向该结点的指针，又限定了<code>O(1)</code>的平均时间复杂度，所以不能通过遍历的方式找到其前驱结点。这个时候就需要我们跳出常规的思路：我们可以<strong>直接用该结点的后继结点的值覆盖掉该结点的值，然后将其后继结点删除</strong>。<br/>
+当然这种方法有一个前提，就是该结点不是链表的最后一个结点。如果是的话，我们只好乖乖地采用正常的方法，从链表头开始遍历找到该结点的前驱结点了。<br/>
+我们可以计算一下算法的平均时间复杂度：假设链表中有<code>n</code>个结点，我们的算法复杂度为<code>1</code>的概率为<code>(n-1)/n</code>，复杂度为<code>n</code>的概率为<code>1/n</code>，所以平均复杂度仍然为<code>O(1)</code>，满足要求。<br/>
+<strong>总结：</strong>这个题主要考察我们打破常规思维的能力，以及对“平均时间复杂度”的理解。</p>
+
+<h2>二、在一趟遍历内找到链表的中点</h2>
+
+<p><strong>问题：</strong>给定单向链表的头指针，要求在一趟遍历内找到链表的中点。<br/>
+通常情况下，我们会先进行一趟遍历，计算链表的长度<code>n</code>，然后再进行一趟遍历，返回第<code>n/2</code>个结点。<br/>
+更加快速的解法是利用<strong>快慢指针</strong>，我们定义两个指针<code>slow</code>和<code>fast</code>用于遍历链表，每次迭代，快指针<code>fast</code>向前走两步，慢指针<code>slow</code>向前走一步。这样，当<code>fast</code>走到链表尾端时，<code>slow</code>指针正好指向链表的中点。</p>
+
+<h2>三、判断链表是否存在环</h2>
+
+<p><strong>问题：</strong>给定单向链表的头指针，判断该链表是否存在环。<br/>
+仍然是使用快慢指针的方法，定义两个指针<code>slow</code>和<code>fast</code>。如果该链表不存在环，<code>fast</code>走到链表尾端，值会变为<code>NULL</code>；如果该链表存在环，<code>slow</code>和<code>fast</code>最终会相遇。</p>
+
+<p><strong>扩展1：</strong>如何知道环的长度（即位于环中的结点个数）？<br/>
+记录下<code>slow</code>和<code>fast</code>相遇的位置<code>p</code>，令<code>slow</code>和<code>fast</code>继续从<code>p</code>位置移动。我们知道，它们最后还是会在<code>p</code>处相遇，此时<code>slow</code>走了一圈，<code>fast</code>走了两圈。所以，记录<code>slow</code>从<code>p</code>开始移动到再次相遇所走的步数，就是环的长度。</p>
+
+<p><strong>扩展2：</strong>如何找出环的入口结点在哪里？<br/>
+利用两个指针<code>p1</code>和<code>p2</code>，分别从相遇点<code>p</code>和头结点<code>head</code>开始走，每次走一步，最终<code>p1</code>和<code>p2</code>肯定会相遇，相遇的结点就是环的入口结点。</p>
+
+<div class="expand">如何证明？<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+如图所示：<br/>
+<img src="/images/blogimg/6.png"><br/>
+假设头结点到入口结点的距离为<code>a</code>，入口结点到快慢指针相遇结点的距离为<code>x</code>，环的长度为<code>r</code>。从开始到快慢指针相遇为止，慢指针总共走了<code>s</code>步，则快指针走了<code>2s</code>步。另外，假设慢指针在环中转了<code>n1</code>圈，快指针转了<code>n2</code>圈。<br/>
+我们可以列出下面等式：<br/>
+<code>s = a + n1*r + x</code><br/>
+<code>2s = a + n2*r + x</code><br/>
+从上面两个等式中可以得出：<br/>
+<code>a = (n2 - 2*n1) * r - x</code><br/>
+由上式可知，若两个指针<code>p1</code>和<code>p2</code>分别从相遇结点和头结点开始移动，<code>p1</code>一定会在转第<code>n2 - 2*n1</code>圈的过程中与<code>p2</code>在入口结点相遇。命题得证。
+</div></div>
+
+
+<p>下面的代码以链表头结点作为输入，返回指向环的入口结点的指针。如果链表不包含环，则返回<code>NULL</code>：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">ListNode</span> <span class="o">*</span><span class="nf">detectCycle</span><span class="p">(</span><span class="n">ListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">head</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">p1</span> <span class="o">!=</span> <span class="n">p2</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">p2</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">||</span> <span class="o">!</span><span class="n">p2</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//一个从相遇点走，一个从起点走，二者相遇的地方即为环的起始点：</span>
+</span><span class='line'>    <span class="n">p1</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">p1</span> <span class="o">!=</span> <span class="n">p2</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">p1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>扩展3：</strong>如何求出带环链表的总长度？<br/>
+之前已经求出入口结点距离链表头的长度，以及链表环的长度，二者相加，就是带环链表的总长度。</p>
+
+<h2>四、如何求两个链表的交点？</h2>
+
+<p><strong>问题：</strong>给定两个单向链表的头指针，返回指向它们的交点的指针，如果它们没有交点，则返回<code>NULL</code>。（先假设两个链表都没有环。）<br/>
+<strong>方法一：</strong>将一个链表的头结点接到另外一个链表尾节点的后面，然后判断得到的新链表是否有环。如果有环，说明原来的链表有交点。<br/>
+<strong>方法二：</strong>定义两个指针<code>p1</code>和<code>p2</code>，分别指向第一个链表的头和第二个链表的头，然后每次向前走一格。当<code>p1</code>变为<code>NULL</code>时，将<code>p1</code>重置为第二个链表的头，继续遍历；当<code>p2</code>变为<code>NULL</code>时，将<code>p2</code>重置为第一个链表的头，继续遍历。这样，<code>p1</code>和<code>p2</code>第一次相遇的地方就是两个链表的交点了。<br/>
+另外，我们记录<code>p1</code>和<code>p2</code>因为遇到<code>NULL</code>而重置的次数，如果发现已经要进行第二次重置，但两个指针仍然没有相遇，则说明两个链表没有交点。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">ListNode</span> <span class="o">*</span><span class="nf">getIntersectionNode</span><span class="p">(</span><span class="n">ListNode</span> <span class="o">*</span><span class="n">headA</span><span class="p">,</span> <span class="n">ListNode</span> <span class="o">*</span><span class="n">headB</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">headA</span> <span class="o">||</span> <span class="o">!</span><span class="n">headB</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">headA</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">headB</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">p1Changed</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">p2Changed</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">p1</span> <span class="o">!=</span> <span class="n">p2</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">p1</span><span class="p">){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">p1Changed</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">p1</span> <span class="o">=</span> <span class="n">headB</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">p1Changed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">p2</span><span class="p">){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">p2Changed</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">p2</span> <span class="o">=</span> <span class="n">headA</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">p2Changed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">p1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>扩展：</strong>如果不保证两个链表没有环，该如何判断？<br/>
+首先判断两个链表是否有环，如果两个都没有环，直接利用上面的方法判断即可。<br/>
+如果一个有环一个没有环，那么两个链表肯定没有交点。<br/>
+如果两个都有环：假设利用快慢指针方法对链表<code>A</code>求得的相遇结点为<code>a</code>，对链表<code>B</code>求得的相遇结点为<code>b</code>。我们知道，<code>a</code>一定在<code>A</code>的环上，<code>b</code>一定在<code>B</code>的环上，关键是判断<code>a</code>和<code>b</code>所处的环是不是同一个环。我们从<code>a</code>开始遍历，直到再次遇到<code>a</code>之前，如果我们能够遇到<code>b</code>，说明<code>a</code>和<code>b</code>在一个环上，也就是<code>A</code>和<code>B</code>有交点；否则说明两个链表的环是单独的环，两个链表没有交点。</p>
+
+<h2>五、反向打印链表元素</h2>
+
+<p><strong>问题：</strong>给定单向链表的头指针，反向打印链表中的所有元素。<br/>
+对于非递归方式，可以用一个栈来实现，首先遍历链表，将遍历到的元素依次进栈。在遍历完链表之后，弹栈并依次将弹出的元素打印出来。<br/>
+当然，本问题也可以用递归方式实现。递归方式类似于树的后序遍历，即先打印后继结点，再打印当前结点。递归方式实现的代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">print</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">head</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">print</span><span class="p">(</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">val</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>六、反转链表</h2>
+
+<p><strong>问题：</strong>给定单向链表的头指针，将该链表反转，并且返回新链表的头指针。<br/>
+当然，一种方法仍然是利用栈。遍历链表并将遍历到的元素一个一个压入栈，然后将栈中的元素弹出并依照弹出的顺序构造一个新的链表。<br/>
+但是如果要求<strong>不能使用额外空间</strong>呢？我们需要对链表进行原地反转操作。我们在调整结点<code>node</code>的<code>next</code>指针时，除了需要知道<code>node</code>本身之外，还需要知道<code>node</code>的前一个结点<code>prev</code>，因为我们需要把结点<code>node</code>的<code>next</code>指针赋值成<code>prev</code>；同时我们还要事先保存结点<code>node</code>原本的下一个结点<code>succ</code>，以防止链表因为<code>node-&gt;next</code>被重新赋值而断开。注意这三个变量的相互关系，写出反转链表的迭代形式就很容易了：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">ListNode</span><span class="o">*</span> <span class="nf">reverseList</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">head</span> <span class="o">||</span> <span class="o">!</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">prev</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">node</span> <span class="o">=</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">node</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">ListNode</span><span class="o">*</span> <span class="n">succ</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">prev</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">node</span> <span class="o">=</span> <span class="n">succ</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">prev</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>反转链表也可以用递归的形式来实现，其实本质上和树的后序遍历仍然是类似的，即先反转后继结点，再反转当前结点。代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">ListNode</span><span class="o">*</span> <span class="nf">reverseRecur</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">head</span> <span class="o">||</span> <span class="o">!</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span>  <span class="o">=</span> <span class="n">reverseRecur</span><span class="p">(</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<div class="expand">对上述代码的解释<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+对于一个链表<code>n[1]->n[2]->...->n[m]</code>，假设我们对<code>head = n[k]</code>一层进行递归，也就是结点<code>n[k+1]</code>后面已经反转好了，那么现在链表的状态可以表示为：<br/>
+<code>n[1]->n[2]->...->n[k]->n[k+1]<-n[k+2]<-...n[m]</code><br/>
+我们这一步要做的操作是让<code>n[k+1]</code>的<code>next</code>结点指向<code>n[k]</code>，对应的代码就是：<br/>
+<code>n[k]->next->next = n[k]</code><br/>
+为了避免出现环，我们还要把<code>n[k]->next</code>置为<code>NULL</code>。
+</div></div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-06-02T16:11:10+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>4:11 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/bi-ji/'>笔记</a>, <a class='category' href='/blog/categories/suan-fa/'>算法</a>
+  
+</span>
+
+
+      
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/c-plus-plus/'>c++</a>, <a class='tag' href='/tags/lian-biao/'>链表</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/28/table-plugin/" title="Previous Post: Octopress插件：表格">&laquo; Octopress插件：表格</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (3)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (6)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (5)</a></li>
+
+  </ul>
+</section><section>
+  <h1>标签云</h1>
+  <ul class="tag-cloud">
+<a style="font-size: 176%" href="/tags/c-plus-plus/">c++</a>
+<a style="font-size: 200%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 176%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 60%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
+<a style="font-size: 110%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
+<a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
+<a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
+<a style="font-size: 139%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+
+  </ul>
+</section>
+<section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点之链表</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/27/binary-indexed-tree/">Random Query之树状数组</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/24/segment-tree/">RMQ问题（二）：线段树</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_310_430_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="310" height="430" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/06/02/linked-list-problems/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/06/02/linked-list-problems/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>

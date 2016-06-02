@@ -181,8 +181,8 @@
 <h2>一、概述</h2>
 
 <p>本文还是以求一段区间中元素的最小值问题为例，建立线段树这种数据结构。<br/>
-线段树首先是一棵普通的二叉树，每个节点都有指向自己的左右儿子的指针。但在此基础上，线段树的每个节点还表示一个区间<code>[l,r]</code>。如果<code>l</code>等于<code>r</code>，该节点就是一个叶子节点；否则该节点就是一个中间节点，其左儿子表示这个区间的前半部分<code>[l,(l+r)/2]</code>，其右儿子表示这个区间的后半部分<code>[(l+r)/2+1,r]</code>。线段树的根节点表示的是原数组对应的整个区间<code>[1,n]</code>。<br/>
-于是我们可以在脑海中大致勾勒出线段树的节点对应的数据结构<code>Node</code>的轮廓：</p>
+线段树首先是一棵普通的二叉树，每个结点都有指向自己的左右儿子的指针。但在此基础上，线段树的每个结点还表示一个区间<code>[l,r]</code>。如果<code>l</code>等于<code>r</code>，该结点就是一个叶子结点；否则该结点就是一个中间结点，其左儿子表示这个区间的前半部分<code>[l,(l+r)/2]</code>，其右儿子表示这个区间的后半部分<code>[(l+r)/2+1,r]</code>。线段树的根结点表示的是原数组对应的整个区间<code>[1,n]</code>。<br/>
+于是我们可以在脑海中大致勾勒出线段树的结点对应的数据结构<code>Node</code>的轮廓：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -205,9 +205,9 @@
 
 <h2>二、线段树的初始化</h2>
 
-<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个节点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个节点对应的区间如下图所示（图片来自hihoCoder）：<br/>
+<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个结点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个结点对应的区间如下图所示（图片来自hihoCoder）：<br/>
 <img src="/images/blogimg/4.png"><br/>
-构建完基本结构之后，下一步操作是计算每个节点对应的区间中元素的最小值。对于叶子节点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间节点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子节点的值，再根据子节点的值计算父节点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
+构建完基本结构之后，下一步操作是计算每个结点对应的区间中元素的最小值。对于叶子结点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间结点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子结点的值，再根据子结点的值计算父结点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -316,16 +316,16 @@
 </span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
 </span><span class='line'>        <span class="n">root</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子节点的最小值</span>
-</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子节点的最小值</span>
+</span><span class='line'>    <span class="n">root</span> <span class="o">=</span> <span class="n">constructTree</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//构建线段树，顺便初始化叶子结点的最小值</span>
+</span><span class='line'>    <span class="n">initializeMin</span><span class="p">(</span><span class="n">root</span><span class="p">);</span> <span class="c1">//利用后序遍历，初始化非叶子结点的最小值</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <h2>三、线段树的更新</h2>
 
-<p>所谓更新，就是在对应的数组<code>arr</code>中某个元素的值发生变化时，更新该线段树上的节点所记录的最小值。我们可以想象一下受影响的节点包括哪些：首先这个发生变化的元素对应的叶子节点的值肯定要更新，然后是叶子节点的父节点、叶子节点的祖父节点……最后是根节点。由于其他节点对应的区间没有包含该元素，因此其值不受影响。<br/>
-也就是说，我只需要找到从根节点到该叶子节点的路径，然后倒序更新该路径上节点的值就可以了。由于根节点到叶子节点的路径上节点数目为<code>O(logn)</code>，所以更新线段树的时间复杂度为<code>O(logn)</code>。代码如下：</p>
+<p>所谓更新，就是在对应的数组<code>arr</code>中某个元素的值发生变化时，更新该线段树上的结点所记录的最小值。我们可以想象一下受影响的结点包括哪些：首先这个发生变化的元素对应的叶子结点的值肯定要更新，然后是叶子结点的父结点、叶子结点的祖父结点……最后是根结点。由于其他结点对应的区间没有包含该元素，因此其值不受影响。<br/>
+也就是说，我只需要找到从根结点到该叶子结点的路径，然后倒序更新该路径上结点的值就可以了。由于根结点到叶子结点的路径上结点数目为<code>O(logn)</code>，所以更新线段树的时间复杂度为<code>O(logn)</code>。代码如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -360,8 +360,8 @@
 <span class='line-number'>31</span>
 <span class='line-number'>32</span>
 <span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//在更新一个元素的值的时候，用类似二分查找的方法更新查找路径上节点的值。</span>
-</span><span class='line'><span class="c1">//具体更新的方法是利用递归，先更新子节点，再根据子节点更新之后的值更新父节点。</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//在更新一个元素的值的时候，用类似二分查找的方法更新查找路径上结点的值。</span>
+</span><span class='line'><span class="c1">//具体更新的方法是利用递归，先更新子结点，再根据子结点更新之后的值更新父结点。</span>
 </span><span class='line'><span class="c1">//这一步操作的复杂度是O(nlogn)。</span>
 </span><span class='line'><span class="kt">void</span> <span class="n">SegmentTree</span><span class="o">::</span><span class="n">updateNode</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">){</span>
 </span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
@@ -380,7 +380,7 @@
 </span><span class='line'>        <span class="c1">//查找右子树：</span>
 </span><span class='line'>        <span class="n">updateNode</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">//更新该节点的最小值：</span>
+</span><span class='line'>    <span class="c1">//更新该结点的最小值：</span>
 </span><span class='line'>    <span class="kt">int</span> <span class="n">minVal</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
 </span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
 </span><span class='line'>        <span class="n">minVal</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">minVal</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">-&gt;</span><span class="n">minVal</span><span class="p">);</span>
@@ -398,7 +398,7 @@
 
 <h2>四、线段树的查询：</h2>
 
-<p>还是以上面所建立的10个元素的线段树为例：如果要查询的区间就是<code>[1,10]</code>，那么我们直接取出根节点记录的最小值就可以了。但如果不是<code>[1,10]</code>呢？又分为三种情况：<br/>
+<p>还是以上面所建立的10个元素的线段树为例：如果要查询的区间就是<code>[1,10]</code>，那么我们直接取出根结点记录的最小值就可以了。但如果不是<code>[1,10]</code>呢？又分为三种情况：<br/>
 首先，要查询的区间完全位于左子树，这个时候我们对左子树进行递归调用，获取查询结果即可；其次，要查询的区间完全位于右子树，类似地，我们对右子树进行递归调用；最后，要查询的区间横跨左右子树，这个时候，我们只能把这个区间<code>[l,r]</code>分为两部分，第一部分<code>[l,middle]</code>完全位于左子树中，第二部分<code>[middle+1,r]</code>完全位于右子树中，对两部分都进行递归调用，然后取两部分结果中较小的那一个。这一步的时间复杂度仍然是<code>O(logn)</code>，代码如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -478,6 +478,15 @@
 </span>
 
 
+      
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/c-plus-plus/'>c++</a>, <a class='tag' href='/tags/xian-duan-shu/'>线段树</a>, <a class='tag' href='/tags/sui-ji-cha-xun/'>随机查询</a>
+  
+</span>
+
+
     </p>
     
       <div class="sharing">
@@ -526,15 +535,35 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (2)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (3)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
-<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (5)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (4)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (6)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (5)</a></li>
 
   </ul>
 </section><section>
+  <h1>标签云</h1>
+  <ul class="tag-cloud">
+<a style="font-size: 176%" href="/tags/c-plus-plus/">c++</a>
+<a style="font-size: 200%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 176%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 60%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
+<a style="font-size: 110%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
+<a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
+<a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
+<a style="font-size: 139%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+
+  </ul>
+</section>
+<section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点之链表</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
@@ -550,10 +579,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/23/rmq-st/">RMQ问题（一）：RMQ-ST算法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/22/lyric-bar/">在自己的博客中加入歌词栏</a>
       </li>
     
   </ul>
