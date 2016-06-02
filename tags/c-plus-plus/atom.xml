@@ -4,7 +4,7 @@
   <title><![CDATA[标签：c++ | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-02T20:50:38+08:00</updated>
+  <updated>2016-06-02T21:27:01+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -121,7 +121,7 @@
 <p><strong>扩展3：</strong>如何求出带环链表的总长度？<br/>
 之前已经求出入口结点距离链表头的长度，以及链表环的长度，二者相加，就是带环链表的总长度。</p>
 
-<h2>四、如何求两个链表的交点？</h2>
+<h2>四、求两个链表的交点</h2>
 
 <p><strong>问题：</strong>给定两个单向链表的头指针，返回指向它们的交点的指针，如果它们没有交点，则返回<code>NULL</code>。（先假设两个链表都没有环。）<br/>
 <strong>方法一：</strong>将一个链表的头结点接到另外一个链表尾节点的后面，然后判断得到的新链表是否有环。如果有环，说明原来的链表有交点。<br/>
