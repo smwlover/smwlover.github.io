@@ -180,18 +180,22 @@
 
 <h2>一、概览</h2>
 
-<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：<br/>
-<code>e[1] = a[1]</code><br/>
-<code>e[2] = a[1] + a[2]</code><br/>
-<code>e[3] = a[3]</code><br/>
-<code>e[4] = a[1] + a[2] + a[3] + a[4]</code><br/>
-<code>e[5] = a[5]</code><br/>
-<code>e[6] = a[5] + a[6]</code><br/>
-<code>e[7] = a[7]</code><br/>
-<code>e[8] = a[1] + a[2] + a[3] + a[4] + ... + a[8]</code></p>
+<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：</p>
 
-<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：<br/>
-<img src="/images/blogimg/5.png"></p>
+<p><code>
+<span>e[1] = a[1]</span><br/>
+<span>e[2] = a[1] + a[2]</span><br/>
+<span>e[3] = a[3]</span><br/>
+<span>e[4] = a[1] + a[2] + a[3] + a[4]</span><br/>
+<span>e[5] = a[5]</span><br/>
+<span>e[6] = a[5] + a[6]</span><br/>
+<span>e[7] = a[7]</span><br/>
+<span>e[8] = a[1] + a[2] + a[3] + a[4] + &hellip; + a[8]</span>
+</code></p>
+
+<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：</p>
+
+<p><img src="/images/blogimg/5.png"></p>
 
 <h2>二、查询</h2>
 

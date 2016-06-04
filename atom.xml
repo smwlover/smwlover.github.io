@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-04T19:41:43+08:00</updated>
+  <updated>2016-06-04T20:44:42+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -465,8 +465,12 @@
 <img src="http://smwlover.github.io/images/blogimg/6.png"><br/>
 假设头结点到入口结点的距离为<code>a</code>，入口结点到快慢指针相遇结点的距离为<code>x</code>，环的长度为<code>r</code>。从开始到快慢指针相遇为止，慢指针总共走了<code>s</code>步，则快指针走了<code>2s</code>步。另外，假设慢指针在环中转了<code>n1</code>圈，快指针转了<code>n2</code>圈。<br/>
 我们可以列出下面等式：<br/>
-<code>s = a + n1*r + x</code><br/>
-<code>2s = a + n2*r + x</code><br/>
+
+<code>
+<span>s = a + n1*r + x</span><br/>
+<span>2s = a + n2*r + x</span>
+</code>
+<br/>
 从上面两个等式中可以得出：<br/>
 <code>a = (n2 - 2*n1) * r - x</code><br/>
 由上式可知，若两个指针<code>p1</code>和<code>p2</code>分别从相遇结点和头结点开始移动，<code>p1</code>一定会在转第<code>n2 - 2*n1</code>圈的过程中与<code>p2</code>在入口结点相遇。命题得证。
@@ -938,18 +942,22 @@
 
 <h2>一、概览</h2>
 
-<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：<br/>
-<code>e[1] = a[1]</code><br/>
-<code>e[2] = a[1] + a[2]</code><br/>
-<code>e[3] = a[3]</code><br/>
-<code>e[4] = a[1] + a[2] + a[3] + a[4]</code><br/>
-<code>e[5] = a[5]</code><br/>
-<code>e[6] = a[5] + a[6]</code><br/>
-<code>e[7] = a[7]</code><br/>
-<code>e[8] = a[1] + a[2] + a[3] + a[4] + ... + a[8]</code></p>
+<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：</p>
 
-<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：<br/>
-<img src="http://smwlover.github.io/images/blogimg/5.png"></p>
+<p><code>
+<span>e[1] = a[1]</span><br/>
+<span>e[2] = a[1] + a[2]</span><br/>
+<span>e[3] = a[3]</span><br/>
+<span>e[4] = a[1] + a[2] + a[3] + a[4]</span><br/>
+<span>e[5] = a[5]</span><br/>
+<span>e[6] = a[5] + a[6]</span><br/>
+<span>e[7] = a[7]</span><br/>
+<span>e[8] = a[1] + a[2] + a[3] + a[4] + &hellip; + a[8]</span>
+</code></p>
+
+<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：</p>
+
+<p><img src="http://smwlover.github.io/images/blogimg/5.png"></p>
 
 <h2>二、查询</h2>
 
