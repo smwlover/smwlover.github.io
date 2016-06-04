@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 数据结构 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-03T20:39:38+08:00</updated>
+  <updated>2016-06-04T10:52:32+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -28,7 +28,7 @@
 <p><strong>问题：</strong>输入一个数组以及一个整数<code>k</code>，返回数组中第<code>k</code>大的元素。<br/>
 看到这个问题，我们的第一反应是先将输入的数组排序，这样一来，算法的时间复杂度就至少是<code>O(nlogn)</code>。其实，解决这类问题有一种更快的方法，它是基于快速排序的<code>partition</code>函数实现的。</p>
 
-<p>首先回顾一下快速排序的<code>partition</code>函数，该函数的作用是选择一个标记元素<code>pivot</code>（一般取数组第一个元素为标记元素），将原数组划分为两部分，左边一部分都比<code>pivot</code>小，右边一部分都比<code>pivot</code>大，<code>pivot</code>位于中间。<br/>
+<p>首先回顾一下快速排序的<code>partition</code>函数，该函数的作用是选择一个标记元素<code>pivot</code>（一般取数组第一个元素为标记元素），将原数组划分为两部分，左边一部分元素比<code>pivot</code>小，右边一部分元素比<code>pivot</code>大，<code>pivot</code>位于中间。<br/>
 <code>partition</code>函数的大致流程如下：<br/>
 <strong>1. 初始：</strong>记录两个下标<code>p1</code>和<code>p2</code>。<code>p1</code>记录了比<code>pivot</code>小的部分的最后一个元素的下标，初始值为<code>0</code>；<code>p2</code>记录了当前正在遍历的元素的下标，初始值为<code>1</code>。<br/>
 <strong>2. 迭代：</strong>每当<code>p2</code>遍历到一个比<code>pivot</code>小的元素，则将<code>p1++</code>，然后将<code>arr[p1]</code>的值和<code>arr[p2]</code>的值进行交换。<br/>
@@ -260,23 +260,23 @@
 </span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="c1">//逐个输入数组元素</span>
 </span><span class='line'>        <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">Heap</span> <span class="n">heap</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">priority_queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;,</span> <span class="n">less</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">heap</span><span class="p">;</span> <span class="c1">//建立大根堆</span>
 </span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
 </span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">heap</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">k</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">heap</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span><span class='line'>        <span class="n">heap</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 </span><span class='line'>    <span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">top</span> <span class="o">=</span> <span class="n">heap</span><span class="p">.</span><span class="n">getMax</span><span class="p">();</span> <span class="c1">//获取堆顶元素</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">top</span> <span class="o">=</span> <span class="n">heap</span><span class="p">.</span><span class="n">top</span><span class="p">();</span> <span class="c1">//获取堆顶元素</span>
 </span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">top</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </span><span class='line'>            <span class="k">continue</span><span class="p">;</span>
 </span><span class='line'>        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">top</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]){</span>
-</span><span class='line'>            <span class="n">heap</span><span class="p">.</span><span class="n">deleteMax</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">heap</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span><span class='line'>            <span class="n">heap</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>            <span class="n">heap</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">heap</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">//输出结果</span>
-</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">heap</span><span class="p">.</span><span class="n">getMax</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">heap</span><span class="p">.</span><span class="n">deleteMax</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">heap</span><span class="p">.</span><span class="n">top</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">heap</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
