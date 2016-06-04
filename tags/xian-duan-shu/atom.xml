@@ -4,7 +4,7 @@
   <title><![CDATA[标签：线段树 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/xian-duan-shu/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-04T11:09:12+08:00</updated>
+  <updated>2016-06-04T19:03:24+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[RMQ问题（二）：线段树]]></title>
+    <title type="html"><![CDATA[随机查询（二）：线段树]]></title>
     <link href="http://smwlover.github.io/blog/2016/05/24/segment-tree/"/>
     <updated>2016-05-24T20:00:09+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/05/24/segment-tree</id>
