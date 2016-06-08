@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 笔记 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/bi-ji/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-04T20:44:42+08:00</updated>
+  <updated>2016-06-08T15:28:30+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -14,28 +14,30 @@
 
   
   <entry>
-    <title type="html"><![CDATA[面试常见问题盘点之中位数]]></title>
+    <title type="html"><![CDATA[面试常见问题盘点：第k大元素]]></title>
     <link href="http://smwlover.github.io/blog/2016/06/03/kth-largest-element/"/>
     <updated>2016-06-03T15:28:17+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/06/03/kth-largest-element</id>
-    <content type="html"><![CDATA[<p>数组本身结构简单，但是对数组进行操作会涉及到很多经典算法，这使得数组成为了面试中最热门的考点之一。这篇文章就总结一下与数组有关的一类问题：求数组中元素的中位数（或者第<code>k</code>小/第<code>k</code>大元素）的问题。</p>
+    <content type="html"><![CDATA[<p>数组本身结构简单，但是对数组进行操作会涉及到很多经典算法，这使得数组成为了面试中最热门的考点之一。这篇文章就总结一下求数组的第<code>k</code>小/第<code>k</code>大元素，或者中位数的问题。</p>
 
 <!--more-->
 
 
-<h2>一、求数组中第k小/第k大的元素</h2>
+<h2>一、求数组中第k小/第k大元素</h2>
 
 <p><strong>问题：</strong>输入一个数组以及一个整数<code>k</code>，返回数组中第<code>k</code>大的元素。<br/>
-看到这个问题，我们的第一反应是先将输入的数组排序，这样一来，算法的时间复杂度就至少是<code>O(nlogn)</code>。其实，解决这类问题有一种更快的方法，它是基于快速排序的<code>partition</code>函数实现的。</p>
+看到这个问题，我们的第一反应可能是先将输入的数组排序，这样一来，算法的时间复杂度就至少是<code>O(nlogn)</code>。其实，解决这类问题有一种更快的方法，它是基于快速排序的<code>partition</code>函数实现的。</p>
 
-<p>首先回顾一下快速排序的<code>partition</code>函数，该函数的作用是选择一个标记元素<code>pivot</code>（一般取数组第一个元素为标记元素），将原数组划分为两部分，左边一部分元素比<code>pivot</code>小，右边一部分元素比<code>pivot</code>大，<code>pivot</code>位于中间。<br/>
-<code>partition</code>函数的大致流程如下：<br/>
+<h3>1.1 <code>partition</code>函数概述</h3>
+
+<p><code>partition</code>函数的作用是选择一个标记元素<code>pivot</code>（一般取数组第一个元素为标记元素），将原数组划分为两部分，左边一部分元素比<code>pivot</code>小，右边一部分元素比<code>pivot</code>大，<code>pivot</code>位于中间。该函数的大致流程如下：<br/>
 <strong>1. 初始：</strong>记录两个下标<code>p1</code>和<code>p2</code>。<code>p1</code>记录了比<code>pivot</code>小的部分的最后一个元素的下标，初始值为<code>0</code>；<code>p2</code>记录了当前正在遍历的元素的下标，初始值为<code>1</code>。<br/>
 <strong>2. 迭代：</strong>每当<code>p2</code>遍历到一个比<code>pivot</code>小的元素，则将<code>p1++</code>，然后将<code>arr[p1]</code>的值和<code>arr[p2]</code>的值进行交换。<br/>
 <strong>3. 结束：</strong>在遍历完毕后，<code>arr[1..p1]</code>存放的就是所有小于<code>pivot</code>的元素，<code>arr[p1+1..p2]</code>存放的就是所有的大于<code>pivot</code>的元素。我们将<code>arr[0]</code>和<code>arr[p1]</code>交换，这样标记元素<code>pivot</code>就位于下标为<code>p1</code>的位置，它左侧的元素小于它，它右侧的元素大于它。</p>
 
-<p>求数组中第<code>k</code>大元素的问题也是基于<code>partition</code>函数实现的：<br/>
-首先对整个数组进行一次划分，观察大于<code>pivot</code>的元素数量<code>size</code>。如果<code>size == k-1</code>，说明<code>pivot</code>正好是我们要找的第<code>k</code>大的元素，直接返回<code>pivot</code>即可；如果<code>size &gt; k-1</code>，说明第<code>k</code>大的元素位于右半部分，我们需要对右半部分递归调用<code>partition</code>函数，找右半部分第<code>k</code>大的元素；如果<code>size &lt; k-1</code>，说明第<code>k</code>大的元素位于左半部分，我们需要对左半部分递归调用<code>partition</code>函数，找左半部分第<code>k-1-size</code>大的元素。</p>
+<h3>1.2 基于<code>partition</code>函数的求第<code>k</code>大元素的算法</h3>
+
+<p>首先对整个数组进行一次划分，观察大于<code>pivot</code>的元素数量<code>size</code>。如果<code>size == k-1</code>，说明<code>pivot</code>正好是我们要找的第<code>k</code>大的元素，直接返回<code>pivot</code>即可；如果<code>size &gt; k-1</code>，说明第<code>k</code>大的元素位于右半部分，我们需要对右半部分递归调用<code>partition</code>函数，找右半部分第<code>k</code>大的元素；如果<code>size &lt; k-1</code>，说明第<code>k</code>大的元素位于左半部分，我们需要对左半部分递归调用<code>partition</code>函数，找左半部分第<code>k-1-size</code>大的元素。</p>
 
 <p><figure class='code'><figcaption><span>数组第k大的元素 </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -118,7 +120,10 @@
 
 <p><strong>问题：</strong>输入一个数组以及一个整数<code>k</code>，返回数组中前<code>k</code>小的元素。</p>
 
-<p><strong>方法一：</strong>定义<code>partition</code>函数，其返回值为<code>pivot</code>在划分之后所处的下标。首先对整个数组进行一次划分，观察返回值。如果返回值等于<code>k</code>，我们知道<code>arr[0..k-1]</code>肯定都比<code>pivot</code>小，<code>arr[k+1..n-1]</code>肯定都比<code>pivot</code>大，换句话说，<code>arr[0..k-1]</code>就是数组的前<code>k</code>小的元素；如果返回值小于<code>k</code>，我们对右半部分进行递归调用，直到返回值等于<code>k</code>为止；如果返回值大于<code>k</code>，我们对左半部分进行递归调用，直到返回值等于<code>k</code>为止。<br/>
+<h3>2.1 方法一：基于<code>partition</code>函数的算法</h3>
+
+<p>定义<code>partition</code>函数，其返回值为<code>pivot</code>在划分之后所处的下标。首先对整个数组进行一次划分，并观察函数的返回值。<br/>
+如果返回值等于<code>k</code>，我们知道<code>arr[0..k-1]</code>肯定都比<code>pivot</code>小，<code>arr[k+1..n-1]</code>肯定都比<code>pivot</code>大，换句话说，<code>arr[0..k-1]</code>就是数组的前<code>k</code>小的元素；如果返回值小于<code>k</code>，我们对右半部分进行递归调用，直到返回值等于<code>k</code>为止；如果返回值大于<code>k</code>，我们对左半部分进行递归调用，直到返回值等于<code>k</code>为止。<br/>
 与上一个问题相同，该算法的平均时间复杂度为<code>O(n)</code>。</p>
 
 <p><figure class='code'><figcaption><span>数组前k小的元素 </span></figcaption>
@@ -218,9 +223,10 @@
 
 <p>上述方法尽管效率较高，但是也存在一个致命的问题：<strong>运行时需要将所有数据载入内存</strong>。这就决定了该算法不适合海量数据的场合，比如从一亿个数中找出前一百个数。为了解决这个问题，我们便引入了一种基于堆的方法。</p>
 
-<p><strong>方法二：</strong>建立一个大根堆，然后遍历数组中的所有元素，在遍历过程中：<br/>
-如果堆的大小小于<code>k</code>，则直接将该元素进堆；<br/>
-如果堆的大小等于<code>k</code>，则比较该元素与堆顶元素的大小。由于是大根堆，堆顶元素肯定是堆中最大的元素。如果该元素比堆顶元素还要大，那么该元素不可能是前<code>k</code>小的元素之一（因为堆中已经有<code>k</code>个比它小的元素了），我们可以直接将该元素抛弃；如果该元素比堆顶元素小，我们知道堆顶元素已经不再属于前<code>k</code>小的元素之一了，我们将堆顶元素弹出，然后将该元素进堆。<br/>
+<h3>2.2 方法二：基于堆的算法</h3>
+
+<p>建立一个大根堆，然后遍历数组中的所有元素，在遍历过程中：<br/>
+如果堆的大小小于<code>k</code>，则直接将该元素进堆。如果堆的大小等于<code>k</code>，则比较该元素与堆顶元素的大小。由于是大根堆，堆顶元素肯定是堆中最大的元素。如果该元素比堆顶元素还要大，那么该元素不可能是前<code>k</code>小的元素之一（因为堆中已经有<code>k</code>个比它小的元素了），我们可以直接将该元素抛弃；如果该元素比堆顶元素小，我们知道堆顶元素已经不再属于前<code>k</code>小的元素之一了，我们将堆顶元素弹出，然后将该元素进堆。<br/>
 在算法执行的过程中，保证堆的大小不大于<code>k</code>。这样算法执行完毕后，堆中的元素就是原数组前<code>k</code>小的元素。</p>
 
 <p><figure class='code'><figcaption><span>数组前k小的元素 </span></figcaption>
@@ -286,14 +292,15 @@
 
 <p>该方法不需要将所有数据载入内存，只需要在内存中保存一个大小为<code>k</code>的堆，所以更适合处理海量数据。因为每次调整堆的时间复杂度为<code>O(logk)</code>，并且最坏情况下，每遍历到一个元素就需要对堆进行一次调整，所以该方法的时间复杂度为<code>O(nlogk)</code>。总体来讲，该方法适用于<code>n</code>较大但是<code>k</code>非常小的情况。</p>
 
-<h2>三、求数据流的中位数</h2>
+<h2>三、求长度可变数组的中位数</h2>
 
-<p><strong>问题：</strong>有一个数据结构支持两种操作：一是向该数据结构中加入一个整数；二是求该数据结构中所有整数的中位数。请将该数据结构实现。<br/>
+<p><strong>问题：</strong>有一个数组支持两种操作：一是向该数组中加入一个元素（<code>int</code>类型）；二是求该数组中所有元素的中位数。请实现该数组。<br/>
 通过本文的第一节，我们已经知道了计算大小为<code>n</code>的数组中位数的方法：如果<code>n</code>是奇数，那么中位数就是第<code>n/2 + 1</code>大的元素；如果<code>n</code>是偶数，中位数则是第<code>n/2</code>和<code>n/2 + 1</code>大的元素的平均值。我们可以直接利用上面提到的基于<code>partition</code>的方法进行递归求解。<br/>
 但是本问题中，数组的长度是逐渐增加的，我们不可能在每次往数组中添加元素之后，都利用<code>O(n)</code>的时间来求新的中位数。我们需要找到更快的方法。</p>
 
-<p><strong>最大最小堆法：</strong><br/>
-我们保存一个大根堆和一个小根堆，并且在往数组中添加元素之后，保证以下三个条件：<br/>
+<h3>3.1 最大最小堆法更新中位数</h3>
+
+<p>我们保存一个大根堆和一个小根堆，并且在往数组中添加元素之后，保证以下三个条件：<br/>
 1、大根堆中的元素是整个数组中较小的一半元素；<br/>
 2、小根堆中的元素是整个数组中较大的一半元素；<br/>
 3、大根堆和小根堆的大小之差的绝对值不超过1。<br/>
@@ -303,10 +310,11 @@
 如果<code>num</code>介于二者之间，则放入哪个堆中都是可以的。<br/>
 然后观察两个堆大小之差的绝对值是否超过<code>1</code>，如果是，我们需要调节两个堆的平衡，具体做法为：从元素数量较多的堆中取出一个元素，放入另一个堆中。</p>
 
-<p><strong>中位数的获取：</strong><br/>
-如果大根堆与小根堆的大小相差<code>1</code>，说明原数组大小为奇数。大小较大的那个堆的堆顶元素即为中位数。如果大根堆与小根堆的大小相等，说明原数组大小为偶数。两个堆堆顶元素的平均值即为中位数。</p>
+<h3>3.2 最大最小堆法获取中位数</h3>
 
-<p><figure class='code'><figcaption><span>该数据结构的实现 </span></figcaption>
+<p>如果大根堆与小根堆的大小相差<code>1</code>，说明原数组大小为奇数。大小较大的那个堆的堆顶元素即为中位数。如果大根堆与小根堆的大小相等，说明原数组大小为偶数。两个堆堆顶元素的平均值即为中位数。</p>
+
+<p><figure class='code'><figcaption><span>求长度可变数组的中位数 </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -441,7 +449,7 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[面试常见问题盘点之链表]]></title>
+    <title type="html"><![CDATA[面试常见问题盘点：链表]]></title>
     <link href="http://smwlover.github.io/blog/2016/06/02/linked-list-problems/"/>
     <updated>2016-06-02T16:11:10+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/06/02/linked-list-problems</id>
