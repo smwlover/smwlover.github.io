@@ -259,44 +259,44 @@
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="k">class</span> <span class="nc">Table</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Block</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="vi">@title</span> <span class="o">=</span> <span class="n">str</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>      <span class="n">content</span> <span class="o">=</span> <span class="k">super</span><span class="o">.</span><span class="n">strip!</span>
-</span><span class='line'>      <span class="n">rows</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>      <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">rows</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
-</span><span class='line'>          <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
-</span><span class='line'>          <span class="n">columns</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
-</span><span class='line'>          <span class="n">colCount</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>          <span class="n">colhtml</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>          <span class="k">while</span> <span class="n">colCount</span> <span class="o">&lt;</span> <span class="n">columns</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
-</span><span class='line'>              <span class="n">element</span> <span class="o">=</span> <span class="n">columns</span><span class="o">[</span><span class="n">colCount</span><span class="o">]</span>
-</span><span class='line'>              <span class="n">element</span><span class="o">.</span><span class="n">strip!</span>
-</span><span class='line'>              
-</span><span class='line'>              <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
-</span><span class='line'>                  <span class="n">colhtml</span> <span class="o">=</span> <span class="n">colhtml</span> <span class="o">+</span> <span class="s2">&quot;&lt;th&gt;</span><span class="si">#{</span><span class="n">element</span><span class="si">}</span><span class="s2">&lt;/th&gt;&quot;</span>
-</span><span class='line'>              <span class="k">else</span>
-</span><span class='line'>                  <span class="n">colhtml</span> <span class="o">=</span> <span class="n">colhtml</span> <span class="o">+</span> <span class="s2">&quot;&lt;td&gt;</span><span class="si">#{</span><span class="n">element</span><span class="si">}</span><span class="s2">&lt;/td&gt;&quot;</span>
-</span><span class='line'>              <span class="k">end</span>
-</span><span class='line'>              <span class="n">colCount</span> <span class="o">=</span> <span class="n">colCount</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span class='line'>          <span class="k">end</span>
-</span><span class='line'>          
-</span><span class='line'>          <span class="c1">#判断是奇数还是偶数</span>
-</span><span class='line'>          <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
-</span><span class='line'>              <span class="vi">@res</span> <span class="o">=</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;tr&gt;</span><span class="si">#{</span><span class="n">colhtml</span><span class="si">}</span><span class="s2">&lt;/tr&gt;&quot;</span>
-</span><span class='line'>          <span class="k">else</span>
-</span><span class='line'>              <span class="vi">@res</span> <span class="o">=</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;tr class=</span><span class="se">\&quot;</span><span class="s2">alt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">colhtml</span><span class="si">}</span><span class="s2">&lt;/tr&gt;&quot;</span>
-</span><span class='line'>          <span class="k">end</span>
-</span><span class='line'>          <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="s2">&quot;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>        <span class="vi">@title</span> <span class="o">=</span> <span class="n">str</span>
+</span><span class='line'>        <span class="k">super</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="n">content</span> <span class="o">=</span> <span class="k">super</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>        <span class="n">rows</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>        <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">rows</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>            <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>            <span class="n">columns</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">colCount</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>            <span class="n">colhtml</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>            <span class="k">while</span> <span class="n">colCount</span> <span class="o">&lt;</span> <span class="n">columns</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">element</span> <span class="o">=</span> <span class="n">columns</span><span class="o">[</span><span class="n">colCount</span><span class="o">]</span>
+</span><span class='line'>                <span class="n">element</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>                    <span class="n">colhtml</span> <span class="o">=</span> <span class="n">colhtml</span> <span class="o">+</span> <span class="s2">&quot;&lt;th&gt;</span><span class="si">#{</span><span class="n">element</span><span class="si">}</span><span class="s2">&lt;/th&gt;&quot;</span>
+</span><span class='line'>                <span class="k">else</span>
+</span><span class='line'>                    <span class="n">colhtml</span> <span class="o">=</span> <span class="n">colhtml</span> <span class="o">+</span> <span class="s2">&quot;&lt;td&gt;</span><span class="si">#{</span><span class="n">element</span><span class="si">}</span><span class="s2">&lt;/td&gt;&quot;</span>
+</span><span class='line'>                <span class="k">end</span>
+</span><span class='line'>                <span class="n">colCount</span> <span class="o">=</span> <span class="n">colCount</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">#判断是奇数还是偶数</span>
+</span><span class='line'>            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span class='line'>                <span class="vi">@res</span> <span class="o">=</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;tr&gt;</span><span class="si">#{</span><span class="n">colhtml</span><span class="si">}</span><span class="s2">&lt;/tr&gt;&quot;</span>
+</span><span class='line'>            <span class="k">else</span>
+</span><span class='line'>                <span class="vi">@res</span> <span class="o">=</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;tr class=</span><span class="se">\&quot;</span><span class="s2">alt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">colhtml</span><span class="si">}</span><span class="s2">&lt;/tr&gt;&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="s2">&quot;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
@@ -341,33 +341,33 @@
 <span class='line-number'>30</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//blogTable</span>
 </span><span class='line'><span class="nc">.blogTable</span> <span class="p">{</span>
-</span><span class='line'>  <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">27</span><span class="mf">.6</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">27</span><span class="mf">.6</span><span class="kt">px</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nc">.blogTable</span> <span class="nt">td</span><span class="o">,</span> <span class="nc">.blogTable</span> <span class="nt">th</span><span class="p">{</span>
-</span><span class='line'>  <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#888888</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">padding</span><span class="o">:</span> <span class="mi">3</span><span class="kt">px</span> <span class="mi">7</span><span class="kt">px</span> <span class="mi">2</span><span class="kt">px</span> <span class="mi">7</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#888888</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding</span><span class="o">:</span> <span class="mi">3</span><span class="kt">px</span> <span class="mi">7</span><span class="kt">px</span> <span class="mi">2</span><span class="kt">px</span> <span class="mi">7</span><span class="kt">px</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nc">.blogTable</span> <span class="nt">th</span> <span class="p">{</span> <span class="c1">//表头的样式需要额外定制</span>
-</span><span class='line'>  <span class="na">padding-top</span><span class="o">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">padding-bottom</span><span class="o">:</span> <span class="mi">4</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">background-color</span><span class="o">:</span> <span class="mh">#aaaaaa</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">font-family</span><span class="o">:</span> <span class="n">SimHei</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">font-weight</span><span class="o">:</span> <span class="mi">600</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding-top</span><span class="o">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding-bottom</span><span class="o">:</span> <span class="mi">4</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-color</span><span class="o">:</span> <span class="mh">#aaaaaa</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-family</span><span class="o">:</span> <span class="n">SimHei</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-weight</span><span class="o">:</span> <span class="mi">600</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nc">.blogTable</span> <span class="nt">tr</span><span class="nc">.alt</span> <span class="nt">td</span> <span class="p">{</span> <span class="c1">//偶数行的背景色需要额外定制</span>
-</span><span class='line'>  <span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nc">.blogTable</span> <span class="nt">caption</span> <span class="p">{</span> <span class="c1">//标题栏的样式</span>
-</span><span class='line'>  <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">font-family</span><span class="o">:</span> <span class="n">KaiTi</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.1</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">font-weight</span><span class="o">:</span> <span class="no">bold</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">text-align</span><span class="o">:</span> <span class="no">center</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-family</span><span class="o">:</span> <span class="n">KaiTi</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.1</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-weight</span><span class="o">:</span> <span class="no">bold</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -387,15 +387,15 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.blogTable</span> <span class="nt">code</span><span class="p">{</span>
-</span><span class='line'>  <span class="na">display</span><span class="o">:</span> <span class="no">inline</span><span class="o">-</span><span class="no">block</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">background</span><span class="o">:</span> <span class="mh">#fff</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">font-size</span><span class="o">:</span> <span class="mf">.8</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">line-height</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.5</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">color</span><span class="o">:</span> <span class="mh">#555</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#ddd</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">border-radius</span><span class="o">:</span> <span class="mf">.4</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">padding</span><span class="o">:</span> <span class="mi">0</span> <span class="mf">.3</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>  <span class="na">margin</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">inline</span><span class="o">-</span><span class="no">block</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background</span><span class="o">:</span> <span class="mh">#fff</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mf">.8</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.5</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">color</span><span class="o">:</span> <span class="mh">#555</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#ddd</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-radius</span><span class="o">:</span> <span class="mf">.4</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding</span><span class="o">:</span> <span class="mi">0</span> <span class="mf">.3</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -481,32 +481,38 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (3)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (7)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (8)</a></li>
 
   </ul>
 </section><section>
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 200%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 176%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 191%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 168%" href="/tags/ruby/">ruby</a>
 <a style="font-size: 60%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 110%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 60%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 107%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 110%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 107%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 107%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 139%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 134%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/25/painting/">hihoCoder题目赏析：刷油漆</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/09/two-pointers/">面试常见问题盘点：双指针</a>
@@ -522,10 +528,6 @@
     
       <li class="post">
         <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/27/binary-indexed-tree/">随机查询（三）：树状数组</a>
       </li>
     
   </ul>
