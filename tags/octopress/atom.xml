@@ -4,7 +4,7 @@
   <title><![CDATA[标签：octopress | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/octopress/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-25T16:24:04+08:00</updated>
+  <updated>2016-06-26T09:22:10+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -739,7 +739,7 @@
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>  <span class="c1">//Expand:</span>
 </span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;.</span><span class="nx">expandtitle</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">next</span><span class="p">().</span><span class="nx">toggle</span><span class="p">();</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">next</span><span class="p">().</span><span class="nx">slideToggle</span><span class="p">();</span>
 </span><span class='line'>        <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
 </span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nx">content</span> <span class="o">==</span> <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="err">展开</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;)</span>
 </span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="err">隐藏</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;);</span>

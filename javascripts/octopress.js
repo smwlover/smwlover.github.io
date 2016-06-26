@@ -115,7 +115,7 @@ $('document').ready(function() {
   
   //Expand:
   $(".expandtitle").click(function(){
-		$(this).next().toggle();
+		$(this).next().slideToggle();
 		var content = $(this).html();
 		if(content == "展开")
 			$(this).html("隐藏");
