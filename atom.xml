@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-26T09:22:10+08:00</updated>
+  <updated>2016-06-26T09:28:10+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -3142,17 +3142,17 @@ Minimum window is <code>"BANC"</code>.<br/>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;document&#39;</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="c1">//该函数中已经有了一些内容，不用管它，直接在这些内容后面添加。</span>
+</span><span class='line'>    <span class="c1">//该函数中已经有了一些内容，不用管它，直接在这些内容后面添加。</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="c1">//Expand:</span>
-</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.expandtitle&quot;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">next</span><span class="p">().</span><span class="nx">slideToggle</span><span class="p">();</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
-</span><span class='line'>      <span class="k">if</span><span class="p">(</span><span class="nx">content</span> <span class="o">==</span> <span class="s2">&quot;展开&quot;</span><span class="p">)</span>
-</span><span class='line'>          <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;隐藏&quot;</span><span class="p">);</span>
-</span><span class='line'>      <span class="k">else</span>
-</span><span class='line'>          <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;展开&quot;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>    <span class="c1">//Expand:</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.expandtitle&quot;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">next</span><span class="p">().</span><span class="nx">slideToggle</span><span class="p">();</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nx">content</span> <span class="o">==</span> <span class="s2">&quot;展开&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;隐藏&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;展开&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
 </span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -3179,20 +3179,18 @@ Minimum window is <code>"BANC"</code>.<br/>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-<span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">Expand</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Block</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>            <span class="vi">@title</span> <span class="o">=</span> <span class="n">str</span>
+</span><span class='line'>            <span class="k">super</span>
+</span><span class='line'>        <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Expand</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Block</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="vi">@title</span> <span class="o">=</span> <span class="n">str</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="s2">&quot;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">expand</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;a href=</span><span class="se">\&quot;</span><span class="s2">javascript:void(0)</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">float: right;</span><span class="se">\&quot;</span><span class="s2"> class=</span><span class="se">\&quot;</span><span class="s2">expandtitle</span><span class="se">\&quot;</span><span class="s2">&gt;展开&lt;/a&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">expandcontent</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">display: none;</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="k">super</span><span class="si">}</span><span class="s2">&lt;/div&gt;&lt;/div&gt;&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="s2">&quot;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">expand</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;a href=</span><span class="se">\&quot;</span><span class="s2">javascript:void(0)</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">float: right;</span><span class="se">\&quot;</span><span class="s2"> class=</span><span class="se">\&quot;</span><span class="s2">expandtitle</span><span class="se">\&quot;</span><span class="s2">&gt;展开&lt;/a&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">expandcontent</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">display: none;</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="k">super</span><span class="si">}</span><span class="s2">&lt;/div&gt;&lt;/div&gt;&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;expand&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">Expand</span><span class="p">)</span>
@@ -3230,19 +3228,19 @@ Minimum window is <code>"BANC"</code>.<br/>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Expand Plugin:</span>
 </span><span class='line'><span class="nc">.expand</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">border-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-style</span><span class="o">:</span> <span class="no">solid</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-color</span><span class="o">:</span> <span class="mh">#bbbbbb</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-radius</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">1</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-style</span><span class="o">:</span> <span class="no">solid</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-color</span><span class="o">:</span> <span class="mh">#bbbbbb</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-color</span><span class="o">:</span> <span class="mh">#eeeeee</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-radius</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">1</span><span class="kt">em</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nc">.expandcontent</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">margin</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-top-style</span><span class="o">:</span> <span class="no">dashed</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-top-color</span><span class="o">:</span> <span class="mh">#bbbbbb</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-top-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-top-style</span><span class="o">:</span> <span class="no">dashed</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-top-color</span><span class="o">:</span> <span class="mh">#bbbbbb</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-top-width</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 </div></div>
@@ -3268,19 +3266,19 @@ Minimum window is <code>"BANC"</code>.<br/>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.expandcontent</span> <span class="o">&gt;</span> <span class="nt">figure</span><span class="nc">.code</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">0</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin-bottom</span><span class="o">:</span> <span class="mi">0</span><span class="kt">em</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nc">.expandcontent</span> <span class="o">&gt;</span> <span class="nt">code</span><span class="o">,</span> <span class="nt">div</span><span class="nc">.expand</span> <span class="o">&gt;</span> <span class="nt">code</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">display</span><span class="o">:</span> <span class="no">inline</span><span class="o">-</span><span class="no">block</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">background</span><span class="o">:</span> <span class="mh">#fff</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">font-size</span><span class="o">:</span> <span class="mf">.8</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">line-height</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.5</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">color</span><span class="o">:</span> <span class="mh">#555</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#ddd</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-radius</span><span class="o">:</span> <span class="mf">.4</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">padding</span><span class="o">:</span> <span class="mi">0</span> <span class="mf">.3</span><span class="kt">em</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">margin</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">inline</span><span class="o">-</span><span class="no">block</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background</span><span class="o">:</span> <span class="mh">#fff</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mf">.8</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">line-height</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.5</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">color</span><span class="o">:</span> <span class="mh">#555</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border</span><span class="o">:</span> <span class="mi">1</span><span class="kt">px</span> <span class="no">solid</span> <span class="mh">#ddd</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-radius</span><span class="o">:</span> <span class="mf">.4</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding</span><span class="o">:</span> <span class="mi">0</span> <span class="mf">.3</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 </div></div>
@@ -3313,16 +3311,16 @@ Minimum window is <code>"BANC"</code>.<br/>
 <span class='line-number'>15</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">CodeTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="s2">&quot;&lt;code&gt;</span><span class="si">#{</span><span class="vi">@code</span><span class="si">}</span><span class="s2">&lt;/code&gt;&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">CodeTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>            <span class="vi">@code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>            <span class="k">super</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="s2">&quot;&lt;code&gt;</span><span class="si">#{</span><span class="vi">@code</span><span class="si">}</span><span class="s2">&lt;/code&gt;&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">CodeTag</span><span class="p">)</span>
