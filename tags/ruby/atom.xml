@@ -4,7 +4,7 @@
   <title><![CDATA[标签：ruby | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/ruby/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-26T09:28:10+08:00</updated>
+  <updated>2016-06-28T12:15:53+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -28,7 +28,7 @@
 <p>简单的html表格由<code>table</code>标签以及一个或多个<code>tr</code>、<code>th</code>或<code>td</code>标签组成，其中<code>tr</code>标签定义表格行，<code>th</code>标签定义表头，<code>td</code>标签定义表格单元。<br/>
 我将本插件的语法定义为<code>{% table title %} content {% endtable %}</code>，其中<code>content</code>代表表格内容，由多行构成，<code>content</code>的一行对应着表格中的一行，这一行中的不同单元用字符<code>|</code>分割。<code>content</code>的第一行对应着表头。比如表格：</p>
 
-<p><table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table></p>
+<p><div align="center"><table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table></div></p>
 
 <p>对应的Markdown文件的代码为：</p>
 
@@ -140,7 +140,7 @@
 </span><span class='line'>        <span class="k">end</span>
 </span><span class='line'>        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
 </span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>    <span class="s2">&quot;&amp;lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&amp;gt;&amp;lt;caption&amp;gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&amp;lt;/caption&amp;gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&amp;lt;/table&amp;gt;&quot;</span>
+</span><span class='line'>    <span class="s2">&quot;&amp;lt;div align=</span><span class="se">\&quot;</span><span class="s2">center</span><span class="se">\&quot;</span><span class="s2">&amp;gt;&amp;lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&amp;gt;&amp;lt;caption&amp;gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&amp;lt;/caption&amp;gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&amp;lt;/table&amp;gt;&amp;lt;/div&amp;gt;&quot;</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
 </span><span class='line'>

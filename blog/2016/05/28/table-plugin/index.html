@@ -183,7 +183,7 @@
 <p>简单的html表格由<code>table</code>标签以及一个或多个<code>tr</code>、<code>th</code>或<code>td</code>标签组成，其中<code>tr</code>标签定义表格行，<code>th</code>标签定义表头，<code>td</code>标签定义表格单元。<br/>
 我将本插件的语法定义为<code>{% table title %} content {% endtable %}</code>，其中<code>content</code>代表表格内容，由多行构成，<code>content</code>的一行对应着表格中的一行，这一行中的不同单元用字符<code>|</code>分割。<code>content</code>的第一行对应着表头。比如表格：</p>
 
-<table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table>
+<div align="center"><table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table></div>
 
 
 <p>对应的Markdown文件的代码为：</p>
@@ -295,7 +295,7 @@
 </span><span class='line'>            <span class="k">end</span>
 </span><span class='line'>            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
 </span><span class='line'>        <span class="k">end</span>
-</span><span class='line'>        <span class="s2">&quot;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;div align=</span><span class="se">\&quot;</span><span class="s2">center</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&lt;/div&gt;&quot;</span>
 </span><span class='line'>    <span class="k">end</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
@@ -484,31 +484,35 @@
 <li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (8)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
 
   </ul>
 </section><section>
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 191%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 168%" href="/tags/ruby/">ruby</a>
-<a style="font-size: 60%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 60%" href="/tags/dong-tai-gui-hua/">动态规划</a>
-<a style="font-size: 107%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 107%" href="/tags/ri-ma/">日麻</a>
-<a style="font-size: 107%" href="/tags/shu/">树</a>
+<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 104%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 134%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/25/painting/">hihoCoder题目赏析：刷油漆</a>
@@ -524,10 +528,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
       </li>
     
   </ul>

@@ -1,0 +1,551 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>hihoCoder题目赏析：状态压缩 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="本文介绍了一道hihoCoder上的题目“状态压缩”。">
+  <meta name="keywords" content="动态规划, dynamic, programming, smwlover, hihocoder, 位运算, bit">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/06/28/state-compression/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\n");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
+						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
+						adjustPos();
+					}
+				}
+			}
+		}
+	</script>
+	<div id="lyricsContent"">
+		<h3 id="lyric">Loading…</h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">hihoCoder题目赏析：状态压缩</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-06-28T09:48:08+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:48 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>本文来赏析hihoCoder上的一道题目<a href="http://hihocoder.com/problemset/problem/1044">“状态压缩”</a>。我们知道，用动态规划解决问题的时候，状态的表示是很重要的一环。一般来讲，状态可以用一个数组来表示，但是对于有些问题，它们的状态中所包含的信息过多，如果要用数组表示的话，数组的维度会达到四维或以上，这时我们就需要使用状态压缩。状态压缩的核心思想是<strong>用二进制位来表示状态，用位运算来表示状态之间的转化</strong>。这样不仅减少了空间的消耗，而且提高了程序的效率。</p>
+
+<!--more-->
+
+
+<h2>一、题目</h2>
+
+<h3>背景</h3>
+
+<p>小Hi和小Ho决定乘坐火车前往一座城市，但是不幸的是，他们并没有能够买到很好的火车票——他们只能够乘坐最为破旧的火车进行他们的旅程。<br/>
+火车上的人非常多，以致于都没有足够的位置能让每一个人都有地方坐下来。小Hi和小Ho本着礼让他们的心情——当然还因为本来他们买的就是站票，老老实实的呆在两节车厢的结合处。他们本以为就能够这样安稳抵达目的地，但事与愿违，他们这节车厢的乘务员是一个强迫症，每隔一小会都要清扫一次卫生，而时值深夜，大家都早已入睡，这种行为总是会惊醒一些人。一旦相邻的一些乘客被惊醒了大多数的话，就会同乘务员吵起来，弄得大家都睡不好。<br/>
+将这一切看在眼里的小Hi与小Ho决定利用他们的算法知识，来帮助这个有着强迫症的乘务员——在不与乘客吵起来的前提下尽可能多的清扫垃圾。<br/>
+小Hi和小Ho所处的车厢可以被抽象成连成一列的<code>N</code>个位置，按顺序分别编号为<code>1..N</code>，每个位置上都有且仅有一名乘客在休息。同时每个位置上都有一些垃圾需要被清理，其中第<code>i</code>个位置的垃圾数量为<code>Wi</code>。乘务员可以选择其中一些位置进行清理，但是值得注意的是，一旦编号连续的<code>M</code>个位置中有超过<code>Q</code>个的位置都在这一次清理中被选中的话（即这<code>M</code>个位置上的乘客有至少<code>Q+1</code>个被惊醒了），就会发生令人不愉快的口角。而小Hi和小Ho的任务是，计算选择哪些位置进行清理，在不发生口角的情况下，清扫尽可能多的垃圾。</p>
+
+<h3>输入与输出</h3>
+
+<p>输入数据的第一行为三个正整数<code>N</code>、<code>M</code>和<code>Q</code>，意义如前文所述。<br/>
+输入数据的第二行为<code>N</code>个整数，分别为<code>W1</code>到<code>WN</code>，代表每一个位置上的垃圾数目。 <br/>
+输出一个整数<code>Ans</code>，表示在不发生口角的情况下，乘务员最多可以清扫的垃圾数目。</p>
+
+<div align="center"><table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>5 2 1</span><br/><span>36 9 80 69 85</span></code></td><td><code>201</code></td></tr></table></div>
+
+
+<h2>二、列出状态转移方程</h2>
+
+<p>我们定义<code>F(i,p1,p2,...,p(m-1))</code>表示<strong>当前已经完成了第<code>1</code>个位置到第<code>i</code>个位置的清理工作，并且<code>p1</code>表示第<code>i</code>个位置是否被清理（<code>0</code>表示未清理，<code>1</code>表示已清理）、<code>p2</code>表示第<code>i-1</code>个位置是否被清理……<code>p(m-1)</code>表示第<code>i-m+2</code>个位置是否被清理的情况下，最多可以清扫的垃圾数量。</strong>注意到，<code>p1...p(m-1)</code>代表从第<code>i</code>个位置往前的连续<code>m-1</code>个位置。<br/>
+假设我们已经求得了<code>F(i,p1,p2,...,p(m-1))</code>的值，我们来讨论第<code>i+1</code>个位置的清理情况：<br/>
+如果不清理第<code>i+1</code>个位置，那么我们在该位置的状态可以表示为<code>F(i+1,0,p1,p2,...,p(m-2))</code>，并且由于我们没有在第<code>i+1</code>个位置清理任何垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置是没有变化的；<br/>
+如果要清理第<code>i+1</code>个位置，我们首先要观察是否违反了题目的条件，即<code>p1...p(m-1)</code>中1的数量是否小于<code>Q</code>。如果不小于<code>Q</code>，我们无法清理第<code>i+1</code>个位置；如果小于<code>Q</code>，我们可以清理，此时该位置的状态可以表示为：<code>F(i+1,1,p1,p2,...,p(m-2))</code>，并且由于我们清理了第<code>i+1</code>个位置的垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置增加了<code>W(i+1)</code>。<br/>
+综上所述，我们列出的状态转移方程如下：</p>
+
+<p><img src="/images/blogimg/7.png"></p>
+
+<p>因为每次状态转移都是从<code>i</code>向<code>i+1</code>进行的，所以我们只需要按照<code>i</code>从小到大的顺序进行计算就可以了。最后，我们找到第<code>N</code>个位置上对应的所有状态，这些状态中清理垃圾数量的最大值即为所求。</p>
+
+<h2>三、状态压缩</h2>
+
+<p>我们如果按照上面的方程求解，那么需要开辟一个维数为<code>M</code>的数组，在<code>M</code>达到两位数的时候显然是不太可能做到的。通过观察发现，对于<code>p1...p(m-1)</code>中的每个<code>p</code>，取值只有0或1两种可能，我们很自然地想到用长度为<code>m-1</code>的二进制串来表示<code>p1...p(m-1)</code>，其最高位代表<code>p1</code>，最低位代表<code>p(m-1)</code>。这样我们动态规划数组的维度可以被直接减少到二维。<br/>
+此时，我们的方程可以直接写成<code>F(i,j)</code>，其中<code>i</code>的含义和之前相同，<code>j</code>则是上述二进制串对应的十进制整数，其取值范围为<code>0</code>到<code>2^(m-1)-1</code>。<br/>
+如果不清理第<code>i+1</code>个位置，<code>j</code>的变化相当于<strong>右移一位，第一位补0</strong>，即：</p>
+
+<div align="center"><img src="/images/blogimg/8.png" class="mahjong"/></div>
+
+
+<p></p>
+
+<p>如果要清理第<code>i+1</code>个位置，<code>j</code>的变化相当于<strong>右移一位，第一位补1</strong>，即：</p>
+
+<div align="center"><img src="/images/blogimg/9.png" class="mahjong"/></div>
+
+
+<p></p>
+
+<p>通过状态压缩，我们保存状态只需要开辟<code>N*2^(m-1)</code>大小的空间。在遍历的时候，对于第<code>i</code>行，讨论清理或不清理第<code>i+1</code>个位置的情况，并且填充第<code>i+1</code>行的相应位置。最后观察第<code>N</code>行的所有位置中填充的数据，最大值即为所求。</p>
+
+<h2>四、代码</h2>
+
+<figure class='code'><figcaption><span>状态压缩 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">countFlag</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">num</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">num</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">Q</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">N</span> <span class="o">&gt;&gt;</span> <span class="n">M</span> <span class="o">&gt;&gt;</span> <span class="n">Q</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">rubbish</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">rubbish</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">));</span>
+</span><span class='line'>    <span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>                <span class="c1">//考虑第i+1个位置选还是不选：</span>
+</span><span class='line'>                <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">countFlag</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+</span><span class='line'>                <span class="k">if</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="n">Q</span><span class="p">)</span> <span class="c1">//可以选择：</span>
+</span><span class='line'>                    <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">)],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">rubbish</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
+</span><span class='line'>                <span class="c1">//不选的情况：</span>
+</span><span class='line'>                <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//遍历最后一行，找到最大值：</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">maxRubbish</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">maxRubbish</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">maxRubbish</span><span class="p">,</span> <span class="n">table</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">maxRubbish</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-06-28T09:48:08+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:48 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/suan-fa/'>算法</a>
+  
+</span>
+
+
+      
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/c-plus-plus/'>c++</a>, <a class='tag' href='/tags/wei-yun-suan/'>位运算</a>, <a class='tag' href='/tags/dong-tai-gui-hua/'>动态规划</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/06/25/painting/" title="Previous Post: hihoCoder题目赏析：刷油漆">&laquo; hihoCoder题目赏析：刷油漆</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
+
+  </ul>
+</section><section>
+  <h1>标签云</h1>
+  <ul class="tag-cloud">
+<a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
+<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
+<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 104%" href="/tags/shu/">树</a>
+<a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
+<a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
+<a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
+<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+
+  </ul>
+</section>
+<section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/25/painting/">hihoCoder题目赏析：刷油漆</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/09/two-pointers/">面试常见问题盘点：双指针</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/03/kth-largest-element/">面试常见问题盘点：第k大元素</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_280_400_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="280" height="400" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/06/28/state-compression/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/06/28/state-compression/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>

@@ -4,7 +4,7 @@
   <title><![CDATA[标签：树 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/shu/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-26T09:28:10+08:00</updated>
+  <updated>2016-06-28T12:15:53+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -42,7 +42,7 @@
 输入的第3~N+1行，每行分别描述一根木棍，其中第<code>i+1</code>行为两个整数<code>Ai</code>、<code>Bi</code>，表示第<code>i</code>根木棍连接的两个小球的编号。<br/>
 要求输出一个整数，表示使得涂漆结点的评分之和最高可能是多少。</p>
 
-<p><table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>10 4</span><br/><span>370 328 750 930 604 732 159 167 945 210</span><br/><span>1 2</span><br/><span>2 3</span><br/><span>1 4</span><br/><span>1 5</span><br/><span>4 6</span><br/><span>4 7</span><br/><span>4 8</span><br/><span>6 9</span><br/><span>5 10</span></code></td><td><code>2977</code></td></tr></table></p>
+<p><div align="center"><table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>10 4</span><br/><span>370 328 750 930 604 732 159 167 945 210</span><br/><span>1 2</span><br/><span>2 3</span><br/><span>1 4</span><br/><span>1 5</span><br/><span>4 6</span><br/><span>4 7</span><br/><span>4 8</span><br/><span>6 9</span><br/><span>5 10</span></code></td><td><code>2977</code></td></tr></table></div></p>
 
 <h2>二、引子一：0-1背包</h2>
 

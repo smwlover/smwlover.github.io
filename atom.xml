@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-26T09:28:10+08:00</updated>
+  <updated>2016-06-28T12:15:53+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[hihoCoder题目赏析：状态压缩]]></title>
+    <link href="http://smwlover.github.io/blog/2016/06/28/state-compression/"/>
+    <updated>2016-06-28T09:48:08+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/06/28/state-compression</id>
+    <content type="html"><![CDATA[<p>本文来赏析hihoCoder上的一道题目<a href="http://hihocoder.com/problemset/problem/1044">“状态压缩”</a>。我们知道，用动态规划解决问题的时候，状态的表示是很重要的一环。一般来讲，状态可以用一个数组来表示，但是对于有些问题，它们的状态中所包含的信息过多，如果要用数组表示的话，数组的维度会达到四维或以上，这时我们就需要使用状态压缩。状态压缩的核心思想是<strong>用二进制位来表示状态，用位运算来表示状态之间的转化</strong>。这样不仅减少了空间的消耗，而且提高了程序的效率。</p>
+
+<!--more-->
+
+
+<h2>一、题目</h2>
+
+<h3>背景</h3>
+
+<p>小Hi和小Ho决定乘坐火车前往一座城市，但是不幸的是，他们并没有能够买到很好的火车票——他们只能够乘坐最为破旧的火车进行他们的旅程。<br/>
+火车上的人非常多，以致于都没有足够的位置能让每一个人都有地方坐下来。小Hi和小Ho本着礼让他们的心情——当然还因为本来他们买的就是站票，老老实实的呆在两节车厢的结合处。他们本以为就能够这样安稳抵达目的地，但事与愿违，他们这节车厢的乘务员是一个强迫症，每隔一小会都要清扫一次卫生，而时值深夜，大家都早已入睡，这种行为总是会惊醒一些人。一旦相邻的一些乘客被惊醒了大多数的话，就会同乘务员吵起来，弄得大家都睡不好。<br/>
+将这一切看在眼里的小Hi与小Ho决定利用他们的算法知识，来帮助这个有着强迫症的乘务员——在不与乘客吵起来的前提下尽可能多的清扫垃圾。<br/>
+小Hi和小Ho所处的车厢可以被抽象成连成一列的<code>N</code>个位置，按顺序分别编号为<code>1..N</code>，每个位置上都有且仅有一名乘客在休息。同时每个位置上都有一些垃圾需要被清理，其中第<code>i</code>个位置的垃圾数量为<code>Wi</code>。乘务员可以选择其中一些位置进行清理，但是值得注意的是，一旦编号连续的<code>M</code>个位置中有超过<code>Q</code>个的位置都在这一次清理中被选中的话（即这<code>M</code>个位置上的乘客有至少<code>Q+1</code>个被惊醒了），就会发生令人不愉快的口角。而小Hi和小Ho的任务是，计算选择哪些位置进行清理，在不发生口角的情况下，清扫尽可能多的垃圾。</p>
+
+<h3>输入与输出</h3>
+
+<p>输入数据的第一行为三个正整数<code>N</code>、<code>M</code>和<code>Q</code>，意义如前文所述。<br/>
+输入数据的第二行为<code>N</code>个整数，分别为<code>W1</code>到<code>WN</code>，代表每一个位置上的垃圾数目。 <br/>
+输出一个整数<code>Ans</code>，表示在不发生口角的情况下，乘务员最多可以清扫的垃圾数目。</p>
+
+<div align="center"><table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>5 2 1</span><br/><span>36 9 80 69 85</span></code></td><td><code>201</code></td></tr></table></div>
+
+
+<h2>二、列出状态转移方程</h2>
+
+<p>我们定义<code>F(i,p1,p2,...,p(m-1))</code>表示<strong>当前已经完成了第<code>1</code>个位置到第<code>i</code>个位置的清理工作，并且<code>p1</code>表示第<code>i</code>个位置是否被清理（<code>0</code>表示未清理，<code>1</code>表示已清理）、<code>p2</code>表示第<code>i-1</code>个位置是否被清理……<code>p(m-1)</code>表示第<code>i-m+2</code>个位置是否被清理的情况下，最多可以清扫的垃圾数量。</strong>注意到，<code>p1...p(m-1)</code>代表从第<code>i</code>个位置往前的连续<code>m-1</code>个位置。<br/>
+假设我们已经求得了<code>F(i,p1,p2,...,p(m-1))</code>的值，我们来讨论第<code>i+1</code>个位置的清理情况：<br/>
+如果不清理第<code>i+1</code>个位置，那么我们在该位置的状态可以表示为<code>F(i+1,0,p1,p2,...,p(m-2))</code>，并且由于我们没有在第<code>i+1</code>个位置清理任何垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置是没有变化的；<br/>
+如果要清理第<code>i+1</code>个位置，我们首先要观察是否违反了题目的条件，即<code>p1...p(m-1)</code>中1的数量是否小于<code>Q</code>。如果不小于<code>Q</code>，我们无法清理第<code>i+1</code>个位置；如果小于<code>Q</code>，我们可以清理，此时该位置的状态可以表示为：<code>F(i+1,1,p1,p2,...,p(m-2))</code>，并且由于我们清理了第<code>i+1</code>个位置的垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置增加了<code>W(i+1)</code>。<br/>
+综上所述，我们列出的状态转移方程如下：</p>
+
+<p><img src="http://smwlover.github.io/images/blogimg/7.png"></p>
+
+<p>因为每次状态转移都是从<code>i</code>向<code>i+1</code>进行的，所以我们只需要按照<code>i</code>从小到大的顺序进行计算就可以了。最后，我们找到第<code>N</code>个位置上对应的所有状态，这些状态中清理垃圾数量的最大值即为所求。</p>
+
+<h2>三、状态压缩</h2>
+
+<p>我们如果按照上面的方程求解，那么需要开辟一个维数为<code>M</code>的数组，在<code>M</code>达到两位数的时候显然是不太可能做到的。通过观察发现，对于<code>p1...p(m-1)</code>中的每个<code>p</code>，取值只有0或1两种可能，我们很自然地想到用长度为<code>m-1</code>的二进制串来表示<code>p1...p(m-1)</code>，其最高位代表<code>p1</code>，最低位代表<code>p(m-1)</code>。这样我们动态规划数组的维度可以被直接减少到二维。<br/>
+此时，我们的方程可以直接写成<code>F(i,j)</code>，其中<code>i</code>的含义和之前相同，<code>j</code>则是上述二进制串对应的十进制整数，其取值范围为<code>0</code>到<code>2^(m-1)-1</code>。<br/>
+如果不清理第<code>i+1</code>个位置，<code>j</code>的变化相当于<strong>右移一位，第一位补0</strong>，即：</p>
+
+<div align="center"><img src="http://smwlover.github.io/images/blogimg/8.png" class="mahjong"/></div>
+
+
+<p></p>
+
+<p>如果要清理第<code>i+1</code>个位置，<code>j</code>的变化相当于<strong>右移一位，第一位补1</strong>，即：</p>
+
+<div align="center"><img src="http://smwlover.github.io/images/blogimg/9.png" class="mahjong"/></div>
+
+
+<p></p>
+
+<p>通过状态压缩，我们保存状态只需要开辟<code>N*2^(m-1)</code>大小的空间。在遍历的时候，对于第<code>i</code>行，讨论清理或不清理第<code>i+1</code>个位置的情况，并且填充第<code>i+1</code>行的相应位置。最后观察第<code>N</code>行的所有位置中填充的数据，最大值即为所求。</p>
+
+<h2>四、代码</h2>
+
+<figure class='code'><figcaption><span>状态压缩 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">countFlag</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">num</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">num</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">Q</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">N</span> <span class="o">&gt;&gt;</span> <span class="n">M</span> <span class="o">&gt;&gt;</span> <span class="n">Q</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">rubbish</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">rubbish</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">));</span>
+</span><span class='line'>    <span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>                <span class="c1">//考虑第i+1个位置选还是不选：</span>
+</span><span class='line'>                <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">countFlag</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+</span><span class='line'>                <span class="k">if</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="n">Q</span><span class="p">)</span> <span class="c1">//可以选择：</span>
+</span><span class='line'>                    <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">)],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">rubbish</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
+</span><span class='line'>                <span class="c1">//不选的情况：</span>
+</span><span class='line'>                <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//遍历最后一行，找到最大值：</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">maxRubbish</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">maxRubbish</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">maxRubbish</span><span class="p">,</span> <span class="n">table</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">maxRubbish</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[hihoCoder题目赏析：刷油漆]]></title>
@@ -42,7 +186,7 @@
 输入的第3~N+1行，每行分别描述一根木棍，其中第<code>i+1</code>行为两个整数<code>Ai</code>、<code>Bi</code>，表示第<code>i</code>根木棍连接的两个小球的编号。<br/>
 要求输出一个整数，表示使得涂漆结点的评分之和最高可能是多少。</p>
 
-<table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>10 4</span><br/><span>370 328 750 930 604 732 159 167 945 210</span><br/><span>1 2</span><br/><span>2 3</span><br/><span>1 4</span><br/><span>1 5</span><br/><span>4 6</span><br/><span>4 7</span><br/><span>4 8</span><br/><span>6 9</span><br/><span>5 10</span></code></td><td><code>2977</code></td></tr></table>
+<div align="center"><table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>10 4</span><br/><span>370 328 750 930 604 732 159 167 945 210</span><br/><span>1 2</span><br/><span>2 3</span><br/><span>1 4</span><br/><span>1 5</span><br/><span>4 6</span><br/><span>4 7</span><br/><span>4 8</span><br/><span>6 9</span><br/><span>5 10</span></code></td><td><code>2977</code></td></tr></table></div>
 
 
 <h2>二、引子一：0-1背包</h2>
@@ -1376,7 +1520,7 @@ Minimum window is <code>"BANC"</code>.<br/>
 <p>简单的html表格由<code>table</code>标签以及一个或多个<code>tr</code>、<code>th</code>或<code>td</code>标签组成，其中<code>tr</code>标签定义表格行，<code>th</code>标签定义表头，<code>td</code>标签定义表格单元。<br/>
 我将本插件的语法定义为<code>{% table title %} content {% endtable %}</code>，其中<code>content</code>代表表格内容，由多行构成，<code>content</code>的一行对应着表格中的一行，这一行中的不同单元用字符<code>|</code>分割。<code>content</code>的第一行对应着表头。比如表格：</p>
 
-<table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table>
+<div align="center"><table class="blogTable"><caption>歌曲列表</caption><tr><th>歌曲名称</th><th>歌手名称</th></tr><tr><td>Hacking to the Gate</td><td>いとうかなこ</td></tr><tr class="alt"><td>コネクト</td><td>ClariS</td></tr><tr><td>Magia</td><td>Kalafina</td></tr><tr class="alt"><td>secret arms</td><td>Ray</td></tr></table></div>
 
 
 <p>对应的Markdown文件的代码为：</p>
@@ -1488,7 +1632,7 @@ Minimum window is <code>"BANC"</code>.<br/>
 </span><span class='line'>            <span class="k">end</span>
 </span><span class='line'>            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
 </span><span class='line'>        <span class="k">end</span>
-</span><span class='line'>        <span class="s2">&quot;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+</span><span class='line'>      <span class="s2">&quot;&lt;div align=</span><span class="se">\&quot;</span><span class="s2">center</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;table class=</span><span class="se">\&quot;</span><span class="s2">blogTable</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;caption&gt;</span><span class="si">#{</span><span class="vi">@title</span><span class="si">}</span><span class="s2">&lt;/caption&gt;&quot;</span> <span class="o">+</span> <span class="vi">@res</span> <span class="o">+</span> <span class="s2">&quot;&lt;/table&gt;&lt;/div&gt;&quot;</span>
 </span><span class='line'>    <span class="k">end</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
@@ -1719,7 +1863,7 @@ Minimum window is <code>"BANC"</code>.<br/>
 2. 令<code>i</code>从<code>1</code>到<code>n</code>递增，对于每个<code>i</code>，如果<code>next(i)</code>没有越界，令<code>e[next(i)] += e[i]</code>。<br/>
 这就完成了树状数组的初始化，可以观察数组长度为6的情况：</p>
 
-<table class="blogTable"><caption>长度为6的树状数组初始化的过程</caption><tr><th>当前状态</th><th>e[1]</th><th>e[2]</th><th>e[3]</th><th>e[4]</th><th>e[5]</th><th>e[6]</th></tr><tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=1</code>，<code>next(i)=2</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=2</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=3</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=4</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=5</code>，<code>next(i)=6</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr><tr><td><code>i=6</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr></table>
+<div align="center"><table class="blogTable"><caption>长度为6的树状数组初始化的过程</caption><tr><th>当前状态</th><th>e[1]</th><th>e[2]</th><th>e[3]</th><th>e[4]</th><th>e[5]</th><th>e[6]</th></tr><tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=1</code>，<code>next(i)=2</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=2</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=3</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=4</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=5</code>，<code>next(i)=6</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr><tr><td><code>i=6</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr></table></div>
 
 
 <p>对应的代码如下：</p>

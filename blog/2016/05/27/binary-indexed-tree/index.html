@@ -292,7 +292,7 @@
 2. 令<code>i</code>从<code>1</code>到<code>n</code>递增，对于每个<code>i</code>，如果<code>next(i)</code>没有越界，令<code>e[next(i)] += e[i]</code>。<br/>
 这就完成了树状数组的初始化，可以观察数组长度为6的情况：</p>
 
-<table class="blogTable"><caption>长度为6的树状数组初始化的过程</caption><tr><th>当前状态</th><th>e[1]</th><th>e[2]</th><th>e[3]</th><th>e[4]</th><th>e[5]</th><th>e[6]</th></tr><tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=1</code>，<code>next(i)=2</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=2</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=3</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=4</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=5</code>，<code>next(i)=6</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr><tr><td><code>i=6</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr></table>
+<div align="center"><table class="blogTable"><caption>长度为6的树状数组初始化的过程</caption><tr><th>当前状态</th><th>e[1]</th><th>e[2]</th><th>e[3]</th><th>e[4]</th><th>e[5]</th><th>e[6]</th></tr><tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=1</code>，<code>next(i)=2</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=2</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=3</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=4</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=5</code>，<code>next(i)=6</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr><tr><td><code>i=6</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr></table></div>
 
 
 <p>对应的代码如下：</p>
@@ -383,7 +383,7 @@
 
 <span class="tags">
   
-    <a class='tag' href='/tags/c-plus-plus/'>c++</a>, <a class='tag' href='/tags/shu-zhuang-shu-zu/'>树状数组</a>, <a class='tag' href='/tags/sui-ji-cha-xun/'>随机查询</a>
+    <a class='tag' href='/tags/c-plus-plus/'>c++</a>, <a class='tag' href='/tags/wei-yun-suan/'>位运算</a>, <a class='tag' href='/tags/shu-zhuang-shu-zu/'>树状数组</a>, <a class='tag' href='/tags/sui-ji-cha-xun/'>随机查询</a>
   
 </span>
 
@@ -439,31 +439,35 @@
 <li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (8)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
 
   </ul>
 </section><section>
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 191%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 168%" href="/tags/ruby/">ruby</a>
-<a style="font-size: 60%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 60%" href="/tags/dong-tai-gui-hua/">动态规划</a>
-<a style="font-size: 107%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 107%" href="/tags/ri-ma/">日麻</a>
-<a style="font-size: 107%" href="/tags/shu/">树</a>
+<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 104%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 134%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/25/painting/">hihoCoder题目赏析：刷油漆</a>
@@ -479,10 +483,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
       </li>
     
   </ul>

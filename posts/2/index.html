@@ -9,7 +9,7 @@
   <meta name="author" content="smwlover">
 
   
-  <meta name="description" content="很久之前我就有将自己喜欢的歌曲分享给别人的梦想，而现在正值我的博客搭建完成，我终于可以通过在博客中加入歌词栏实现我的梦想了。这篇文章就来简单介绍一下在博客中添加歌词栏的流程。 ">
+  <meta name="description" content="这篇文章中，我以RMQ问题为例，来介绍随机查询类问题。RMQ是Random Maximum/Minimum Query的简称，顾名思义，是求解区间最值的问题。假设有一个无序的数组arr（大小为n），给定两个下标l和r，让我们求出arr[l]到arr[r]之间元素的最大值或最小值（我们称之为一次查询 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -154,6 +154,40 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/23/rmq-st/">随机查询（一）：RMQ-ST算法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-23T15:02:32+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>3:02 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这篇文章中，我以RMQ问题为例，来介绍随机查询类问题。RMQ是Random Maximum/Minimum Query的简称，顾名思义，是求解区间最值的问题。假设有一个无序的数组<code>arr</code>（大小为<code>n</code>），给定两个下标<code>l</code>和<code>r</code>，让我们求出<code>arr[l]</code>到<code>arr[r]</code>之间元素的最大值或最小值（我们称之为一次查询，即query），我们当然可以直接遍历这些元素，然后将结果输出。但是如果query的次数不是仅仅只有一次，而是成百上千次，难道我们每次输出对应结果的时候都需要遍历一遍相应的区间吗？</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/05/23/rmq-st/">继续阅读 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -424,31 +458,35 @@
 <li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
-<li class='category'><a href='/blog/categories/suan-fa/'>算法 (8)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
 
   </ul>
 </section><section>
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 191%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 168%" href="/tags/ruby/">ruby</a>
-<a style="font-size: 60%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 60%" href="/tags/dong-tai-gui-hua/">动态规划</a>
-<a style="font-size: 107%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 107%" href="/tags/ri-ma/">日麻</a>
-<a style="font-size: 107%" href="/tags/shu/">树</a>
+<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 104%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 134%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/25/painting/">hihoCoder题目赏析：刷油漆</a>
@@ -464,10 +502,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/28/table-plugin/">Octopress插件：表格</a>
       </li>
     
   </ul>
