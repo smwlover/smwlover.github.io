@@ -204,7 +204,8 @@
 如果要清理第<code>i+1</code>个位置，我们首先要观察是否违反了题目的条件，即<code>p1...p(m-1)</code>中1的数量是否小于<code>Q</code>。如果不小于<code>Q</code>，我们无法清理第<code>i+1</code>个位置；如果小于<code>Q</code>，我们可以清理，此时该位置的状态可以表示为：<code>F(i+1,1,p1,p2,...,p(m-2))</code>，并且由于我们清理了第<code>i+1</code>个位置的垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置增加了<code>W(i+1)</code>。<br/>
 综上所述，我们列出的状态转移方程如下：</p>
 
-<p><img src="/images/blogimg/7.png"></p>
+<div align="center"><img src="/images/blogimg/7.png"></div>
+
 
 <p>因为每次状态转移都是从<code>i</code>向<code>i+1</code>进行的，所以我们只需要按照<code>i</code>从小到大的顺序进行计算就可以了。最后，我们找到第<code>N</code>个位置上对应的所有状态，这些状态中清理垃圾数量的最大值即为所求。</p>
 
@@ -357,6 +358,8 @@
         <a class="basic-alignment left" href="/blog/2016/06/25/painting/" title="Previous Post: hihoCoder题目赏析：刷油漆">&laquo; hihoCoder题目赏析：刷油漆</a>
       
       
+        <a class="basic-alignment right" href="/blog/2016/07/31/union-find/" title="Next Post: hihoCoder题目赏析：并查集">hihoCoder题目赏析：并查集 &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -389,7 +392,7 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (5)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
 <li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
@@ -399,24 +402,29 @@
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
-<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
-<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 178%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 158%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 144%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 102%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 60%" href="/tags/bing-cha-ji/">并查集</a>
+<a style="font-size: 102%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
-<a style="font-size: 104%" href="/tags/shu/">树</a>
+<a style="font-size: 102%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 102%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 127%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/07/31/union-find/">hihoCoder题目赏析：并查集</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
@@ -432,10 +440,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/03/kth-largest-element/">面试常见问题盘点：第k大元素</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[标签：ruby | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/ruby/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-28T18:49:28+08:00</updated>
+  <updated>2016-07-31T17:03:54+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -501,7 +501,7 @@
 
 <p><del>其实这个东西根本没必要写成插件的</del>   ←就是这样的效果。<br/>
 之前说到过，所谓Octopress的插件，其实就是把我们在markdown文件中写的内容转化为html的工具，要写关于删除线的插件，就要先弄明白删除线在html里是怎么表示的。我随便找了一个有删除线的萌娘百科网页，通过F12键查看源代码……<br/>
-<img src="/images/blogimg/1.png"><br/>
+<div align="center"><img src="/images/blogimg/1.png"></div><br/>
 可以发现，删除线什么的，就是用<code>&lt;del&gt;</code>和<code>&lt;/del&gt;</code>标签括起来嘛！所以写markdown的时候直接手动加上这样的两个标签就可以了，也不麻烦，<del>根本用不着什么插件嘛</del>。<br/>
 不过，写就写了，语法是<code>{% delete sentence %}</code>。看看代码吧，反正就几行：</p>
 
@@ -546,7 +546,7 @@
 
 <p><span class="mask">这是什么中二爆表的名字</span> ←就是这样的效果。<br/>
 同理，我们要查看一下相应的html是怎么写的，我找到的网页如下：<br/>
-<img src="/images/blogimg/2.png"><br/>
+<div align="center"><img src="/images/blogimg/2.png"></div><br/>
 我们可以发现，这是一种特殊类别的<code>&lt;span&gt;</code>，在css分类器中为这种<code>&lt;span&gt;</code>定义了特殊的样式表，使得文字颜色和背景色相同，就可以达到“防剧透屏障”的效果。我们也照葫芦画瓢，开发一个语法为<code>{% mask sentence %}</code>的插件：</p>
 
 <p><figure class='code'><figcaption><span>mask.rb </span></figcaption>
@@ -608,7 +608,7 @@
 <p>不知道大家看过《<ruby><rb>Clannad</rb><rp>(</rp><rt class="rubytagrt">人生</rt><rp>)</rp></ruby>》没有？ ←就是这样的效果。当然，这种效果还可以用来对日语进行注音，比如“<ruby><rb>学</rb><rp>(</rp><rt class="rubytagrt">がっ</rt><rp>)</rp></ruby><ruby><rb>校</rb><rp>(</rp><rt class="rubytagrt">こう</rt><rp>)</rp></ruby>”。<br/>
 日语中，经常见到用假名在汉字上方标明读音的情况，这种情况叫振假名（<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>）。又因为日文印刷时以五号格大小的振假名为标准，并且五号格大小的文字在印刷行业被简称为ruby，所以振假名也有“<ruby><rb>ルビー</rb><rp>(</rp><rt class="rubytagrt">ruby</rt><rp>)</rp></ruby>”的别称。所以，我把这个插件的名字叫做<code>rubytag</code>。<br/>
 同样，我找到了萌娘百科的一个网页，观察振假名的具体实现方式：<br/>
-<img src="/images/blogimg/3.png"><br/>
+<div align="center"><img src="/images/blogimg/3.png"></div><br/>
 可以发现，这种效果正是利用html一个叫做<code>&lt;ruby&gt;</code>的标签实现的。其中，<code>&lt;rb&gt;&lt;/rb&gt;</code>中的内容是下面的文字，<code>&lt;rt&gt;&lt;/rt&gt;</code>中的内容是上面的标注。通过调查发现，一般情况下，<code>&lt;rp&gt;&lt;/rp&gt;</code>中的内容是不显示的，但是在不支持<code>&lt;ruby&gt;</code>标签的浏览器中，<code>&lt;rp&gt;(&lt;/rp&gt;</code>和<code>&lt;rp&gt;)&lt;/rp&gt;</code>中的内容就会显示出来，使得标注不是显示在文字上方，而是显示在由<code>&lt;rp&gt;</code>组成的一对括号中，效果类似于“学(がっ)校(こう)”。<br/>
 总体来讲，这个插件的逻辑比上面两个插件要复杂一些，但是比起前面的<code>mahjonglist</code>来还是较为简单的。我定义了本插件的语法为<code>{% rubytag word1[-tag1]/word2[-tag2]/... %}</code>，其中不同的单词之间用<code>/</code>分割，每个单词及其注音则用<code>-</code>分割。本插件允许不带注音的单词，这种情况下该单词就会被当成一个普通文本来显示。<br/>
 实现本插件的代码如下，总体来讲就是一个<code>string.split</code>函数的调用过程：</p>

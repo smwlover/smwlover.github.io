@@ -4,7 +4,7 @@
   <title><![CDATA[标签：链表 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/lian-biao/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-28T18:49:28+08:00</updated>
+  <updated>2016-07-31T17:03:54+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -50,7 +50,7 @@
 
 <p><div class="expand">如何证明？<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
 如图所示：<br/>
-<img src="/images/blogimg/6.png"><br/>
+<div align="center"><img src="/images/blogimg/6.png"></div><br/>
 假设头结点到入口结点的距离为<code>a</code>，入口结点到快慢指针相遇结点的距离为<code>x</code>，环的长度为<code>r</code>。从开始到快慢指针相遇为止，慢指针总共走了<code>s</code>步，则快指针走了<code>2s</code>步。另外，假设慢指针在环中转了<code>n1</code>圈，快指针转了<code>n2</code>圈。<br/>
 我们可以列出下面等式：<br/></p>
 

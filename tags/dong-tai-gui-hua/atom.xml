@@ -4,7 +4,7 @@
   <title><![CDATA[标签：动态规划 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/dong-tai-gui-hua/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-28T18:49:28+08:00</updated>
+  <updated>2016-07-31T17:03:54+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -48,7 +48,7 @@
 如果要清理第<code>i+1</code>个位置，我们首先要观察是否违反了题目的条件，即<code>p1...p(m-1)</code>中1的数量是否小于<code>Q</code>。如果不小于<code>Q</code>，我们无法清理第<code>i+1</code>个位置；如果小于<code>Q</code>，我们可以清理，此时该位置的状态可以表示为：<code>F(i+1,1,p1,p2,...,p(m-2))</code>，并且由于我们清理了第<code>i+1</code>个位置的垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置增加了<code>W(i+1)</code>。<br/>
 综上所述，我们列出的状态转移方程如下：</p>
 
-<p><img src="/images/blogimg/7.png"></p>
+<p><div align="center"><img src="/images/blogimg/7.png"></div></p>
 
 <p>因为每次状态转移都是从<code>i</code>向<code>i+1</code>进行的，所以我们只需要按照<code>i</code>从小到大的顺序进行计算就可以了。最后，我们找到第<code>N</code>个位置上对应的所有状态，这些状态中清理垃圾数量的最大值即为所求。</p>
 

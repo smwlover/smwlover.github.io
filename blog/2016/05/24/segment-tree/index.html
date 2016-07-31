@@ -205,8 +205,12 @@
 
 <h2>二、线段树的初始化</h2>
 
-<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个结点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个结点对应的区间如下图所示（图片来自hihoCoder）：<br/>
-<img src="/images/blogimg/4.png"><br/>
+<p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个结点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个结点对应的区间如下图所示（图片来自hihoCoder）：</p>
+
+<div align="center"><img src="/images/blogimg/4.png"></div>
+
+
+<p>
 构建完基本结构之后，下一步操作是计算每个结点对应的区间中元素的最小值。对于叶子结点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间结点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子结点的值，再根据子结点的值计算父结点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -535,7 +539,7 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (5)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
 <li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
@@ -545,24 +549,29 @@
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
-<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
-<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 178%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 158%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 144%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 102%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 60%" href="/tags/bing-cha-ji/">并查集</a>
+<a style="font-size: 102%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
-<a style="font-size: 104%" href="/tags/shu/">树</a>
+<a style="font-size: 102%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 102%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 127%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/07/31/union-find/">hihoCoder题目赏析：并查集</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
@@ -578,10 +587,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/03/kth-largest-element/">面试常见问题盘点：第k大元素</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
       </li>
     
   </ul>

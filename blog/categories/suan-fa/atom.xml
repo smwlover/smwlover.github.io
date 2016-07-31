@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 算法 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-28T18:49:28+08:00</updated>
+  <updated>2016-07-31T17:03:54+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -48,7 +48,7 @@
 如果要清理第<code>i+1</code>个位置，我们首先要观察是否违反了题目的条件，即<code>p1...p(m-1)</code>中1的数量是否小于<code>Q</code>。如果不小于<code>Q</code>，我们无法清理第<code>i+1</code>个位置；如果小于<code>Q</code>，我们可以清理，此时该位置的状态可以表示为：<code>F(i+1,1,p1,p2,...,p(m-2))</code>，并且由于我们清理了第<code>i+1</code>个位置的垃圾，所以我们清理的垃圾数量相比于第<code>i</code>个位置增加了<code>W(i+1)</code>。<br/>
 综上所述，我们列出的状态转移方程如下：</p>
 
-<p><img src="/images/blogimg/7.png"></p>
+<p><div align="center"><img src="/images/blogimg/7.png"></div></p>
 
 <p>因为每次状态转移都是从<code>i</code>向<code>i+1</code>进行的，所以我们只需要按照<code>i</code>从小到大的顺序进行计算就可以了。最后，我们找到第<code>N</code>个位置上对应的所有状态，这些状态中清理垃圾数量的最大值即为所求。</p>
 
@@ -1307,7 +1307,7 @@ Minimum window is <code>"BANC"</code>.<br/>
 
 <p><div class="expand">如何证明？<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
 如图所示：<br/>
-<img src="/images/blogimg/6.png"><br/>
+<div align="center"><img src="/images/blogimg/6.png"></div><br/>
 假设头结点到入口结点的距离为<code>a</code>，入口结点到快慢指针相遇结点的距离为<code>x</code>，环的长度为<code>r</code>。从开始到快慢指针相遇为止，慢指针总共走了<code>s</code>步，则快指针走了<code>2s</code>步。另外，假设慢指针在环中转了<code>n1</code>圈，快指针转了<code>n2</code>圈。<br/>
 我们可以列出下面等式：<br/></p>
 

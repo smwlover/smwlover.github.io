@@ -9,7 +9,7 @@
   <meta name="author" content="smwlover">
 
   
-  <meta name="description" content="本文来赏析hihoCoder上的一道题目“状态压缩”。我们知道，用动态规划解决问题的时候，状态的表示是很重要的一环。一般来讲，状态可以用一个数组来表示，但是对于有些问题，它们的状态中所包含的信息过多，如果要用数组表示的话，数组的维度会达到四维或以上，这时我们就需要使用状态压缩。 &hellip;">
+  <meta name="description" content="并查集是一种非常精巧而实用的数据结构，它可以处理一些不相交集合的合并与查询问题。并查集的用途有求连通子图、求最小生成树（Kruskal算法）、求最近公共祖先等。本文就通过hihoCoder上的一道题目“无间道之并查集”，来介绍一下并查集这种数据结构。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -154,6 +154,40 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/07/31/union-find/">hihoCoder题目赏析：并查集</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-07-31T16:00:37+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>4:00 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>并查集是一种非常精巧而实用的数据结构，它可以处理一些不相交集合的合并与查询问题。并查集的用途有求连通子图、求最小生成树（Kruskal算法）、求最近公共祖先等。本文就通过hihoCoder上的一道题目<a href="http://hihocoder.com/problemset/problem/1066">“无间道之并查集”</a>，来介绍一下并查集这种数据结构。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/07/31/union-find/">继续阅读 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -393,40 +427,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/24/segment-tree/">随机查询（二）：线段树</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-24T20:00:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在上一篇文章中，我介绍了解决RMQ问题的ST算法，这篇文章我再介绍一种名为“线段树”的数据结构。所谓线段树，其实就是在求解一个区间所有元素的最大值、最小值或所有元素的和之类问题的时候，用一棵树来维护这段区间及其子区间对应的值。在输入数组经常变化的情况下，线段树比起ST算法更加高效。每当原数组变化后，线段树可以在<code>O(logn)</code>的时间内进行更新（ST算法要进行更新，相当于重新生成一遍Sparse Table，其时间复杂度为<code>O(nlogn)</code>），并且对于每次查询，也可以在<code>O(logn)</code>的时间内给出答案。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/05/24/segment-tree/">继续阅读 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; 之前的文章</a>
@@ -455,7 +455,7 @@
   <h1>文章分类</h1>
   <ul id="categories">
     <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
-<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (4)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (5)</a></li>
 <li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
 <li class='category'><a href='/blog/categories/bi-ji/'>笔记 (8)</a></li>
 <li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
@@ -465,24 +465,29 @@
   <h1>标签云</h1>
   <ul class="tag-cloud">
 <a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
-<a style="font-size: 184%" href="/tags/octopress/">octopress</a>
-<a style="font-size: 163%" href="/tags/ruby/">ruby</a>
-<a style="font-size: 148%" href="/tags/wei-yun-suan/">位运算</a>
-<a style="font-size: 104%" href="/tags/dong-tai-gui-hua/">动态规划</a>
-<a style="font-size: 104%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 178%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 158%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 144%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 102%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 60%" href="/tags/bing-cha-ji/">并查集</a>
+<a style="font-size: 102%" href="/tags/shu-zu/">数组</a>
 <a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
-<a style="font-size: 104%" href="/tags/ri-ma/">日麻</a>
-<a style="font-size: 104%" href="/tags/shu/">树</a>
+<a style="font-size: 102%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 102%" href="/tags/shu/">树</a>
 <a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
 <a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
 <a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
-<a style="font-size: 130%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+<a style="font-size: 127%" href="/tags/sui-ji-cha-xun/">随机查询</a>
 
   </ul>
 </section>
 <section>
   <h1>最近发表</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/07/31/union-find/">hihoCoder题目赏析：并查集</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
@@ -498,10 +503,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/03/kth-largest-element/">面试常见问题盘点：第k大元素</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/02/linked-list-problems/">面试常见问题盘点：链表</a>
       </li>
     
   </ul>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[标签：并查集 | 美柑の部屋]]></title>
+  <link href="http://smwlover.github.io/tags/bing-cha-ji/atom.xml" rel="self"/>
+  <link href="http://smwlover.github.io/"/>
+  <updated>2016-07-31T17:03:54+08:00</updated>
+  <id>http://smwlover.github.io/</id>
+  <author>
+    <name><![CDATA[smwlover]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[hihoCoder题目赏析：并查集]]></title>
+    <link href="http://smwlover.github.io/blog/2016/07/31/union-find/"/>
+    <updated>2016-07-31T16:00:37+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/07/31/union-find</id>
+    <content type="html"><![CDATA[<p>并查集是一种非常精巧而实用的数据结构，它可以处理一些不相交集合的合并与查询问题。并查集的用途有求连通子图、求最小生成树（Kruskal算法）、求最近公共祖先等。本文就通过hihoCoder上的一道题目<a href="http://hihocoder.com/problemset/problem/1066">“无间道之并查集”</a>，来介绍一下并查集这种数据结构。</p>
+
+<!--more-->
+
+
+<h2>一、题目</h2>
+
+<h3>背景</h3>
+
+<p>这天天气晴朗、阳光明媚、鸟语花香，空气中弥漫着春天的气息……额，说远了，总之，小Hi和小Ho决定趁着这朗朗春光出去玩。但是刚刚离开居住的宾馆不久，抄近道不小心走入了一条偏僻小道的小Hi和小Ho就发现自己的前方走来了几个彪形大汉，定睛一看还都是地地道道的黑人兄弟！小Hi和小Ho这下就慌了神，捡肥皂事小，这一身百把来斤别一不小心葬身他乡可就没处说去了。<br/>
+就在两人正举足无措之时，为首的黑叔叔从怀里掏出了一件东西——两张花花绿绿的纸，分别递给了小Hi和小Ho。小Hi和小Ho接过来，只见上面写道：“本地最大的帮派——青龙帮，诚邀您的加入！”下面还详细的列出了加入青龙帮的种种好处。<br/>
+于是两人略感心安，在同黑叔叔们交谈一番之后，已是均感相见恨晚。同时，在小Hi和小Ho表示自己不日便将回国之后，黑叔叔们也没有再提加入帮派之事，但是那为首的黑叔叔思索一会，开口道：“我现在有一个难题，思索了很久也没法子解决，既然你们俩都是高材生，不如来帮我看看。”<br/>
+小Hi和小Ho点了点头表示没问题，于是黑叔叔继续说道：“这个问题是这样的，我们帮派最近混进了许多警察的卧底，但是在我们的调查过程中只能够知道诸如‘某人和另一个人是同阵营的’这样的信息，虽然没有办法知道他们具体是哪个阵营的，但是这样的信息也是很重要的，因为我们经常会想要知道某两个人究竟是不是同一阵营的。”<br/>
+小Hi和小Ho赞同的点了点头，毕竟无间道也都是他们看过的。<br/>
+黑叔叔接着说道：“于是现在问题就来了，我希望你们能写出这样一个程序，我会有两种操作，一种是告诉它哪两个人是同一阵营的，而另一种是询问某两个人是不是同一阵营的……既然你们就要回国了，不如现在就去我们帮派的总部写好这个程序再走吧。”<br/>
+为了生命安全与……小Hi和小Ho都不得不解决这个问题！</p>
+
+<h3>输入与输出</h3>
+
+<p>输入数据的第一行为一个整数<code>N</code>，表示黑叔叔总共进行的操作次数。<br/>
+输入数据的第二至<code>N+1</code>行，每行分别描述黑叔叔的一次操作，其中第<code>i+1</code>行为一个整数<code>op_i</code>和两个由大小写字母组成的字符串<code>Name1_i</code>、<code>Name2_i</code>。<code>op_i</code>只可能为<code>0</code>或<code>1</code>。当<code>op_i==0</code>时，表示黑叔叔判定<code>Name1_i</code>和<code>Name2_i</code>是同一阵营的；当<code>op_i==1</code>时，表示黑叔叔希望知道<code>Name1_i</code>和<code>Name2_i</code>是否为同一阵营的。<br/>
+输出：对于黑叔叔每次<code>op_i==1</code>的操作，输出一行，表示查询的结果：如果根据已知信息（即这次操作之前的所有<code>op_i==0</code>的操作），可以判定询问中的两个人是同一阵营的，则输出yes，否则输出no。<br/>
+<strong>注意：数据中所有涉及的人物中不存在两个名字相同的人（即姓名唯一地确定了一个人），对于所有的</strong><code>i</code><strong>，满足</strong><code>Name1_i</code><strong>和</strong><code>Name2_i</code><strong>是不同的两个人。</strong></p>
+
+<p><div align="center"><table class="blogTable"><caption>样例输入与输出</caption><tr><th>样例输入</th><th>样例输出</th></tr><tr><td><code><span>10</span><br/><span>0 Steven David</span><br/><span>0 Lcch Dzx</span><br/><span>1 Lcch Dzx</span><br/><span>1 David Dzx</span><br/><span>0 Lcch David</span><br/><span>0 Frank Dzx</span><br/><span>1 Steven Dzx</span><br/><span>1 Frank David</span><br/><span>0 Steven Dzx</span><br/><span>0 Dzx Frank</span></code></td><td><code><span>yes</span><br/><span>no</span><br/><span>yes</span><br/><span>yes</span></code></td></tr></table></div></p>
+
+<h2>二、并查集简介</h2>
+
+<p>并查集即一个或多个不相交的集合，我们从每个集合中选出一个元素作为代表，来表示这个集合。一般情况下，我们不关心每个集合具体包含哪些元素；也不关心每个集合的代表具体是哪个元素。我们所关心的并查集的基本操作主要包含<strong>合并（Union）</strong>和<strong>查询（Find）</strong>操作。其中查询操作是给定一个元素，返回该元素所在集合的代表元素；合并操作则是给定两个元素，将它们所在的集合合并为一个整体。<br/>
+我们可以用一个森林来表示并查集，森林中的每棵树代表并查集中的一个集合，树中每个结点表示一个元素，根结点则是这个集合的代表元素。初始状态下，每个结点单独成为一个集合，即每个结点的代表结点均为它自己，如图所示：</p>
+
+<p><div align="center"><img src="/images/blogimg/10.png"></div></p>
+
+<p>并查集的合并操作则是将一棵树的根结点指向另一棵树的根结点。如图所示：</p>
+
+<p><div align="center"><img src="/images/blogimg/11.png"></div></p>
+
+<p>而在C++中，我们可以用一个<code>map</code>或者<code>unordered_map</code>来实现并查集。其中，键代表一个结点的名字，值表示其代表结点的名字。这样，我们可以为上面的问题建立一个数据结构如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">Union</span><span class="p">{</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">unordered_map</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;</span> <span class="n">represent</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">Union</span><span class="p">()</span><span class="o">:</span> <span class="n">represent</span><span class="p">(</span><span class="n">unordered_map</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;</span><span class="p">()){}</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">insert</span><span class="p">(</span><span class="n">string</span> <span class="n">name</span><span class="p">);</span> <span class="c1">//添加一个结点</span>
+</span><span class='line'>    <span class="n">string</span> <span class="nf">find</span><span class="p">(</span><span class="n">string</span> <span class="n">name</span><span class="p">);</span> <span class="c1">//find查询函数</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">merge</span><span class="p">(</span><span class="n">string</span> <span class="n">name1</span><span class="p">,</span> <span class="n">string</span> <span class="n">name2</span><span class="p">);</span> <span class="c1">//union合并函数</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="n">string</span> <span class="n">name1</span><span class="p">,</span> <span class="n">string</span> <span class="n">name2</span><span class="p">);</span> <span class="c1">//op==0的操作</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="nf">judge</span><span class="p">(</span><span class="n">string</span> <span class="n">name1</span><span class="p">,</span> <span class="n">string</span> <span class="n">name2</span><span class="p">);</span> <span class="c1">//op==1的操作</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>三、查询操作</h2>
+
+<p><code>find</code>操作的实现是显而易见的：判断当前元素的代表结点是不是它自己，如果是，返回它自己；如果不是，则对其代表结点递归调用<code>find</code>函数。这样的思路写成伪代码如下：</p>
+
+<p><div align="center"><img src="/images/blogimg/12.png"></div></p>
+
+<p>但是这种思路有一个缺陷，它的平均时间复杂度为树的高度。为了提高查询操作的效率，我们可以在查询的过程中改变树的结构：如果我们求解出了<code>X</code>所在集合的代表元素是<code>X_r</code>的话，我们可以直接令<code>represent[X]=X_r</code>。这样，下一次再对<code>X</code>进行查询时，效率就会高很多。这种操作会在查询时令查询路径上经过的每一个结点都直接指向根结点，就像把整条路径压缩了一样，所以被称为<strong>路径压缩</strong>，如图所示：</p>
+
+<p><div align="center"><img src="/images/blogimg/14.png"></div></p>
+
+<p>实现路径压缩的伪代码如下：</p>
+
+<p><div align="center"><img src="/images/blogimg/13.png"></div></p>
+
+<h2>四、合并操作</h2>
+
+<p><code>union</code>操作需要输入两个元素<code>name1</code>和<code>name2</code>，我们首先调用<code>find</code>找到这两个元素的代表元素<code>repName1</code>和<code>repName2</code>，然后令<code>repName1</code>的代表元素等于<code>repName2</code>即可。<br/>
+当然这一步也可以做一些优化：假设两个元素对应的树高度分别为3和4，如果我们将第二棵树合并到第一棵树上，那么最终得到的树的高度就是5；如果反过来合并，那么得到的树的高度就是4。为了让我们每次合并之后得到的树的高度都是最小的，我们需要将高度较小的树合并到高度较大的树上面。在并查集中，我们通常将树高度的上界称为<strong>秩（rank）</strong>，这种将秩较小的树合并到秩较大的树上的方法，称为<strong>按秩合并</strong>。<br/>
+在下面的代码中，我们利用<code>unordered_map&lt;string, int&gt; rank</code>来记录每个结点的秩，然后根据秩的大小关系决定合并操作的方法：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">unionSet</span><span class="p">(</span><span class="n">string</span> <span class="n">x</span><span class="p">,</span> <span class="n">string</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">x</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">==</span> <span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span> <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">rank</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">rank</span><span class="p">[</span><span class="n">y</span><span class="p">])</span> <span class="n">represent</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">represent</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">rank</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">rank</span><span class="p">[</span><span class="n">y</span><span class="p">])</span> <span class="n">rank</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+]]></content>
+  </entry>
+  
+</feed>

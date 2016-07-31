@@ -4,7 +4,7 @@
   <title><![CDATA[标签：线段树 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/xian-duan-shu/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-06-28T18:49:28+08:00</updated>
+  <updated>2016-07-31T17:03:54+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -50,7 +50,7 @@
 <h2>二、线段树的初始化</h2>
 
 <p>对于一个数组<code>arr</code>，我们可以按照上面给出的线段树的定义，构建出线段树的基本结构，确定每个结点代表的是哪一段区间。假设原数组有10个元素，构建好的线段树中每个结点对应的区间如下图所示（图片来自hihoCoder）：<br/>
-<img src="/images/blogimg/4.png"><br/>
+<div align="center"><img src="/images/blogimg/4.png"></div><br/>
 构建完基本结构之后，下一步操作是计算每个结点对应的区间中元素的最小值。对于叶子结点来讲，因为其对应的区间只包含一个元素，所以最小值就是该元素；而对于中间结点，其最小值则是它的两个儿子所记录的最小值中较小的那一个。这种先计算子结点的值，再根据子结点的值计算父结点的值的过程，与后序遍历的过程类似，<strong>可以通过一次后序遍历来实现</strong>，其时间复杂度为<code>O(n)</code>。构建线段树并且初始化最小值的代码如下：</p>
 
 <p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
