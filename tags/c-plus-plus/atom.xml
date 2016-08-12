@@ -4,7 +4,7 @@
   <title><![CDATA[标签：c++ | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-07-31T17:03:54+08:00</updated>
+  <updated>2016-08-06T17:32:24+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,230 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[面试奇葩问题：求1到n的和]]></title>
+    <link href="http://smwlover.github.io/blog/2016/08/06/add-numbers/"/>
+    <updated>2016-08-06T15:39:19+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/08/06/add-numbers</id>
+    <content type="html"><![CDATA[<p>在面试中，我们可能会遇到一些“不走寻常路”的问题。这类问题看似简单，但是经常有许多奇葩的要求。比如我们之前讨论过的一个问题：输入两个<code>int</code>类型的整数<code>a</code>和<code>b</code>，输出二者的和，要求不能使用四则运算符。最后我们得出的解决方法是利用<a href="http://smwlover.github.io/blog/2016/05/20/binary-manipulation/">位运算</a>。今天我们再来讨论一道题目：<strong>输入一个<code>int</code>类型的正整数<code>n</code>，输出<code>1</code>到<code>n</code>的和，要求不能使用<code>*</code>、<code>/</code>、<code>for</code>、<code>while</code>、<code>if</code>、<code>else</code>、<code>switch</code>、<code>case</code>以及<code>?:</code>等关键字或运算符</strong>。</p>
+
+<!--more-->
+
+
+<p>我们可以思考一下，如果不考虑这些限制条件，我们应该怎么去做。能想到的方法无非三种：首先是直接输出结果<code>n*(n+1)/2</code>（但是出现了乘除法，不能用）；其次是利用循环（显然不能用）；最后是利用递归（递归需要用条件判断语句判断是否达到终止条件，所以不能用）。<br/>
+其实，上面提到的“不能用”，指的是我们不能在程序中<strong>显式地</strong>使用。我们仍然可以<strong>隐式地</strong>使用它们，也就是<strong>让编译器代替我们实现循环或条件判断</strong>。如果能发现这一点，我们就可以想出很多解法来了，在这里列举其中四种。</p>
+
+<h2>一、让编译器代替我们实现循环</h2>
+
+<h3>方法一</h3>
+
+<p>假设我们有一个类<code>Sum</code>，在我们执行语句<code>new Sum[n]</code>时，会调用<code>n</code>次类<code>Sum</code>的构造函数。我们可以在类<code>Sum</code>中声明两个静态成员变量<code>sum</code>和<code>n</code>，并且分别初始化为0和1。在<code>Sum</code>的构造函数中，我们可以令<code>sum+=n</code>，然后<code>n+=1</code>。这样在构造函数被调用<code>n</code>次之后，<code>Sum::sum</code>的值就是我们想要的结果。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">Sum</span><span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">sum</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Sum</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">sum</span> <span class="o">+=</span> <span class="p">(</span><span class="n">n</span><span class="o">++</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">Sum</span><span class="o">::</span><span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">Sum</span><span class="o">::</span><span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Sum</span><span class="o">*</span> <span class="n">dump</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Sum</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">Sum</span><span class="o">::</span><span class="n">sum</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">delete</span><span class="p">[]</span> <span class="n">dump</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>这种方法需要我们理解什么是一个类的静态成员，还需要我们知道在通过<code>new</code>操作符为类的一个或多个实例动态分配内存空间的时候，类的构造函数是会被调用的。在用代码实现的时候，我们还需要清楚类的静态成员变量是如何初始化的。</p>
+
+<p><div class="expand">关于<code>static</code>成员变量和函数的一些补充<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+☆静态成员不能在类定义内部初始化，只能在外部初始化。<br/>
+☆静态成员函数没有<code>this</code>指针，它不能返回非静态成员，因为除了实例会调用它以外，类本身也可以调用。<br/>
+☆静态成员之间可以相互访问，静态成员函数可以访问静态成员变量和静态成员函数。<br/>
+☆非静态成员函数可以任意地访问静态成员函数和静态成员变量。<br/>
+☆静态成员函数不能访问非静态成员函数和非静态成员变量。
+</div></div></p>
+
+<h2>二、让编译器代替我们实现条件判断</h2>
+
+<h3>方法二</h3>
+
+<p>我们知道，C++有一种语言特性叫做短路求值。具体来讲，在逻辑与操作符中，如果前面一个表达式值为<code>false</code>，不必对后面的表达式再做判断，直接返回<code>false</code>；在逻辑或操作符中，如果前面一个表达式值为<code>true</code>，不必对后面的表达式再做判断，直接返回<code>true</code>。我们可以发现，短路求值的效果和条件判断语句是很类似的。<br/>
+假设我们用递归来实现求和的功能，递归函数为<code>getSum(int n)</code>，我们需要该函数达到以下效果：<code>n==0</code>的时候达到终止条件，不做递归调用；<code>n&gt;0</code>的时候递归调用<code>getSum(n-1)</code>。参考刚才提到的短路求值，我们可以写出表达式<code>n &amp;&amp; getSum(n-1)</code>，这个表达式刚好满足我们的要求。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">getSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">n</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">getSum</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">sum</span> <span class="o">+=</span> <span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">getSum</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>如果说上一种方法考察我们对静态成员变量的理解，这种方法则考察我们对短路求值这种语言特性的认识。</p>
+
+<h3>方法三</h3>
+
+<p>我们先观察一个表达式<code>!!n</code>。在<code>n==0</code>的时候，<code>!n</code>为<code>true</code>，<code>!!n</code>则为<code>false</code>，转化成整形则为<code>0</code>；在<code>n&gt;0</code>的时候，<code>!n</code>为<code>false</code>，<code>!!n</code>则为<code>true</code>，转化成整形则为<code>1</code>。也就是说，这个表达式在<code>n==0</code>的时候返回<code>0</code>，其余情况返回<code>1</code>。<br/>
+在了解了这一点之后，我们可以写出下面的代码：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">getSumZero</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">getSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="k">typedef</span> <span class="nf">int</span> <span class="p">(</span><span class="o">*</span><span class="n">Func</span><span class="p">)(</span><span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="n">Func</span> <span class="n">functions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">getSumZero</span><span class="p">,</span> <span class="n">getSum</span><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">getSumZero</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">getSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">n</span> <span class="o">+</span> <span class="n">functions</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;n-1&quot;</span><span class="o">&gt;!!</span><span class="n">n</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">getSum</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>可以看到，我们首先声明了两个函数，其中<code>getSumZero</code>对应递归的终止条件，而<code>getSum</code>则是递归的主函数。然后我们声明了一个由函数指针构成的数组<code>functions</code>，数组的长度为2，而数组的每个元素都是<code>Func</code>类型。根据之前我们定义的类型别名，我们知道<code>Func</code>类型实际上指的是一种函数指针类型，这种函数指针指向一个参数为<code>int</code>且返回值为<code>int</code>的函数。<br/>
+在<code>getSum</code>函数的实现中，我们发现：当<code>n&gt;0</code>时，我们会调用<code>functions[1](n-1)</code>，这其实是对<code>getSum</code>自身的递归调用；当<code>n==0</code>时，调用的则是<code>getSumZero(n-1)</code>，这就是递归的终止条件。通过<code>!!n</code>的值，我们可以从数组中选择一个函数进行调用，实现了隐式的条件判断。<br/>
+这种方法需要我们理解C++中布尔类型和整数类型之间是如何进行转换的，也需要我们对函数指针的使用方法有一个大致的了解。</p>
+
+<h3>方法四</h3>
+
+<p>这个方法总体上和上一种方法类似，但是没有使用函数指针，而是使用了类的继承与虚函数。代码如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">;</span>
+</span><span class='line'><span class="n">A</span><span class="o">*</span> <span class="n">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">getSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">getSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span> <span class="k">return</span> <span class="n">n</span> <span class="o">+</span> <span class="n">arr</span><span class="p">[</span><span class="o">!!</span><span class="n">n</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">getSum</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="p">}</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="p">();</span>
+</span><span class='line'><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B</span><span class="p">();</span>
+</span><span class='line'><span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">getSum</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="k">delete</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'><span class="k">delete</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'><span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>可以看到，我们定义了两个类<code>A</code>和<code>B</code>，其中<code>B</code>是<code>A</code>的子类。它们有一个虚成员函数<code>getSum</code>，其中<code>A::getSum</code>直接返回<code>0</code>，对应递归的终止条件；<code>B::getSum</code>覆盖了其父类的定义，对应递归的主函数。程序定义了一个<code>A*</code>类型的数组，其第一个元素指向一个<code>A</code>类型的实例，第二个元素指向一个<code>B</code>类型的实例。由于<code>getSum</code>是虚函数，程序会根据指针实际指向的类型（动态类型），而不是其声明时的类型<code>A*</code>（静态类型）进行调用。<br/>
+其实，这个方法本质上与上一种方法是相同的，因为虚函数（多态）的实现方式是虚表，而虚表实际上就是由一些函数指针构成的。这种方法需要我们对类的继承、虚函数、多态等知识有一个清晰的了解，这些内容是C++的精华，在面试中也是必不可少的。</p>
+
+<h2>总结</h2>
+
+<p>通过上面几种方法我们可以发现，这个问题表面上是让我们实现一个求和的功能，实际上考察的是我们对C++一些重要的语言特性的了解程度，以及我们从这些语言特性入手解决问题的创新能力。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[hihoCoder题目赏析：并查集]]></title>
@@ -942,441 +1166,6 @@ Minimum window is <code>"BANC"</code>.<br/>
 <h3>总结</h3>
 
 <p>这一类的双指针问题主要是利用两个指针构造一个窗口，然后对窗口的内容进行讨论。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[面试常见问题盘点：第k大元素]]></title>
-    <link href="http://smwlover.github.io/blog/2016/06/03/kth-largest-element/"/>
-    <updated>2016-06-03T15:28:17+08:00</updated>
-    <id>http://smwlover.github.io/blog/2016/06/03/kth-largest-element</id>
-    <content type="html"><![CDATA[<p>数组本身结构简单，但是对数组进行操作会涉及到很多经典算法，这使得数组成为了面试中最热门的考点之一。这篇文章就总结一下求数组的第<code>k</code>小/第<code>k</code>大元素，或者中位数的问题。</p>
-
-<!--more-->
-
-
-<h2>一、求数组中第k小/第k大元素</h2>
-
-<p><strong>问题：</strong>输入一个数组以及一个整数<code>k</code>，返回数组中第<code>k</code>大的元素。<br/>
-看到这个问题，我们的第一反应可能是先将输入的数组排序，这样一来，算法的时间复杂度就至少是<code>O(nlogn)</code>。其实，解决这类问题有一种更快的方法，它是基于快速排序的<code>partition</code>函数实现的。</p>
-
-<h3>1.1 <code>partition</code>函数概述</h3>
-
-<p><code>partition</code>函数的作用是选择一个标记元素<code>pivot</code>（一般取数组第一个元素为标记元素），将原数组划分为两部分，左边一部分元素比<code>pivot</code>小，右边一部分元素比<code>pivot</code>大，<code>pivot</code>位于中间。该函数的大致流程如下：<br/>
-<strong>1. 初始：</strong>记录两个下标<code>p1</code>和<code>p2</code>。<code>p1</code>记录了比<code>pivot</code>小的部分的最后一个元素的下标，初始值为<code>0</code>；<code>p2</code>记录了当前正在遍历的元素的下标，初始值为<code>1</code>。<br/>
-<strong>2. 迭代：</strong>每当<code>p2</code>遍历到一个比<code>pivot</code>小的元素，则将<code>p1++</code>，然后将<code>arr[p1]</code>的值和<code>arr[p2]</code>的值进行交换。<br/>
-<strong>3. 结束：</strong>在遍历完毕后，<code>arr[1..p1]</code>存放的就是所有小于<code>pivot</code>的元素，<code>arr[p1+1..p2]</code>存放的就是所有的大于<code>pivot</code>的元素。我们将<code>arr[0]</code>和<code>arr[p1]</code>交换，这样标记元素<code>pivot</code>就位于下标为<code>p1</code>的位置，它左侧的元素小于它，它右侧的元素大于它。</p>
-
-<h3>1.2 基于<code>partition</code>函数的求第<code>k</code>大元素的算法</h3>
-
-<p>首先对整个数组进行一次划分，观察大于<code>pivot</code>的元素数量<code>size</code>。如果<code>size == k-1</code>，说明<code>pivot</code>正好是我们要找的第<code>k</code>大的元素，直接返回<code>pivot</code>即可；如果<code>size &gt; k-1</code>，说明第<code>k</code>大的元素位于右半部分，我们需要对右半部分递归调用<code>partition</code>函数，找右半部分第<code>k</code>大的元素；如果<code>size &lt; k-1</code>，说明第<code>k</code>大的元素位于左半部分，我们需要对左半部分递归调用<code>partition</code>函数，找左半部分第<code>k-1-size</code>大的元素。</p>
-
-<p><figure class='code'><figcaption><span>数组第k大的元素 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">findKthLargest</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">nums</span><span class="p">,</span> <span class="kt">int</span> <span class="n">k</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nf">findResult</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">findResult</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">nums</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">k</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">start</span> <span class="o">==</span> <span class="n">end</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="n">start</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="c1">//Partition:</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">for</span><span class="p">(;</span> <span class="n">p2</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">end</span><span class="p">;</span> <span class="n">p2</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">p2</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">nums</span><span class="p">[</span><span class="n">start</span><span class="p">]){</span>
-</span><span class='line'>        <span class="n">p1</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">p2</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">nums</span><span class="p">[</span><span class="n">p2</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">p1</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">nums</span><span class="p">[</span><span class="n">p1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
-</span><span class='line'><span class="n">nums</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">p1</span><span class="p">];</span>
-</span><span class='line'><span class="n">nums</span><span class="p">[</span><span class="n">p1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">leftSize</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">start</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">rightSize</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">p1</span><span class="p">;</span>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">rightSize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">k</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">rightSize</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">findResult</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">p1</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">k</span><span class="p">);</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nf">findResult</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">p1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="n">rightSize</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>该算法的平均时间复杂度为<code>O(n)</code>，与快速排序一样，最坏情况下，时间复杂度为<code>O(n2)</code>。</p>
-
-<h2>二、数组前k小/前k大的元素</h2>
-
-<p><strong>问题：</strong>输入一个数组以及一个整数<code>k</code>，返回数组中前<code>k</code>小的元素。</p>
-
-<h3>2.1 方法一：基于<code>partition</code>函数的算法</h3>
-
-<p>定义<code>partition</code>函数，其返回值为<code>pivot</code>在划分之后所处的下标。首先对整个数组进行一次划分，并观察函数的返回值。<br/>
-如果返回值等于<code>k</code>，我们知道<code>arr[0..k-1]</code>肯定都比<code>pivot</code>小，<code>arr[k+1..n-1]</code>肯定都比<code>pivot</code>大，换句话说，<code>arr[0..k-1]</code>就是数组的前<code>k</code>小的元素；如果返回值小于<code>k</code>，我们对右半部分进行递归调用，直到返回值等于<code>k</code>为止；如果返回值大于<code>k</code>，我们对左半部分进行递归调用，直到返回值等于<code>k</code>为止。<br/>
-与上一个问题相同，该算法的平均时间复杂度为<code>O(n)</code>。</p>
-
-<p><figure class='code'><figcaption><span>数组前k小的元素 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">partition</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">start</span> <span class="o">==</span> <span class="n">end</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">start</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">p0</span> <span class="o">=</span> <span class="n">start</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
-</span><span class='line'><span class="k">for</span><span class="p">(;</span> <span class="n">p1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">end</span><span class="p">;</span> <span class="n">p1</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">p1</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">pivot</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">p0</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">p0</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">p0</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">p1</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">p1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">p0</span><span class="p">];</span>
-</span><span class='line'><span class="n">arr</span><span class="p">[</span><span class="n">p0</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">start</span><span class="p">];</span>
-</span><span class='line'><span class="n">arr</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'><span class="k">return</span> <span class="n">p0</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">findLeastKElements</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">k</span><span class="p">){</span>
-</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">k</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">partition</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">);</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">!=</span> <span class="n">k</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">index</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">k</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">start</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">index</span> <span class="o">=</span> <span class="n">partition</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">end</span> <span class="o">=</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">index</span> <span class="o">=</span> <span class="n">partition</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">k</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">res</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'><span class="k">return</span> <span class="n">res</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>上述方法尽管效率较高，但是也存在一个致命的问题：<strong>运行时需要将所有数据载入内存</strong>。这就决定了该算法不适合海量数据的场合，比如从一亿个数中找出前一百个数。为了解决这个问题，我们便引入了一种基于堆的方法。</p>
-
-<h3>2.2 方法二：基于堆的算法</h3>
-
-<p>建立一个大根堆，然后遍历数组中的所有元素，在遍历过程中：<br/>
-如果堆的大小小于<code>k</code>，则直接将该元素进堆。如果堆的大小等于<code>k</code>，则比较该元素与堆顶元素的大小。由于是大根堆，堆顶元素肯定是堆中最大的元素。如果该元素比堆顶元素还要大，那么该元素不可能是前<code>k</code>小的元素之一（因为堆中已经有<code>k</code>个比它小的元素了），我们可以直接将该元素抛弃；如果该元素比堆顶元素小，我们知道堆顶元素已经不再属于前<code>k</code>小的元素之一了，我们将堆顶元素弹出，然后将该元素进堆。<br/>
-在算法执行的过程中，保证堆的大小不大于<code>k</code>。这样算法执行完毕后，堆中的元素就是原数组前<code>k</code>小的元素。</p>
-
-<p><figure class='code'><figcaption><span>数组前k小的元素 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="n">k</span><span class="p">;</span> <span class="c1">//n为数组元素个数</span>
-</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">numbers</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="c1">//逐个输入数组元素</span>
-</span><span class='line'>        <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">priority_queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;,</span> <span class="n">less</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">heap</span><span class="p">;</span> <span class="c1">//建立大根堆</span>
-</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">heap</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">k</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">heap</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>    <span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">top</span> <span class="o">=</span> <span class="n">heap</span><span class="p">.</span><span class="n">top</span><span class="p">();</span> <span class="c1">//获取堆顶元素</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">top</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</span><span class='line'>            <span class="k">continue</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">top</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]){</span>
-</span><span class='line'>            <span class="n">heap</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">heap</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">heap</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">//输出结果</span>
-</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">heap</span><span class="p">.</span><span class="n">top</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">heap</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>该方法不需要将所有数据载入内存，只需要在内存中保存一个大小为<code>k</code>的堆，所以更适合处理海量数据。因为每次调整堆的时间复杂度为<code>O(logk)</code>，并且最坏情况下，每遍历到一个元素就需要对堆进行一次调整，所以该方法的时间复杂度为<code>O(nlogk)</code>。总体来讲，该方法适用于<code>n</code>较大但是<code>k</code>非常小的情况。</p>
-
-<h2>三、求长度可变数组的中位数</h2>
-
-<p><strong>问题：</strong>有一个数组支持两种操作：一是向该数组中加入一个元素（<code>int</code>类型）；二是求该数组中所有元素的中位数。请实现该数组。<br/>
-通过本文的第一节，我们已经知道了计算大小为<code>n</code>的数组中位数的方法：如果<code>n</code>是奇数，那么中位数就是第<code>n/2 + 1</code>大的元素；如果<code>n</code>是偶数，中位数则是第<code>n/2</code>和<code>n/2 + 1</code>大的元素的平均值。我们可以直接利用上面提到的基于<code>partition</code>的方法进行递归求解。<br/>
-但是本问题中，数组的长度是逐渐增加的，我们不可能在每次往数组中添加元素之后，都利用<code>O(n)</code>的时间来求新的中位数。我们需要找到更快的方法。</p>
-
-<h3>3.1 最大最小堆法更新中位数</h3>
-
-<p>我们保存一个大根堆和一个小根堆，并且在往数组中添加元素之后，保证以下三个条件：<br/>
-1、大根堆中的元素是整个数组中较小的一半元素；<br/>
-2、小根堆中的元素是整个数组中较大的一半元素；<br/>
-3、大根堆和小根堆的大小之差的绝对值不超过1。<br/>
-具体来说，在添加一个元素<code>num</code>时：<br/>
-如果<code>num</code>小于大根堆堆顶，说明<code>num</code>位于数组前半部分，将其放入大根堆中；<br/>
-如果<code>num</code>大于小根堆堆顶，说明<code>num</code>位于数组后半部分，将其放入小根堆中；<br/>
-如果<code>num</code>介于二者之间，则放入哪个堆中都是可以的。<br/>
-然后观察两个堆大小之差的绝对值是否超过<code>1</code>，如果是，我们需要调节两个堆的平衡，具体做法为：从元素数量较多的堆中取出一个元素，放入另一个堆中。</p>
-
-<h3>3.2 最大最小堆法获取中位数</h3>
-
-<p>如果大根堆与小根堆的大小相差<code>1</code>，说明原数组大小为奇数。大小较大的那个堆的堆顶元素即为中位数。如果大根堆与小根堆的大小相等，说明原数组大小为偶数。两个堆堆顶元素的平均值即为中位数。</p>
-
-<p><figure class='code'><figcaption><span>求长度可变数组的中位数 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">MedianFinder</span> <span class="p">{</span>
-</span><span class='line'><span class="k">private</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">priority_queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">less</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">greaterRoot</span><span class="p">;</span> <span class="c1">//大根堆</span>
-</span><span class='line'>    <span class="n">priority_queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">greater</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">smallerRoot</span><span class="p">;</span> <span class="c1">//小根堆&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">MedianFinder</span><span class="p">(){</span>
-</span><span class='line'>        <span class="n">greaterRoot</span> <span class="o">=</span> <span class="n">priority_queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">less</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
-</span><span class='line'>        <span class="n">smallerRoot</span> <span class="o">=</span> <span class="n">priority_queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">greater</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="c1">// Adds a number into the data structure.</span>
-</span><span class='line'><span class="kt">void</span> <span class="n">addNum</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">smallerRoot</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span>
-</span><span class='line'>        <span class="n">greaterRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">//观察大根堆的大小是否比小根堆多1，如果不是，则将大根堆的堆顶元素取出，放到小根堆中。</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">greaterRoot</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">2</span><span class="p">){</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">greaterRoot</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">smallerRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">num</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">top</span><span class="p">()){</span>
-</span><span class='line'>            <span class="n">greaterRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">greaterRoot</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">2</span><span class="p">){</span>
-</span><span class='line'>                <span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">greaterRoot</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">smallerRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">num</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">top</span><span class="p">()){</span>
-</span><span class='line'>            <span class="n">smallerRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">smallerRoot</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">2</span><span class="p">){</span>
-</span><span class='line'>                <span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">smallerRoot</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">greaterRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">sizeA</span> <span class="o">=</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">sizeB</span> <span class="o">=</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">sizeA</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">sizeB</span><span class="p">)</span>
-</span><span class='line'>                <span class="n">greaterRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">else</span>
-</span><span class='line'>                <span class="n">smallerRoot</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Returns the median of current data stream</span>
-</span><span class='line'><span class="kt">double</span> <span class="n">findMedian</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">sizeA</span> <span class="o">=</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">sizeB</span> <span class="o">=</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">sizeA</span> <span class="o">==</span> <span class="n">sizeB</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="n">greaterRoot</span><span class="p">.</span><span class="n">top</span><span class="p">()</span> <span class="o">+</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">top</span><span class="p">())</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">sizeA</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">sizeB</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">greaterRoot</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">smallerRoot</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>该算法每次添加元素的时间复杂度为<code>O(logn)</code>，获取中位数的时间复杂度为<code>O(1)</code>。</p>
-
-<p><div class="expand">扩展：如果要求出数据流中第<code>n/10</code>大的元素该怎么做？<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
-改变两个堆的大小比例。要求出第<code>n/2</code>大的元素即中位数时，两个堆是一样大的。<br/>
-而要求出第<code>n/10</code>大的元素时，说明有<code>n/10</code>个元素小于目标元素，<code>9n/10</code>个元素大于目标元素。所以我们保证小根堆是大根堆的9倍大小就可以了。
-</div></div></p>
 ]]></content>
   </entry>
   
