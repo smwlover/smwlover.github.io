@@ -4,7 +4,7 @@
   <title><![CDATA[标签：c++ | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-08-12T21:19:42+08:00</updated>
+  <updated>2016-08-13T19:04:53+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -14,7 +14,248 @@
 
   
   <entry>
-    <title type="html"><![CDATA[面试奇葩问题：求1到n的和]]></title>
+    <title type="html"><![CDATA[C++中sizeof运算符的简要总结]]></title>
+    <link href="http://smwlover.github.io/blog/2016/08/13/sizeof-operator/"/>
+    <updated>2016-08-13T15:16:14+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/08/13/sizeof-operator</id>
+    <content type="html"><![CDATA[<p><code>sizeof</code>是C++中的一个运算符（不是一个函数），它的作用被表述为：<em>The</em> <code>sizeof</code> <em>keyword gives the amount of storage, <strong>in bytes</strong>, associated with <strong>a variable or a type (including aggregate types)</strong>. This keyword returns a value of type</em> <code>size_t</code><em>.</em> 简而言之，就是返回一个变量或类型在内存中所占的字节数。但正是这么一个看似简单的运算符，却成为了面试中的热门考点。这说明关于这个运算符其实有很多需要注意的地方。在这篇文章中，我就对这个运算符进行一个简要的总结。</p>
+
+<!--more-->
+
+
+<h2>一、指针，数组与<code>sizeof</code></h2>
+
+<p>面试的时候，面试官经常将<code>sizeof</code>运算符与<code>char*</code>类型字符串或者<code>char[]</code>类型字符串综合起来考察。比如下面的例子：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">getSize</span><span class="p">(</span><span class="kt">char</span> <span class="n">var</span><span class="p">[]){</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">str1</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="mo">01234567</span><span class="mi">89</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">char</span> <span class="n">str2</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str2</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">char</span> <span class="n">str3</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str3</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">getSize</span><span class="p">(</span><span class="n">str3</span><span class="p">);</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在<code>main</code>函数中，我们依次定义了三个内容相似的字符串。首先对于<code>str1</code>，它是一个指针，指针大小在32位机器中恒定为4，所以输出为4；<code>str2</code>是字符数组，没有预定义大小，所以其大小由存储的字符串长度决定，字符串的长度为10，加上末尾的字符串结束符<code>\0</code>，共11个字符，所以输出11；<code>str3</code>是预定义大小的字符数组，不管内部存储的字符串长度是多少，其大小都是预定义的大小100，所以输出100。而对于函数<code>getSize</code>，我们需要了解的是，<strong>在C++中，任何数组作为函数参数传递进去后都会退化成指针，</strong>所以输出为4。<br/>
+综上所述  ，输出依次为4、11、100和4。</p>
+
+<h2>二、<code>struct</code>和<code>class</code>在内存中的数据对齐</h2>
+
+<p>数据对齐这件事，我们平时好像不太关注，但是一提到<code>sizeof</code>操作符，就会不可避免地涉及到内存对齐的机制。之所以要进行内存对齐，是出于如下考虑：<strong>对于<code>n</code>字节的元素，它的首地址能被<code>n</code>整除时，才能在程序执行时获得最好的性能。</strong>对于类或者结构体，为了保证这一点，就需要使其内部的成员变量按照<strong>最长的成员变量的长度</strong>去对齐。举个例子：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">struct</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在上面的代码中，我们定义了两个结构体<code>A</code>和<code>B</code>，它们的成员变量内容相同，但是顺序不同。通过观察发现，<code>A</code>和<code>B</code>中最长的数据元素类型均为<code>int</code>，占4字节，所以两个结构体的成员变量均要以4字节为单位进行对齐。简而言之，就是成员变量按照顺序放入长度为4字节的位置中，如果能放得下，就继续往里放；如果放不下，就需要开辟一个新的位置。所以，<code>A</code>和<code>B</code>数据对齐的情况如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>A的数据对齐情况，按照声明的顺序，应该依次放置a,b,c：
+</span><span class='line'>|-a-|&mdash;|-b-|-b-|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>所以sizeof(A)应该等于8。&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>B的数据对齐情况，按照声明的顺序，应该依次放置a,c,b：
+</span><span class='line'>|-a-|&mdash;|&mdash;|&mdash;|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>|-b-|-b-|&mdash;|&mdash;|
+</span><span class='line'>所以sizeof(B)应该等于12。</span></code></pre></td></tr></table></div></figure></p>
+
+<p>而对于联合体<code>union</code>，相比于<code>struct</code>在内存上的顺序式组织，<code>union</code>是重叠式组织的，所以对一个<code>union</code>使用<code>sizeof</code>返回的是其最长成员的长度。</p>
+
+<h2>三、类和<code>sizeof</code>运算符</h2>
+
+<h3>3.1 关于空类的继承</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>对一个空类使用<code>sizeof</code>结果为1，因为即使是空类，也需要在内存中占用一定位置，否则就不可寻址了，这是编译器做的一步特殊处理。所以<code>sizeof(A)</code>的结果为1。对于一个只有普通函数，没有成员变量的类使用<code>sizeof</code>，结果仍为1，因为类的普通函数不会占用类的每个实例的空间。所以<code>sizeof(B)</code>的结果为1。对一个多重继承的空类使用<code>sizeof</code>，输出仍然为1。所以<code>sizeof(C)</code>的结果为1。</p>
+
+<h3>3.2 关于有成员变量的类的继承：</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在上面这种情况下，<code>C</code>的实例不仅要存储自身定义的成员变量，还要存储其父类定义的成员变量。所以<code>sizeof(C)</code>的结果为12。</p>
+
+<h3>3.3 关于有虚函数的类：</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func1</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="nf">func2</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>有虚函数的类会保存一个指向虚表的指针，在32位机器上指针的大小为4，所以<code>sizeof(A)</code>的结果为4。一个类无论有多少个虚函数，都只有一张虚表，所以<code>sizeof(B)</code>的结果也是4。而如果一个类有多重继承，那么它就会保存多张虚表。在上面的例子中，<code>C</code>的实例保存了两张虚表，每张虚表的大小是4，所以<code>sizeof(C)</code>的结果为8。</p>
+
+<h3>3.4 关于<code>static</code>成员变量：</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>静态成员变量是存放在全局数据区的，而<code>sizeof</code>运算符只计算栈中分配的大小，所以静态成员变量不会计算在内。<code>sizeof(A)</code>的结果为4。</p>
+
+<h2>四、<code>sizeof</code>和<code>strlen</code>的区别与联系</h2>
+
+<ul>
+<li>首先，<code>sizeof</code>是运算符，而<code>strlen</code>是函数。</li>
+<li>其次，<code>sizeof</code>可以作用于变量名、类型名、表达式或者函数；而<code>strlen</code>只能使用<code>char</code>类型字符串做参数，且必须是以<code>\0</code>结尾。对于一个<code>char</code>数组，<code>sizeof</code>返回的是该数组的总大小，而<code>strlen</code>返回的是该数组实际对应的字符串的长度（末尾的<code>\0</code>不计算在内）；对于一个<code>char*</code>字符串，<code>sizeof</code>在32位机器上恒定返回4，而<code>strlen</code>仍然返回字符串的实际长度。</li>
+<li>最后，大部分程序在编译阶段做类型检测的时候就把<code>sizeof</code>的值计算过了（参考如下代码），而<code>strlen</code>必须是运行时才会计算出来。</li>
+</ul>
+
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">add</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">x</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">add</span><span class="p">());</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="mi">6</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="k">sizeof</span> <span class="n">x</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>上述代码中，在<code>main</code>函数的第一行，<code>sizeof(add())</code>会在编译时刻被替换为<code>sizeof(int)</code>然后得出结果4，不需要在运行时调用<code>add</code>函数。同理，<code>x=6</code>这句表达式也是不被执行的。所以在这两个表达式执行完成后，<code>x</code>的值仍然为0。另外，由于在编译时刻已经确定了值，所以<code>sizeof</code>的结果可以被用来作为定义静态数组的维数。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[面试问题赏析：求1到N的和]]></title>
     <link href="http://smwlover.github.io/blog/2016/08/06/add-numbers/"/>
     <updated>2016-08-06T15:39:19+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/08/06/add-numbers</id>
@@ -756,416 +997,6 @@
 </span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[面试常见问题盘点：双指针]]></title>
-    <link href="http://smwlover.github.io/blog/2016/06/09/two-pointers/"/>
-    <updated>2016-06-09T15:22:29+08:00</updated>
-    <id>http://smwlover.github.io/blog/2016/06/09/two-pointers</id>
-    <content type="html"><![CDATA[<p>在关于数组的问题中，有那么一类问题，它们可以利用双指针（Two Pointers）方法解决。需要说明的一点是，这里提到的“指针”不一定指的是严格意义上的指针，在很多场合下，它被用来代指用来进行遍历的下标<code>i</code>或<code>j</code>。所以“双指针”问题其实就是利用两个下标<code>i</code>和<code>j</code>对数组进行遍历的一类问题。本文就来列举一部分面试中经常涉及到的“双指针”问题。</p>
-
-<!--more-->
-
-
-<h2>类别一</h2>
-
-<h3>1、Two Sum问题</h3>
-
-<p><strong>问题：</strong>输入一个排好序的<code>int</code>类型数组<code>arr</code>，以及一个整数<code>target</code>。判断<code>arr</code>中是否存在两个元素，它们的和等于<code>target</code>。<br/>
-<strong>解法：</strong>这个问题是双指针问题中比较基础并且比较典型的一类问题了。我们定义两个指针<code>i</code>和<code>j</code>，分别从数组的左右端点开始遍历，在遍历时，观察<code>arr[i]</code>和<code>arr[j]</code>的和<code>sum</code>。如果<code>sum &gt; target</code>，则<code>j--</code>；如果<code>sum &lt; target</code>，则<code>i++</code>。如果<code>i</code>和<code>j</code>已经相遇但是仍未找到答案，则说明原数组不存在这样的两个元素。<br/>
-<strong>分析：</strong>相比起<code>O(n2)</code>的暴力解法，双指针的方法进行了剪枝，将时间复杂度减少到了<code>O(n)</code>。</p>
-
-<h3>2、判断一个字符串是否是回文字符串</h3>
-
-<p><strong>问题：</strong>输入一个字符串<code>str</code>，判断它是不是回文字符串。<br/>
-<strong>解法：</strong>仍然是定义两个指针<code>i</code>和<code>j</code>，分别从字符串的左右端点开始遍历。在每个迭代中，观察<code>str[i]</code>和<code>str[j]</code>是否相等，并且令<code>i</code>右移一格、<code>j</code>左移一格，直到两个指针相遇。<br/>
-<strong>分析：</strong>同类的题目还有在<code>O(n)</code>时间内原地反转字符串等。</p>
-
-<h3>3、容积最大的容器</h3>
-
-<p><strong>问题：</strong>Given <code>n</code> non-negative integers <code>a1</code>, <code>a2</code>, &hellip;, <code>an</code>, where each represents a point at coordinate <code>(i, ai)</code>. <code>n</code> vertical lines are drawn such that the two endpoints of line <code>i</code> is at <code>(i, ai)</code> and <code>(i, 0)</code>. Find two lines, which together with x-axis forms a container, such that the container contains the most water. <em>Note: You may not slant the container.</em><br/>
-<strong>解法：</strong>暴力解法的时间复杂度为<code>O(n2)</code>，能不能像前面提到的Two Sum问题一样进行剪枝呢？答案是肯定的。<br/>
-我们在遍历的过程中用<code>maxWater</code>记录当前最大的容积。假设容器的两条边是<code>0</code>和<code>n-1</code>号，我们可以算出一个容量<code>F(0,n-1) = height[0] * (n-1)</code>，将其作为<code>maxWater</code>的初始值。<br/>
-我们注意到：<strong>如果<code>0</code>号边的高度不大于<code>n-1</code>号边的高度，所有以<code>0</code>号边为左侧边的容器容积都比<code>F(0,n-1)</code>小。</strong>因为所有这样的容器高度肯定不大于<code>height[0]</code>，但是宽度却一定小于<code>n-1</code>，所以其容积肯定小于<code>F(0,n-1)</code>，所以我们不需要对这些情况进行枚举。同理，如果<code>0</code>号边的高度大于<code>n-1</code>号边的高度，我们就不需要对其他以<code>n-1</code>号边作为右侧边的容器进行枚举了。<br/>
-这样我们就完成了剪枝。我们定义两个指针<code>i</code>和<code>j</code>，分别从数组的左右端点开始遍历。每个迭代，先算出<code>F(i,j)</code>并更新<code>maxWater</code>的值，然后根据前面得出的结论：如果<code>height[i]</code>不大于<code>height[j]</code>，直接<code>i++</code>；否则直接<code>j--</code>。显然，这种方法的时间复杂度是<code>O(n)</code>。</p>
-
-<p><figure class='code'><figcaption><span>Container With Most Water </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">maxArea</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">height</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">maxWater</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">p1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">p2</span><span class="p">){</span>
-</span><span class='line'>    <span class="n">maxWater</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">maxWater</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">p1</span><span class="p">],</span> <span class="n">height</span><span class="p">[</span><span class="n">p2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p1</span><span class="p">));</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">height</span><span class="p">[</span><span class="n">p1</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">height</span><span class="p">[</span><span class="n">p2</span><span class="p">])</span>
-</span><span class='line'>        <span class="n">p1</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>        <span class="n">p2</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">return</span> <span class="n">maxWater</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h3>总结</h3>
-
-<p>这一类的双指针问题有一个共同之处：分别从数组的左右端点开始遍历。其中，问题二需要这样做，是因为需要研究字符串本身的对称性；问题一和问题三需要这样做，是对暴力搜索进行剪枝的结果。</p>
-
-<h2>类别二</h2>
-
-<h3>1、删除数组中所有值等于<code>val</code>的元素</h3>
-
-<p><strong>问题：</strong>Given an array and a value, remove all instances of that value in place and return the new length. <em>Note: The order of elements can be changed. It doesn&rsquo;t matter what you leave beyond the new length.</em><br/>
-<strong>解法：</strong>通常我们会使用一个新的数组来存储那些不被删除的数，这样就能够很顺利的完成任务。但是实际上由于在这个过程中，新数组的大小是肯定会小于原本数组中已经处理过的数的数量的，所以我们就可以直接利用原本数组中已经处理过的数的位置，避免再开一个额外的数组。所以这里就用到了一种思想，定义两个指针<code>i</code>和<code>cnt</code>，<code>i</code>是遍历用的指针，<code>cnt</code>指向新数组的下一个位置。每当<code>i</code>遍历到一个符合条件的元素，就通过<code>arr[cnt++] = arr[i]</code>将其加入到新数组中。此方法的时间复杂度是<code>O(n)</code>。</p>
-
-<p><figure class='code'><figcaption><span>Remove Element </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">removeElement</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">nums</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>            <span class="n">nums</span><span class="p">[</span><span class="n">cnt</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">cnt</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h3>2、奇偶分类</h3>
-
-<p><strong>问题：</strong>输入一个数组，将其进行重排，使得所有奇数位于所有偶数的前面。<br/>
-<strong>解法：</strong>我们定义两个指针<code>i</code>和<code>j</code>，其中<code>j</code>是遍历用的指针，<code>i</code>则记录了当前数组奇数部分的下一个位置。每当<code>j</code>遍历到一个奇数时，就交换<code>arr[i]</code>和<code>arr[j]</code>的值，然后<code>i++</code>。这样当数组遍历完毕后，<code>arr[0..i-1]</code>就存储了所有的奇数，剩下的部分则存储了所有的偶数。</p>
-
-<p><figure class='code'><figcaption><span>Classify Odd And Even Numbers </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">num</span><span class="p">;</span> <span class="c1">//输入数组长度</span>
-</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">arr</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">num</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="c1">//依次输入数组元素</span>
-</span><span class='line'>        <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//奇数部分的下一个位置</span>
-</span><span class='line'><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">num</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="mh">0x1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">num</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="sc">&#39; &#39;</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h3>3、替换空格</h3>
-
-<p><strong>问题：</strong>实现一个函数，把字符串中的每个空格都替换成<code>"%20"</code>。<br/>
-<strong>解法：</strong>如果是暴力解法，从前往后遍历字符串，在遍历到空格的时候，就将后面的所有字符后移两格，这样的方法在最坏情况下（字符串中都是空格）是<code>O(n2)</code>的。我们有更快的解法，其时间复杂度为<code>O(n)</code>，每个字符只需要向后移动一次，那就是“从后往前替换字符串”。<br/>
-首先遍历一遍原字符串确认有多少个空格，这样我们就得到了新字符串的长度。然后我们令<code>p1</code>从原字符串的末尾往前遍历，<code>p2</code>指向新字符串中已经被替换好的部分的前一个元素。如果<code>arr[p1]</code>不是空格，直接将其拷贝到<code>arr[p2]</code>的位置，然后<code>p2</code>左移一格；如果<code>arr[p1]</code>是空格，则在<code>p2</code>位置依次插入<code>0</code>、<code>2</code>和<code>%</code>。</p>
-
-<p><figure class='code'><figcaption><span>Replace Space </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="n">replaceSpace</span><span class="p">(</span><span class="n">string</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">arr</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">spaceCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span> <span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
-</span><span class='line'>            <span class="n">spaceCount</span><span class="o">++</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="mi">2</span><span class="o">*</span><span class="n">spaceCount</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">arr</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">p2</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">0</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">p1</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39; &#39;</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">p2</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">p1</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">p1</span><span class="o">--</span><span class="p">,</span> <span class="n">p2</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">p2</span><span class="o">--</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">p2</span><span class="o">--</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;2&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">p2</span><span class="o">--</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;%&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">p1</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h3>总结</h3>
-
-<p>这一类的双指针问题有一个共同之处：其中一个指针用于遍历，另一个指针指向数组已完成部分的下一个元素。这种方法可以节省空间，或者减少数据重复移动的次数。</p>
-
-<h2>类别三</h2>
-
-<h3>1、无重复字符的最长子字符串</h3>
-
-<p><strong>问题：</strong>Given a string, find the length of the longest substring without repeating characters. <em>For example, the longest substring without repeating letters for</em> <code>"abcabcbb"</code> <em>is</em> <code>"abc"</code><em>, which the length is 3. For</em> <code>"bbbbb"</code> <em>the longest substring is</em> <code>"b"</code><em>, with the length of 1.</em><br/>
-<strong>解法：</strong>利用<code>p1</code>和<code>p2</code>两个指针构成一个窗口，其中<code>p1</code>指向窗口的第一个元素，<code>p2</code>指向窗口最后一个元素的下一个元素。我们利用一个hashmap记录窗口中各个字符的出现次数，并且保证窗口中没有重复字符。<br/>
-具体做法是：观察即将加入窗口中的字符<code>str[p2]</code>。如果该字符没有在窗口中出现过，我们可以直接将该字符加入窗口中，即<code>p2++</code>，同时调整hashmap的记录；如果该字符在窗口中出现过，那么我们令<code>p1++</code>来缩小窗口的大小，同时调整hashmap的记录，直到该字符没有在窗口中出现为止。在遍历的过程中，记录窗口达到的最大长度。算法的时间复杂度为<code>O(n)</code>。</p>
-
-<p><figure class='code'><figcaption><span>Longest Substring Without Repeating Characters </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">lengthOfLongestSubstring</span><span class="p">(</span><span class="n">string</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">p2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'><span class="n">unordered_map</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">char</span><span class="p">,</span> <span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">hashmap</span><span class="p">;</span>
-</span><span class='line'><span class="n">hashmap</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">p1</span><span class="p">]]</span><span class="o">++</span><span class="p">;</span> <span class="c1">//首元素加入哈希表。</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">maxLength</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">curLength</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">p2</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">size</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">hashmap</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">p2</span><span class="p">]]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">hashmap</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">p2</span><span class="p">]]</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">p2</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">curLength</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">maxLength</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">maxLength</span><span class="p">,</span> <span class="n">curLength</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">hashmap</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">p1</span><span class="p">]]</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">p1</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">curLength</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">return</span> <span class="n">maxLength</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h3>2、Minimum Window Substring</h3>
-
-<p><strong>问题：</strong>Given a string <code>S</code> and a string <code>T</code>, find the minimum window in <code>S</code> which will contain all the characters in <code>T</code> in complexity <code>O(n)</code>. For example,  <br/>
-<code>
-<span>S = &ldquo;ADOBECODEBANC&rdquo;</span><br/>
-<span>T = &ldquo;ABC&rdquo;</span>
-</code><br/>
-Minimum window is <code>"BANC"</code>.<br/>
-<em>Note: If there is no such window in</em> <code>S</code> <em>that covers all characters in</em> <code>T</code><em>, return the empty string</em> <code>""</code><em>. If there are multiple such windows, you are guaranteed that there will always be only one unique minimum window in</em> <code>S</code><em>.</em><br/>
-<strong>解法：</strong>我们仍然利用两个指针<code>p1</code>和<code>p2</code>组成一个窗口，其中<code>p1</code>指向窗口的第一个元素，<code>p2</code>指向窗口最后一个元素的下一个元素。我们还要定义一个哈希表<code>set</code>，表示<code>T</code>中出现过哪些字符，如果遍历到没有在<code>T</code>中出现过的字符，我们可以将该字符跳过，继续遍历下一个字符。<br/>
-为了记录窗口中的字符和<code>T</code>中字符的匹配情况，我们定义一个整数<code>count</code>，表示<code>T</code>中待匹配的字符数量，<code>count</code>等于<code>0</code>说明<code>T</code>中所有字符都已经匹配上；另外，定义一个哈希表<code>num</code>，表示每个字符的待匹配次数，比如当<code>num['a']</code>等于<code>2</code>时，说明窗口中还要再包括进两个<code>'a'</code>才能满足题意。需要注意的是，<strong><code>num</code>中字符对应的待匹配次数可以为负，负数说明该字符过匹配（出现次数太多了）。</strong></p>
-
-<p>在每次遍历中，我们首先检查<code>count</code>是否大于<code>0</code>。<br/>
-如果<code>count</code>大于<code>0</code>，说明还有字符待匹配，我们需要将<code>s[p2]</code>加入到窗口中，并且令<code>num[s[p2]]--</code>。如果该字符还没有过匹配（<code>num[s[p2]]&gt;=0</code>），那么将该字符加入窗口后，待匹配的字符数量减少<code>1</code>，所以<code>count--</code>；如果<code>s[p2]</code>过匹配（<code>num[s[p2]]&lt;0</code>），那么将该字符加入窗口后并不能使待匹配的字符数量减少，所以<code>count</code>不发生变化。<br/>
-如果<code>count</code>等于<code>0</code>，说明已经找到了一个符合题意的窗口，我们需要将记录当前窗口的长度，然后继续向下搜索：从窗口中取出<code>s[p1]</code>，并且令<code>num[s[p1]]++</code>。如果发现<code>num[s[p1]]&gt;0</code>，说明该字符从匹配状态变成了未匹配状态，所以待匹配的字符数量增加<code>1</code>，即<code>count++</code>；如果发现<code>num[s[p1]]&lt;=0</code>，说明该字符仍是匹配状态，待匹配的字符数量并没有增加，所以<code>count</code>不发生变化。</p>
-
-<p><figure class='code'><figcaption><span>Minimum Window Substring </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">string</span> <span class="nf">minWindow</span><span class="p">(</span><span class="n">string</span> <span class="n">s</span><span class="p">,</span> <span class="n">string</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">t</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">unordered_map</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">char</span><span class="p">,</span> <span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">charNum</span><span class="p">;</span>
-</span><span class='line'><span class="n">unordered_map</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">char</span><span class="p">,</span> <span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">charSet</span><span class="p">;</span>
-</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">t</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>    <span class="n">charSet</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">charNum</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">p2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">minLen</span> <span class="o">=</span> <span class="mi">2147483647</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">minStart</span><span class="p">;</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="n">p1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">s</span><span class="p">.</span><span class="n">size</span><span class="p">()){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">count</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">p2</span> <span class="o">==</span> <span class="n">s</span><span class="p">.</span><span class="n">size</span><span class="p">())</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kt">char</span> <span class="n">chr</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">p2</span><span class="p">];</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">charSet</span><span class="p">[</span><span class="n">chr</span><span class="p">]){</span>
-</span><span class='line'>            <span class="n">charNum</span><span class="p">[</span><span class="n">chr</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">charNum</span><span class="p">[</span><span class="n">chr</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>                <span class="n">count</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="n">p2</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">len</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">minLen</span><span class="p">){</span>
-</span><span class='line'>            <span class="n">minLen</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">minStart</span> <span class="o">=</span> <span class="n">p1</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="kt">char</span> <span class="n">chr</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">p1</span><span class="p">];</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">charSet</span><span class="p">[</span><span class="n">chr</span><span class="p">]){</span>
-</span><span class='line'>            <span class="n">charNum</span><span class="p">[</span><span class="n">chr</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">charNum</span><span class="p">[</span><span class="n">chr</span><span class="p">]</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>                <span class="n">count</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="n">p1</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">minLen</span> <span class="o">==</span> <span class="mi">2147483647</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">s</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">minStart</span><span class="p">,</span> <span class="n">minLen</span><span class="p">);</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h3>总结</h3>
-
-<p>这一类的双指针问题主要是利用两个指针构造一个窗口，然后对窗口的内容进行讨论。</p>
 ]]></content>
   </entry>
   

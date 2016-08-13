@@ -1,0 +1,653 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>C++中sizeof运算符的简要总结 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="本文解析了面试中可能考察的关于sizeof运算符的一些内容。">
+  <meta name="keywords" content="smwlover, sizeof">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/08/13/sizeof-operator/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\n");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
+						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
+						adjustPos();
+					}
+				}
+			}
+		}
+	</script>
+	<div id="lyricsContent"">
+		<h3 id="lyric">Loading…</h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">C++中sizeof运算符的简要总结</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-08-13T15:16:14+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:16 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><code>sizeof</code>是C++中的一个运算符（不是一个函数），它的作用被表述为：<em>The</em> <code>sizeof</code> <em>keyword gives the amount of storage, <strong>in bytes</strong>, associated with <strong>a variable or a type (including aggregate types)</strong>. This keyword returns a value of type</em> <code>size_t</code><em>.</em> 简而言之，就是返回一个变量或类型在内存中所占的字节数。但正是这么一个看似简单的运算符，却成为了面试中的热门考点。这说明关于这个运算符其实有很多需要注意的地方。在这篇文章中，我就对这个运算符进行一个简要的总结。</p>
+
+<!--more-->
+
+
+<h2>一、指针，数组与<code>sizeof</code></h2>
+
+<p>面试的时候，面试官经常将<code>sizeof</code>运算符与<code>char*</code>类型字符串或者<code>char[]</code>类型字符串综合起来考察。比如下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">getSize</span><span class="p">(</span><span class="kt">char</span> <span class="n">var</span><span class="p">[]){</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">str1</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str2</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str3</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">getSize</span><span class="p">(</span><span class="n">str3</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在<code>main</code>函数中，我们依次定义了三个内容相似的字符串。首先对于<code>str1</code>，它是一个指针，指针大小在32位机器中恒定为4，所以输出为4；<code>str2</code>是字符数组，没有预定义大小，所以其大小由存储的字符串长度决定，字符串的长度为10，加上末尾的字符串结束符<code>\0</code>，共11个字符，所以输出11；<code>str3</code>是预定义大小的字符数组，不管内部存储的字符串长度是多少，其大小都是预定义的大小100，所以输出100。而对于函数<code>getSize</code>，我们需要了解的是，<strong>在C++中，任何数组作为函数参数传递进去后都会退化成指针，</strong>所以输出为4。<br/>
+综上所述  ，输出依次为4、11、100和4。</p>
+
+<h2>二、<code>struct</code>和<code>class</code>在内存中的数据对齐</h2>
+
+<p>数据对齐这件事，我们平时好像不太关注，但是一提到<code>sizeof</code>操作符，就会不可避免地涉及到内存对齐的机制。之所以要进行内存对齐，是出于如下考虑：<strong>对于<code>n</code>字节的元素，它的首地址能被<code>n</code>整除时，才能在程序执行时获得最好的性能。</strong>对于类或者结构体，为了保证这一点，就需要使其内部的成员变量按照<strong>最长的成员变量的长度</strong>去对齐。举个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面的代码中，我们定义了两个结构体<code>A</code>和<code>B</code>，它们的成员变量内容相同，但是顺序不同。通过观察发现，<code>A</code>和<code>B</code>中最长的数据元素类型均为<code>int</code>，占4字节，所以两个结构体的成员变量均要以4字节为单位进行对齐。简而言之，就是成员变量按照顺序放入长度为4字节的位置中，如果能放得下，就继续往里放；如果放不下，就需要开辟一个新的位置。所以，<code>A</code>和<code>B</code>数据对齐的情况如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>A的数据对齐情况，按照声明的顺序，应该依次放置a,b,c：
+</span><span class='line'>|-a-|---|-b-|-b-|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>所以sizeof(A)应该等于8。
+</span><span class='line'>
+</span><span class='line'>B的数据对齐情况，按照声明的顺序，应该依次放置a,c,b：
+</span><span class='line'>|-a-|---|---|---|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>|-b-|-b-|---|---|
+</span><span class='line'>所以sizeof(B)应该等于12。</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而对于联合体<code>union</code>，相比于<code>struct</code>在内存上的顺序式组织，<code>union</code>是重叠式组织的，所以对一个<code>union</code>使用<code>sizeof</code>返回的是其最长成员的长度。</p>
+
+<h2>三、类和<code>sizeof</code>运算符</h2>
+
+<h3>3.1 关于空类的继承</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对一个空类使用<code>sizeof</code>结果为1，因为即使是空类，也需要在内存中占用一定位置，否则就不可寻址了，这是编译器做的一步特殊处理。所以<code>sizeof(A)</code>的结果为1。对于一个只有普通函数，没有成员变量的类使用<code>sizeof</code>，结果仍为1，因为类的普通函数不会占用类的每个实例的空间。所以<code>sizeof(B)</code>的结果为1。对一个多重继承的空类使用<code>sizeof</code>，输出仍然为1。所以<code>sizeof(C)</code>的结果为1。</p>
+
+<h3>3.2 关于有成员变量的类的继承：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面这种情况下，<code>C</code>的实例不仅要存储自身定义的成员变量，还要存储其父类定义的成员变量。所以<code>sizeof(C)</code>的结果为12。</p>
+
+<h3>3.3 关于有虚函数的类：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func1</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="nf">func2</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>有虚函数的类会保存一个指向虚表的指针，在32位机器上指针的大小为4，所以<code>sizeof(A)</code>的结果为4。一个类无论有多少个虚函数，都只有一张虚表，所以<code>sizeof(B)</code>的结果也是4。而如果一个类有多重继承，那么它就会保存多张虚表。在上面的例子中，<code>C</code>的实例保存了两张虚表，每张虚表的大小是4，所以<code>sizeof(C)</code>的结果为8。</p>
+
+<h3>3.4 关于<code>static</code>成员变量：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>静态成员变量是存放在全局数据区的，而<code>sizeof</code>运算符只计算栈中分配的大小，所以静态成员变量不会计算在内。<code>sizeof(A)</code>的结果为4。</p>
+
+<h2>四、<code>sizeof</code>和<code>strlen</code>的区别与联系</h2>
+
+<ul>
+<li>首先，<code>sizeof</code>是运算符，而<code>strlen</code>是函数。</li>
+<li>其次，<code>sizeof</code>可以作用于变量名、类型名、表达式或者函数；而<code>strlen</code>只能使用<code>char</code>类型字符串做参数，且必须是以<code>\0</code>结尾。对于一个<code>char</code>数组，<code>sizeof</code>返回的是该数组的总大小，而<code>strlen</code>返回的是该数组实际对应的字符串的长度（末尾的<code>\0</code>不计算在内）；对于一个<code>char*</code>字符串，<code>sizeof</code>在32位机器上恒定返回4，而<code>strlen</code>仍然返回字符串的实际长度。</li>
+<li>最后，大部分程序在编译阶段做类型检测的时候就把<code>sizeof</code>的值计算过了（参考如下代码），而<code>strlen</code>必须是运行时才会计算出来。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">add</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">x</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">add</span><span class="p">());</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="mi">6</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="k">sizeof</span> <span class="n">x</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上述代码中，在<code>main</code>函数的第一行，<code>sizeof(add())</code>会在编译时刻被替换为<code>sizeof(int)</code>然后得出结果4，不需要在运行时调用<code>add</code>函数。同理，<code>x=6</code>这句表达式也是不被执行的。所以在这两个表达式执行完成后，<code>x</code>的值仍然为0。另外，由于在编译时刻已经确定了值，所以<code>sizeof</code>的结果可以被用来作为定义静态数组的维数。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-08-13T15:16:14+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:16 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bi-ji/'>笔记</a>
+  
+</span>
+
+
+      
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/c-plus-plus/'>c++</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/08/06/add-numbers/" title="Previous Post: 面试问题赏析：求1到N的和">&laquo; 面试问题赏析：求1到N的和</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (5)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (10)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
+
+  </ul>
+</section><section>
+  <h1>标签云</h1>
+  <ul class="tag-cloud">
+<a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
+<a style="font-size: 170%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 151%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 138%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 99%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 60%" href="/tags/bing-cha-ji/">并查集</a>
+<a style="font-size: 99%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
+<a style="font-size: 99%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 99%" href="/tags/shu/">树</a>
+<a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
+<a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
+<a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
+<a style="font-size: 122%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+
+  </ul>
+</section>
+<section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/08/13/sizeof-operator/">C++中sizeof运算符的简要总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/06/add-numbers/">面试问题赏析：求1到N的和</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/07/31/union-find/">hihoCoder题目赏析：并查集</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/28/state-compression/">hihoCoder题目赏析：状态压缩</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/25/painting/">hihoCoder题目赏析：刷油漆</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_280_400_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="280" height="400" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/08/13/sizeof-operator/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/08/13/sizeof-operator/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>

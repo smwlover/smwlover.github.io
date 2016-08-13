@@ -4,7 +4,7 @@
   <title><![CDATA[分类: 笔记 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/blog/categories/bi-ji/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-08-12T21:19:42+08:00</updated>
+  <updated>2016-08-13T19:04:53+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -14,7 +14,248 @@
 
   
   <entry>
-    <title type="html"><![CDATA[面试奇葩问题：求1到n的和]]></title>
+    <title type="html"><![CDATA[C++中sizeof运算符的简要总结]]></title>
+    <link href="http://smwlover.github.io/blog/2016/08/13/sizeof-operator/"/>
+    <updated>2016-08-13T15:16:14+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/08/13/sizeof-operator</id>
+    <content type="html"><![CDATA[<p><code>sizeof</code>是C++中的一个运算符（不是一个函数），它的作用被表述为：<em>The</em> <code>sizeof</code> <em>keyword gives the amount of storage, <strong>in bytes</strong>, associated with <strong>a variable or a type (including aggregate types)</strong>. This keyword returns a value of type</em> <code>size_t</code><em>.</em> 简而言之，就是返回一个变量或类型在内存中所占的字节数。但正是这么一个看似简单的运算符，却成为了面试中的热门考点。这说明关于这个运算符其实有很多需要注意的地方。在这篇文章中，我就对这个运算符进行一个简要的总结。</p>
+
+<!--more-->
+
+
+<h2>一、指针，数组与<code>sizeof</code></h2>
+
+<p>面试的时候，面试官经常将<code>sizeof</code>运算符与<code>char*</code>类型字符串或者<code>char[]</code>类型字符串综合起来考察。比如下面的例子：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">getSize</span><span class="p">(</span><span class="kt">char</span> <span class="n">var</span><span class="p">[]){</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">str1</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="mo">01234567</span><span class="mi">89</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">char</span> <span class="n">str2</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str2</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">char</span> <span class="n">str3</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="n">cout</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str3</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">getSize</span><span class="p">(</span><span class="n">str3</span><span class="p">);</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在<code>main</code>函数中，我们依次定义了三个内容相似的字符串。首先对于<code>str1</code>，它是一个指针，指针大小在32位机器中恒定为4，所以输出为4；<code>str2</code>是字符数组，没有预定义大小，所以其大小由存储的字符串长度决定，字符串的长度为10，加上末尾的字符串结束符<code>\0</code>，共11个字符，所以输出11；<code>str3</code>是预定义大小的字符数组，不管内部存储的字符串长度是多少，其大小都是预定义的大小100，所以输出100。而对于函数<code>getSize</code>，我们需要了解的是，<strong>在C++中，任何数组作为函数参数传递进去后都会退化成指针，</strong>所以输出为4。<br/>
+综上所述  ，输出依次为4、11、100和4。</p>
+
+<h2>二、<code>struct</code>和<code>class</code>在内存中的数据对齐</h2>
+
+<p>数据对齐这件事，我们平时好像不太关注，但是一提到<code>sizeof</code>操作符，就会不可避免地涉及到内存对齐的机制。之所以要进行内存对齐，是出于如下考虑：<strong>对于<code>n</code>字节的元素，它的首地址能被<code>n</code>整除时，才能在程序执行时获得最好的性能。</strong>对于类或者结构体，为了保证这一点，就需要使其内部的成员变量按照<strong>最长的成员变量的长度</strong>去对齐。举个例子：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">struct</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在上面的代码中，我们定义了两个结构体<code>A</code>和<code>B</code>，它们的成员变量内容相同，但是顺序不同。通过观察发现，<code>A</code>和<code>B</code>中最长的数据元素类型均为<code>int</code>，占4字节，所以两个结构体的成员变量均要以4字节为单位进行对齐。简而言之，就是成员变量按照顺序放入长度为4字节的位置中，如果能放得下，就继续往里放；如果放不下，就需要开辟一个新的位置。所以，<code>A</code>和<code>B</code>数据对齐的情况如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>A的数据对齐情况，按照声明的顺序，应该依次放置a,b,c：
+</span><span class='line'>|-a-|&mdash;|-b-|-b-|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>所以sizeof(A)应该等于8。&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>B的数据对齐情况，按照声明的顺序，应该依次放置a,c,b：
+</span><span class='line'>|-a-|&mdash;|&mdash;|&mdash;|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>|-b-|-b-|&mdash;|&mdash;|
+</span><span class='line'>所以sizeof(B)应该等于12。</span></code></pre></td></tr></table></div></figure></p>
+
+<p>而对于联合体<code>union</code>，相比于<code>struct</code>在内存上的顺序式组织，<code>union</code>是重叠式组织的，所以对一个<code>union</code>使用<code>sizeof</code>返回的是其最长成员的长度。</p>
+
+<h2>三、类和<code>sizeof</code>运算符</h2>
+
+<h3>3.1 关于空类的继承</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>对一个空类使用<code>sizeof</code>结果为1，因为即使是空类，也需要在内存中占用一定位置，否则就不可寻址了，这是编译器做的一步特殊处理。所以<code>sizeof(A)</code>的结果为1。对于一个只有普通函数，没有成员变量的类使用<code>sizeof</code>，结果仍为1，因为类的普通函数不会占用类的每个实例的空间。所以<code>sizeof(B)</code>的结果为1。对一个多重继承的空类使用<code>sizeof</code>，输出仍然为1。所以<code>sizeof(C)</code>的结果为1。</p>
+
+<h3>3.2 关于有成员变量的类的继承：</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在上面这种情况下，<code>C</code>的实例不仅要存储自身定义的成员变量，还要存储其父类定义的成员变量。所以<code>sizeof(C)</code>的结果为12。</p>
+
+<h3>3.3 关于有虚函数的类：</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func1</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="nf">func2</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>有虚函数的类会保存一个指向虚表的指针，在32位机器上指针的大小为4，所以<code>sizeof(A)</code>的结果为4。一个类无论有多少个虚函数，都只有一张虚表，所以<code>sizeof(B)</code>的结果也是4。而如果一个类有多重继承，那么它就会保存多张虚表。在上面的例子中，<code>C</code>的实例保存了两张虚表，每张虚表的大小是4，所以<code>sizeof(C)</code>的结果为8。</p>
+
+<h3>3.4 关于<code>static</code>成员变量：</h3>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>静态成员变量是存放在全局数据区的，而<code>sizeof</code>运算符只计算栈中分配的大小，所以静态成员变量不会计算在内。<code>sizeof(A)</code>的结果为4。</p>
+
+<h2>四、<code>sizeof</code>和<code>strlen</code>的区别与联系</h2>
+
+<ul>
+<li>首先，<code>sizeof</code>是运算符，而<code>strlen</code>是函数。</li>
+<li>其次，<code>sizeof</code>可以作用于变量名、类型名、表达式或者函数；而<code>strlen</code>只能使用<code>char</code>类型字符串做参数，且必须是以<code>\0</code>结尾。对于一个<code>char</code>数组，<code>sizeof</code>返回的是该数组的总大小，而<code>strlen</code>返回的是该数组实际对应的字符串的长度（末尾的<code>\0</code>不计算在内）；对于一个<code>char*</code>字符串，<code>sizeof</code>在32位机器上恒定返回4，而<code>strlen</code>仍然返回字符串的实际长度。</li>
+<li>最后，大部分程序在编译阶段做类型检测的时候就把<code>sizeof</code>的值计算过了（参考如下代码），而<code>strlen</code>必须是运行时才会计算出来。</li>
+</ul>
+
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">add</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">x</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">add</span><span class="p">());</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="mi">6</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="k">sizeof</span> <span class="n">x</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>上述代码中，在<code>main</code>函数的第一行，<code>sizeof(add())</code>会在编译时刻被替换为<code>sizeof(int)</code>然后得出结果4，不需要在运行时调用<code>add</code>函数。同理，<code>x=6</code>这句表达式也是不被执行的。所以在这两个表达式执行完成后，<code>x</code>的值仍然为0。另外，由于在编译时刻已经确定了值，所以<code>sizeof</code>的结果可以被用来作为定义静态数组的维数。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[面试问题赏析：求1到N的和]]></title>
     <link href="http://smwlover.github.io/blog/2016/08/06/add-numbers/"/>
     <updated>2016-08-06T15:39:19+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/08/06/add-numbers</id>
@@ -1357,187 +1598,6 @@ Minimum window is <code>"BANC"</code>.<br/>
 <code>n[k]->next->next = n[k]</code><br/>
 为了避免出现环，我们还要把<code>n[k]->next</code>置为<code>NULL</code>。
 </div></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[随机查询（三）：树状数组]]></title>
-    <link href="http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree/"/>
-    <updated>2016-05-27T14:09:26+08:00</updated>
-    <id>http://smwlover.github.io/blog/2016/05/27/binary-indexed-tree</id>
-    <content type="html"><![CDATA[<p>这篇文章介绍了一种叫做树状数组（Binary Indexed Tree）的数据结构，与之前提到的线段树一样，这种数据结构可以解决“求区间内元素之和”的Random Query问题，并且其初始化的时间复杂度是<code>O(n)</code>、更新和查询的时间复杂度都是<code>O(logn)</code>。</p>
-
-<!--more-->
-
-
-<h2>一、概览</h2>
-
-<p>就和线段树本质上是一棵二叉树一样，树状数组本质上就是个数组。假设输入的数组是<code>a[1...n]</code>，我们可以在该数组的基础上建立树状数组<code>e[1...n]</code>，该数组的长度与原数组相同，而该数组中的每个元素则对应原数组中一个或者多个元素的和。什么叫<strong>对应原数组中一个或者多个元素的和</strong>呢？我们可以观察下面的一组等式，找一找规律：</p>
-
-<p><code>
-<span>e[1] = a[1]</span><br/>
-<span>e[2] = a[1] + a[2]</span><br/>
-<span>e[3] = a[3]</span><br/>
-<span>e[4] = a[1] + a[2] + a[3] + a[4]</span><br/>
-<span>e[5] = a[5]</span><br/>
-<span>e[6] = a[5] + a[6]</span><br/>
-<span>e[7] = a[7]</span><br/>
-<span>e[8] = a[1] + a[2] + a[3] + a[4] + &hellip; + a[8]</span>
-</code></p>
-
-<p>或者参照下面的图片。该图片也展示了树状数组<code>e</code>和原数组<code>a</code>中元素的对应关系：</p>
-
-<p><div align="center"><img src="/images/blogimg/5.png"></div></p>
-
-<h2>二、查询</h2>
-
-<p>那么树状数组<code>e</code>和原数组<code>a</code>到底有什么对应关系呢？我们可以设想：<strong>对于一个正整数<code>num</code>，我们可以求得一个最大的非负整数，它满足：该整数小于<code>num</code>，且二进制表示中末尾的0个数比<code>num</code>多</strong>。举几个例子：如果<code>num=5</code>，我们所求得的整数就应该是4；如果<code>num=6</code>，我们所求得的整数仍然是4；如果<code>num=8</code>，我们所求得的整数就应该是0。<br/>
-我们把我们所求得的整数记作<code>prev(num)</code>，然后我们就得到了树状数组<code>e</code>和原数组<code>a</code>的对应关系：<code>e[num] = a[prev(num)+1] + ... + a[num]</code>。</p>
-
-<h4>prev(num)的求法</h4>
-
-<p>我们定义一个函数<code>lowbit(num)</code>，该函数的结果保留了<code>num</code>最低位的1，而将它左边的所有位全部清零。比如对于<code>num=5</code>，<code>lowbit(num) = 1</code>；对于<code>num=6</code>，<code>lowbit(num) = 2</code>；对于<code>num=8</code>，<code>lowbit(num) = 8</code>。该函数的实现如下：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">lowbit</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">num</span> <span class="o">^</span> <span class="p">(</span><span class="n">num</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">num</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>观察上面代码我们知道，<code>(num-1)</code>是将<code>num</code>最低位的1变成0，然后将这一位右边的0全部变成1，这一位左边的部分不变。<code>num^(num-1)</code>则将这一位左边的部分全部清零，并将这一位和这一位右边的所有位全部变为1。最后，将<code>num^(num-1)</code>与<code>num</code>按位与，这一位左边的所有位在<code>num^(num-1)</code>中是0，所以在最终结果中是0；这一位右边的所有位在<code>num</code>中是0，所以在最终结果中是0；只有这一位本身在<code>num^(num-1)</code>和<code>num</code>中都是1，所以在结果中也是1。这样就达到了只保留<code>num</code>最低位的1的效果。<br/>
-有了<code>lowbit(num)</code>，计算<code>prev(num)</code>也就水到渠成：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">prev</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">num</span> <span class="o">-</span> <span class="n">lowbit</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h4>查询的方法</h4>
-
-<p>给定一个下标<code>i</code>，我们如何求<code>sum(i) = a[1]+...+a[i]</code>？<br/>
-通过访问数组<code>e</code>，我们可以得到<code>e[i] = a[prev(i)+1]+...+a[i]</code>，在这个基础上，只要求出<code>sum(prev(i))</code>，将这个值加上<code>e[i]</code>，就得到了我们要求的<code>sum(i)</code>。不难看出，这是一个重复的子过程，我们可以利用递归或者迭代轻易地实现：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span> <span class="c1">//输出a[1]+&amp;hellip;+a[i]的值。</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">res</span> <span class="o">+=</span> <span class="n">sumArr</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">^</span> <span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">index</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">index</span> <span class="o">-=</span> <span class="n">lowBit</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>在定义了<code>sum</code>函数之后，对于每次查询，输入下标<code>i</code>和<code>j</code>，要输出这之间元素之和，代码就比较简单了：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">sumRange</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">j</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">sum</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>对照着上面的图片我们可以看出，在求<code>sum(i)</code>的过程中，最坏情况下我们要迭代<code>log(i)</code>次。所以对于每次查询，其时间复杂度可以认为是<code>O(logn)</code>。</p>
-
-<h2>三、初始化</h2>
-
-<p>与刚才定义<code>prev(num)</code>同样，我们可以定义<code>next(num)</code>，该函数输出<strong>比<code>num</code>大的、第一个二进制末尾的0比<code>num</code>多的整数</strong>。</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">next</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">num</span> <span class="o">+</span> <span class="n">lowbit</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>树状数组初始化的流程可以简要叙述为：<br/>
-1. 对于所有的<code>i</code>，令 <code>e[i] = a[i]</code>。<br/>
-2. 令<code>i</code>从<code>1</code>到<code>n</code>递增，对于每个<code>i</code>，如果<code>next(i)</code>没有越界，令<code>e[next(i)] += e[i]</code>。<br/>
-这就完成了树状数组的初始化，可以观察数组长度为6的情况：</p>
-
-<p><div align="center"><table class="blogTable"><caption>长度为6的树状数组初始化的过程</caption><tr><th>当前状态</th><th>e[1]</th><th>e[2]</th><th>e[3]</th><th>e[4]</th><th>e[5]</th><th>e[6]</th></tr><tr><td>初始状态：</td><td>a[1]</td><td>a[2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=1</code>，<code>next(i)=2</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=2</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..2, 4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=3</code>，<code>next(i)=4</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr><td><code>i=4</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[6]</td></tr><tr class="alt"><td><code>i=5</code>，<code>next(i)=6</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr><tr><td><code>i=6</code>，<code>next(i)=8</code>：</td><td>a[1]</td><td>a[1..2]</td><td>a[3]</td><td>a[1..4]</td><td>a[5]</td><td>a[5..6]</td></tr></table></div></p>
-
-<p>对应的代码如下：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">//初始化sumArr：</span>
-</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">sumArr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">^</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">nextIndex</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">lowBit</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">nextIndex</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">size</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">sumArr</span><span class="p">[</span><span class="n">nextIndex</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sumArr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>可以发现，树状数组的初始化相当于两次遍历，所以时间复杂度为<code>O(n)</code>。</p>
-
-<h2>四、更新</h2>
-
-<p>假设我们要修改下标为<code>i</code>的元素<code>a[i]</code>的值，我们只需要更改数组<code>e</code>中的一部分值，这一点和线段树是相同的。<br/>
-对照上面的图片，找到下标为<code>i</code>的列然后从下往上看，我们很容易发现需要修改的元素都是哪些。比如在上面的图中，对于<code>i=9</code>而言，要修改的元素分别是<code>e[9]</code>、<code>e[10]</code>、<code>e[12]</code>和<code>e[16]</code>。我们可以发现，它们正好对应着<code>9</code>、<code>next(9)</code>、<code>next(next(9))</code>……<br/>
-由此我们可以总结出更新树状数组的代码：</p>
-
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//val是新的值</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">val</span> <span class="o">-</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="c1">//计算一个相对于原值的变化量</span>
-</span><span class='line'>    <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="n">index</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">size</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">sumArr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">lowBit</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">^</span> <span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">index</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">index</span> <span class="o">+=</span> <span class="n">lowBit</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>与查询一样，在最坏情况下我们要迭代<code>log(i)</code>次。所以对于每次更新，其时间复杂度也可以认为是<code>O(logn)</code>。</p>
-
-<h2>五、总结</h2>
-
-<p>树状数组本质上是按照二分对数组进行分组，其初始化的时间复杂度为<code>O(n)</code>，更新和查询的时间复杂度都是<code>O(logn)</code>。与线段树相比，树状数组能够解决的问题类型有限，它不能解决线段树能够解决的查询最大/最小值类问题。但是相对于线段树而言的好处是，它的实现较为简单，并且虽然用大O表示时二者的时间复杂度相同，但是树状数组前面乘以的常数项较小，所以总体上其效率还是要高于线段树的。</p>
 ]]></content>
   </entry>
   

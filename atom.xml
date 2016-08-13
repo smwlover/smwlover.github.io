@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-08-12T21:19:42+08:00</updated>
+  <updated>2016-08-13T19:04:53+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -14,7 +14,252 @@
 
   
   <entry>
-    <title type="html"><![CDATA[面试奇葩问题：求1到n的和]]></title>
+    <title type="html"><![CDATA[C++中sizeof运算符的简要总结]]></title>
+    <link href="http://smwlover.github.io/blog/2016/08/13/sizeof-operator/"/>
+    <updated>2016-08-13T15:16:14+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/08/13/sizeof-operator</id>
+    <content type="html"><![CDATA[<p><code>sizeof</code>是C++中的一个运算符（不是一个函数），它的作用被表述为：<em>The</em> <code>sizeof</code> <em>keyword gives the amount of storage, <strong>in bytes</strong>, associated with <strong>a variable or a type (including aggregate types)</strong>. This keyword returns a value of type</em> <code>size_t</code><em>.</em> 简而言之，就是返回一个变量或类型在内存中所占的字节数。但正是这么一个看似简单的运算符，却成为了面试中的热门考点。这说明关于这个运算符其实有很多需要注意的地方。在这篇文章中，我就对这个运算符进行一个简要的总结。</p>
+
+<!--more-->
+
+
+<h2>一、指针，数组与<code>sizeof</code></h2>
+
+<p>面试的时候，面试官经常将<code>sizeof</code>运算符与<code>char*</code>类型字符串或者<code>char[]</code>类型字符串综合起来考察。比如下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">getSize</span><span class="p">(</span><span class="kt">char</span> <span class="n">var</span><span class="p">[]){</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">str1</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str2</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str3</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;0123456789&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">getSize</span><span class="p">(</span><span class="n">str3</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在<code>main</code>函数中，我们依次定义了三个内容相似的字符串。首先对于<code>str1</code>，它是一个指针，指针大小在32位机器中恒定为4，所以输出为4；<code>str2</code>是字符数组，没有预定义大小，所以其大小由存储的字符串长度决定，字符串的长度为10，加上末尾的字符串结束符<code>\0</code>，共11个字符，所以输出11；<code>str3</code>是预定义大小的字符数组，不管内部存储的字符串长度是多少，其大小都是预定义的大小100，所以输出100。而对于函数<code>getSize</code>，我们需要了解的是，<strong>在C++中，任何数组作为函数参数传递进去后都会退化成指针，</strong>所以输出为4。<br/>
+综上所述  ，输出依次为4、11、100和4。</p>
+
+<h2>二、<code>struct</code>和<code>class</code>在内存中的数据对齐</h2>
+
+<p>数据对齐这件事，我们平时好像不太关注，但是一提到<code>sizeof</code>操作符，就会不可避免地涉及到内存对齐的机制。之所以要进行内存对齐，是出于如下考虑：<strong>对于<code>n</code>字节的元素，它的首地址能被<code>n</code>整除时，才能在程序执行时获得最好的性能。</strong>对于类或者结构体，为了保证这一点，就需要使其内部的成员变量按照<strong>最长的成员变量的长度</strong>去对齐。举个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">short</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面的代码中，我们定义了两个结构体<code>A</code>和<code>B</code>，它们的成员变量内容相同，但是顺序不同。通过观察发现，<code>A</code>和<code>B</code>中最长的数据元素类型均为<code>int</code>，占4字节，所以两个结构体的成员变量均要以4字节为单位进行对齐。简而言之，就是成员变量按照顺序放入长度为4字节的位置中，如果能放得下，就继续往里放；如果放不下，就需要开辟一个新的位置。所以，<code>A</code>和<code>B</code>数据对齐的情况如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>A的数据对齐情况，按照声明的顺序，应该依次放置a,b,c：
+</span><span class='line'>|-a-|---|-b-|-b-|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>所以sizeof(A)应该等于8。
+</span><span class='line'>
+</span><span class='line'>B的数据对齐情况，按照声明的顺序，应该依次放置a,c,b：
+</span><span class='line'>|-a-|---|---|---|
+</span><span class='line'>|-c-|-c-|-c-|-c-|
+</span><span class='line'>|-b-|-b-|---|---|
+</span><span class='line'>所以sizeof(B)应该等于12。</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而对于联合体<code>union</code>，相比于<code>struct</code>在内存上的顺序式组织，<code>union</code>是重叠式组织的，所以对一个<code>union</code>使用<code>sizeof</code>返回的是其最长成员的长度。</p>
+
+<h2>三、类和<code>sizeof</code>运算符</h2>
+
+<h3>3.1 关于空类的继承</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对一个空类使用<code>sizeof</code>结果为1，因为即使是空类，也需要在内存中占用一定位置，否则就不可寻址了，这是编译器做的一步特殊处理。所以<code>sizeof(A)</code>的结果为1。对于一个只有普通函数，没有成员变量的类使用<code>sizeof</code>，结果仍为1，因为类的普通函数不会占用类的每个实例的空间。所以<code>sizeof(B)</code>的结果为1。对一个多重继承的空类使用<code>sizeof</code>，输出仍然为1。所以<code>sizeof(C)</code>的结果为1。</p>
+
+<h3>3.2 关于有成员变量的类的继承：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面这种情况下，<code>C</code>的实例不仅要存储自身定义的成员变量，还要存储其父类定义的成员变量。所以<code>sizeof(C)</code>的结果为12。</p>
+
+<h3>3.3 关于有虚函数的类：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">func1</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">int</span> <span class="nf">func2</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span><span class="p">{</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>有虚函数的类会保存一个指向虚表的指针，在32位机器上指针的大小为4，所以<code>sizeof(A)</code>的结果为4。一个类无论有多少个虚函数，都只有一张虚表，所以<code>sizeof(B)</code>的结果也是4。而如果一个类有多重继承，那么它就会保存多张虚表。在上面的例子中，<code>C</code>的实例保存了两张虚表，每张虚表的大小是4，所以<code>sizeof(C)</code>的结果为8。</p>
+
+<h3>3.4 关于<code>static</code>成员变量：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>静态成员变量是存放在全局数据区的，而<code>sizeof</code>运算符只计算栈中分配的大小，所以静态成员变量不会计算在内。<code>sizeof(A)</code>的结果为4。</p>
+
+<h2>四、<code>sizeof</code>和<code>strlen</code>的区别与联系</h2>
+
+<ul>
+<li>首先，<code>sizeof</code>是运算符，而<code>strlen</code>是函数。</li>
+<li>其次，<code>sizeof</code>可以作用于变量名、类型名、表达式或者函数；而<code>strlen</code>只能使用<code>char</code>类型字符串做参数，且必须是以<code>\0</code>结尾。对于一个<code>char</code>数组，<code>sizeof</code>返回的是该数组的总大小，而<code>strlen</code>返回的是该数组实际对应的字符串的长度（末尾的<code>\0</code>不计算在内）；对于一个<code>char*</code>字符串，<code>sizeof</code>在32位机器上恒定返回4，而<code>strlen</code>仍然返回字符串的实际长度。</li>
+<li>最后，大部分程序在编译阶段做类型检测的时候就把<code>sizeof</code>的值计算过了（参考如下代码），而<code>strlen</code>必须是运行时才会计算出来。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">add</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">x</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">add</span><span class="p">());</span>
+</span><span class='line'>    <span class="k">sizeof</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="mi">6</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="k">sizeof</span> <span class="n">x</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上述代码中，在<code>main</code>函数的第一行，<code>sizeof(add())</code>会在编译时刻被替换为<code>sizeof(int)</code>然后得出结果4，不需要在运行时调用<code>add</code>函数。同理，<code>x=6</code>这句表达式也是不被执行的。所以在这两个表达式执行完成后，<code>x</code>的值仍然为0。另外，由于在编译时刻已经确定了值，所以<code>sizeof</code>的结果可以被用来作为定义静态数组的维数。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[面试问题赏析：求1到N的和]]></title>
     <link href="http://smwlover.github.io/blog/2016/08/06/add-numbers/"/>
     <updated>2016-08-06T15:39:19+08:00</updated>
     <id>http://smwlover.github.io/blog/2016/08/06/add-numbers</id>
