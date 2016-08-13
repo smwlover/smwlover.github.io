@@ -4,7 +4,7 @@
   <title><![CDATA[美柑の部屋]]></title>
   <link href="http://smwlover.github.io/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-08-13T19:04:53+08:00</updated>
+  <updated>2016-08-13T19:13:43+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -122,7 +122,7 @@
 
 <h2>三、类和<code>sizeof</code>运算符</h2>
 
-<h3>3.1 关于空类的继承</h3>
+<h3>3.1 关于空类的继承：</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -205,7 +205,7 @@
 
 <p>有虚函数的类会保存一个指向虚表的指针，在32位机器上指针的大小为4，所以<code>sizeof(A)</code>的结果为4。一个类无论有多少个虚函数，都只有一张虚表，所以<code>sizeof(B)</code>的结果也是4。而如果一个类有多重继承，那么它就会保存多张虚表。在上面的例子中，<code>C</code>的实例保存了两张虚表，每张虚表的大小是4，所以<code>sizeof(C)</code>的结果为8。</p>
 
-<h3>3.4 关于<code>static</code>成员变量：</h3>
+<h3>3.4 关于有<code>static</code>成员变量的类：</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
