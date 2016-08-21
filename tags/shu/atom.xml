@@ -4,7 +4,7 @@
   <title><![CDATA[标签：树 | 美柑の部屋]]></title>
   <link href="http://smwlover.github.io/tags/shu/atom.xml" rel="self"/>
   <link href="http://smwlover.github.io/"/>
-  <updated>2016-08-20T19:52:46+08:00</updated>
+  <updated>2016-08-21T19:45:44+08:00</updated>
   <id>http://smwlover.github.io/</id>
   <author>
     <name><![CDATA[smwlover]]></name>
@@ -12,6 +12,304 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[巩固基础：二叉树的遍历]]></title>
+    <link href="http://smwlover.github.io/blog/2016/08/21/binary-tree-traversal/"/>
+    <updated>2016-08-21T17:38:39+08:00</updated>
+    <id>http://smwlover.github.io/blog/2016/08/21/binary-tree-traversal</id>
+    <content type="html"><![CDATA[<p>我们在数据结构的学习中，都接触过二叉树。二叉树常用的遍历方法包括：前序遍历、中序遍历、后序遍历以及层次遍历。其中前三种遍历方法均可以通过递归或者迭代实现。递归实现难度较小，而且写出来的代码简洁明了；迭代实现起来则具有一定难度。在这篇文章中，我就来总结一下利用迭代遍历二叉树的方法。</p>
+
+<!--more-->
+
+
+<h2>一、前序遍历</h2>
+
+<p>二叉树的前序、中序和后序遍历都是通过栈来实现的，而前序遍历则是其中最简单的。所谓前序遍历，指的是对于每个结点，先访问该结点本身，然后访问左子树，最后访问右子树。为了进行前序遍历，我们初始化一个空栈存储二叉树的结点。首先令根结点入栈。每当栈不为空，弹出栈顶的结点并访问该结点，然后依次将其右儿子、左儿子入栈（如果不为<code>NULL</code>）。注意入栈的顺序是先右儿子，再左儿子。</p>
+
+<p><figure class='code'><figcaption><span>Preorder Traversal </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">preorderTraversal</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">stack</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">TreeNode</span><span class="o">*&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">nodeStack</span><span class="p">;</span>
+</span><span class='line'><span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">nodeStack</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span>
+</span><span class='line'>    <span class="n">TreeNode</span><span class="o">*</span> <span class="n">node</span> <span class="o">=</span> <span class="n">nodeStack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">nodeStack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">res</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">val</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>二、中序遍历</h2>
+
+<p>所谓中序遍历，指的是对于每个结点，先访问左子树，然后访问该结点本身，最后访问右子树。为了进行中序遍历，我们需要维持两个栈，一个栈存储二叉树的结点，另一个栈则是标记栈，存储结点栈中相应结点的标记，标记的取值可能为0或1。<br/>
+首先，我们令根结点入栈（标记为0）。每当栈不为空，我们弹出栈顶结点及其标记：如果该结点的标记为0，则令该结点再次入栈（标记为1），并且如果该结点有左儿子，将其左儿子入栈（标记为0）；如果该结点的标记为1，则访问该结点，并且如果该结点有右儿子，将其右儿子入栈（标记为0）。</p>
+
+<p><figure class='code'><figcaption><span>Inorder Traversal </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">inorderTraversal</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">stack</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">TreeNode</span><span class="o">*&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">nodeStack</span><span class="p">;</span>
+</span><span class='line'><span class="n">stack</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">markStack</span><span class="p">;</span>
+</span><span class='line'><span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</span><span class='line'><span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">nodeStack</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span>
+</span><span class='line'>    <span class="n">TreeNode</span><span class="o">*</span> <span class="n">node</span> <span class="o">=</span> <span class="n">nodeStack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">mark</span> <span class="o">=</span> <span class="n">markStack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">nodeStack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">markStack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">mark</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//Left child:</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">){</span>
+</span><span class='line'>            <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">res</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">val</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//Right child:</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">){</span>
+</span><span class='line'>            <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>三、后序遍历</h2>
+
+<p>所谓后序遍历，指的是对于每个结点，先访问左子树，然后访问右子树，最后访问该结点本身。后序遍历的实现思路和中序遍历类似，仍然是维持一个结点栈和一个标记栈，不同之处在于标记的取值可能为0、1或2。<br/>
+首先，我们令根结点入栈（标记为0）。每当栈不为空，我们弹出栈顶结点及其标记：如果该结点的标记为0，则令该结点再次入栈（标记为1），并且如果该结点有左儿子，将其左儿子入栈（标记为0）；如果该结点的标记为1，则令该结点再次入栈（标记为2），并且如果该结点有右儿子，将其右儿子入栈（标记为0）；如果该结点的标记为2，则访问该结点。</p>
+
+<p><figure class='code'><figcaption><span>Postorder Traversal </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">postorderTraversal</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">stack</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">TreeNode</span><span class="o">*&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">nodeStack</span><span class="p">;</span>
+</span><span class='line'><span class="n">stack</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">markStack</span><span class="p">;</span>
+</span><span class='line'><span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</span><span class='line'><span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">nodeStack</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span>
+</span><span class='line'>    <span class="n">TreeNode</span><span class="o">*</span> <span class="n">node</span> <span class="o">=</span> <span class="n">nodeStack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">mark</span> <span class="o">=</span> <span class="n">markStack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">nodeStack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">markStack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">mark</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//Left child:</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">){</span>
+</span><span class='line'>            <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">mark</span> <span class="o">==</span> <span class="mi">1</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//Right child:</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">){</span>
+</span><span class='line'>            <span class="n">nodeStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">markStack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span>
+</span><span class='line'>        <span class="n">res</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">val</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>另外需要注意的是，通过一棵二叉树的前序与中序，或者中序与后序遍历序列是可以重建这棵二叉树的。比如一棵二叉树的前序与中序遍历序列如下：<br/>
+前序遍历序列：<code>a,b,e,c,f,g</code>；<br/>
+中序遍历序列：<code>b,e,a,f,c,g</code>。<br/>
+我们知道，前序遍历序列的结点顺序为根结点、左子树、右子树；中序遍历为左子树、根结点、右子树；后序遍历则为左子树、右子树、根结点。通过这个结论，我们可以知道结点<code>a</code>为二叉树的根结点，所以在中序遍历序列中，位于<code>a</code>前面的序列<code>b,e</code>就是左子树的中序遍历序列，位于<code>a</code>后面的序列<code>f,c,g</code>则是右子树的中序遍历序列。另外我们可以确定，左右子树的大小分别为2和3，所以在前序遍历序列中，<code>a</code>后面的2个结点<code>b,e</code>就是左子树的前序遍历序列，再后面的3个结点<code>c,f,g</code>就是右子树的前序遍历序列。<br/>
+然后我们对左右子树分别进行递归调用，即可重建这棵二叉树。</p>
+
+<h2>四、层次遍历</h2>
+
+<p>如果说前序遍历类似于图的深度优先搜索，那么层次遍历则类似于广度优先搜索。层次遍历指的是按照结点所在层，从根结点开始逐一访问。不同于之前几种遍历方法利用栈来实现，层次遍历是利用队列来实现的。首先我们初始化一个空队列并令根结点进队。每当队列不为空，使队列最前端的结点出队并且访问该结点，然后将该结点的左右儿子依次进队。</p>
+
+<p><strong>扩展：</strong>输入一棵二叉树，将其层次遍历序列输出到<code>vector</code>中，不同层的结点需要输出到不同的<code>vector</code>中。比如对于如下图所示的二叉树，层次遍历的结果应该是<code>[[1],[2,4],[8,3]]</code>。</p>
+
+<p><div align="center"><img src="/images/blogimg/15.png"></div></p>
+
+<p><strong>答案：</strong>上面的题目要求我们在层次遍历的基础上，将不同层的结点加以区分。我们可以<strong>利用两个队列交替放置不同层的结点</strong>，也就是说当队列<code>A</code>中的一个结点出队时，我们将其左右儿子加入到队列<code>B</code>中，反之亦然。这样，与当前结点同一层的结点就会出现在同一个队列中，而当前结点的上层或下层结点就会在另一个队列中出现，达到了区分不同层结点的目的。</p>
+
+<p><figure class='code'><figcaption><span>Level Order Traversal </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">vector</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">levelOrder</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">root</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">res</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">queue</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">TreeNode</span><span class="o">*&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">dep</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="p">].</span><span class="n">push</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="p">].</span><span class="n">empty</span><span class="p">()){</span>
+</span><span class='line'>    <span class="n">vector</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="kt">int</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">tmp</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="p">].</span><span class="n">empty</span><span class="p">()){</span>
+</span><span class='line'>        <span class="n">TreeNode</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="p">].</span><span class="n">front</span><span class="p">();</span>
+</span><span class='line'>        <span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="p">].</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>        <span class="n">tmp</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">p</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">val</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="o">^</span><span class="mi">1</span><span class="p">].</span><span class="n">push</span><span class="p">(</span><span class="n">p</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">left</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">q</span><span class="p">[</span><span class="n">dep</span><span class="o">^</span><span class="mi">1</span><span class="p">].</span><span class="n">push</span><span class="p">(</span><span class="n">p</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">right</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">res</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">dep</span> <span class="o">^=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[hihoCoder题目赏析：刷油漆]]></title>
