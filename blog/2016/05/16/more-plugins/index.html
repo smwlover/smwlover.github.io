@@ -205,19 +205,17 @@
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-<span class='line-number'>15</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">DeleteTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>            <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>            <span class="k">super</span>
+</span><span class='line'>        <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">DeleteTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="s2">&quot;&lt;del&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/del&gt;&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="s2">&quot;&lt;del&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/del&gt;&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">DeleteTag</span><span class="p">)</span>
@@ -226,7 +224,7 @@
 
 <h2>第二个插件：36K钛合金防剧透屏障</h2>
 
-<p><span class="mask">这是什么中二爆表的名字</span> ←就是这样的效果。<br/>
+<p><span class="mask">其实这个东西根本没必要写成插件的</span> ←就是这样的效果。<br/>
 同理，我们要查看一下相应的html是怎么写的，我找到的网页如下：</p>
 
 <div align="center"><img src="/images/blogimg/2.png"></div>
@@ -250,19 +248,17 @@
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-<span class='line-number'>15</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">MaskTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>            <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>            <span class="k">super</span>
+</span><span class='line'>        <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">MaskTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="s2">&quot;&lt;span class=</span><span class="se">\&quot;</span><span class="s2">mask</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="s2">&quot;&lt;span class=</span><span class="se">\&quot;</span><span class="s2">mask</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="vi">@content</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">MaskTag</span><span class="p">)</span>
@@ -280,17 +276,16 @@
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Mask Plugin:</span>
 </span><span class='line'><span class="nc">.mask</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">background-color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">text-shadow</span><span class="o">:</span> <span class="no">none</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background-color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">color</span><span class="o">:</span> <span class="mh">#252525</span> <span class="nv">!important</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">text-shadow</span><span class="o">:</span> <span class="no">none</span> <span class="nv">!important</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <h2>第三个插件：写作xx读作xx</h2>
 
-<p>不知道大家看过《<ruby><rb>Clannad</rb><rp>(</rp><rt class="rubytagrt">人生</rt><rp>)</rp></ruby>》没有？ ←就是这样的效果。当然，这种效果还可以用来对日语进行注音，比如“<ruby><rb>学</rb><rp>(</rp><rt class="rubytagrt">がっ</rt><rp>)</rp></ruby><ruby><rb>校</rb><rp>(</rp><rt class="rubytagrt">こう</rt><rp>)</rp></ruby>”。<br/>
-日语中，经常见到用假名在汉字上方标明读音的情况，这种情况叫振假名（<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>）。又因为日文印刷时以五号格大小的振假名为标准，并且五号格大小的文字在印刷行业被简称为ruby，所以振假名也有“<ruby><rb>ルビー</rb><rp>(</rp><rt class="rubytagrt">ruby</rt><rp>)</rp></ruby>”的别称。所以，我把这个插件的名字叫做<code>rubytag</code>。<br/>
+<p>日语中，经常见到用假名在汉字上方标明读音的情况，这种情况叫振假名（<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>）。又因为日文印刷时以五号大小的振假名为标准，并且五号大小的文字在印刷行业被简称为ruby，所以振假名也有“<ruby><rb>ルビー</rb><rp>(</rp><rt class="rubytagrt">ruby</rt><rp>)</rp></ruby>”的别称。所以，我把这个插件的名字叫做<code>rubytag</code>。<br/>
 同样，我找到了萌娘百科的一个网页，观察振假名的具体实现方式：</p>
 
 <div align="center"><img src="/images/blogimg/3.png"></div>
@@ -347,54 +342,48 @@
 <span class='line-number'>43</span>
 <span class='line-number'>44</span>
 <span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">RubyTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>            <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>            <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>            <span class="vi">@result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">RubyTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span>
-</span><span class='line'>      <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>      <span class="vi">@result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>  
-</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="n">arr</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>      <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
-</span><span class='line'>          <span class="n">word</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
-</span><span class='line'>          <span class="n">word</span><span class="o">.</span><span class="n">strip!</span>
-</span><span class='line'>          <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
-</span><span class='line'>              <span class="n">parts</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-</span><span class='line'>              <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">2</span>
-</span><span class='line'>                  <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                  <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;每组对应关系中内容太多&quot;</span>
-</span><span class='line'>                  <span class="k">break</span>
-</span><span class='line'>              <span class="k">elsif</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">2</span>
-</span><span class='line'>                  <span class="n">html</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'>                  <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
-</span><span class='line'>              <span class="k">else</span>
-</span><span class='line'>                  <span class="n">rb</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'>                  <span class="n">rt</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
-</span><span class='line'>                  <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;ruby&gt;&lt;rb&gt;</span><span class="si">#{</span><span class="n">rb</span><span class="si">}</span><span class="s2">&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt class=</span><span class="se">\&quot;</span><span class="s2">rubytagrt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">rt</span><span class="si">}</span><span class="s2">&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&quot;</span>
-</span><span class='line'>                  <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
-</span><span class='line'>              <span class="k">end</span>
-</span><span class='line'>          <span class="k">end</span>
-</span><span class='line'>          <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">if</span> <span class="vi">@successful</span>
-</span><span class='line'>          <span class="vi">@result</span>
-</span><span class='line'>      <span class="k">else</span>
-</span><span class='line'>          <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@information</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>      
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>            <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>            <span class="n">arr</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>            <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="n">size</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">word</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>                <span class="n">word</span><span class="o">.</span><span class="n">strip!</span>
+</span><span class='line'>                <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span class='line'>                    <span class="n">parts</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</span><span class='line'>                    <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">2</span>
+</span><span class='line'>                        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                        <span class="vi">@information</span> <span class="o">=</span> <span class="s2">&quot;每组对应关系中内容太多&quot;</span>
+</span><span class='line'>                        <span class="k">break</span>
+</span><span class='line'>                    <span class="k">elsif</span> <span class="n">parts</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">2</span>
+</span><span class='line'>                        <span class="n">html</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>                        <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
+</span><span class='line'>                    <span class="k">else</span>
+</span><span class='line'>                        <span class="n">rb</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>                        <span class="n">rt</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>                        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;ruby&gt;&lt;rb&gt;</span><span class="si">#{</span><span class="n">rb</span><span class="si">}</span><span class="s2">&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt class=</span><span class="se">\&quot;</span><span class="s2">rubytagrt</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="si">#{</span><span class="n">rt</span><span class="si">}</span><span class="s2">&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&quot;</span>
+</span><span class='line'>                        <span class="vi">@result</span> <span class="o">=</span> <span class="vi">@result</span> <span class="o">+</span> <span class="n">html</span>
+</span><span class='line'>                    <span class="k">end</span>
+</span><span class='line'>                <span class="k">end</span>
+</span><span class='line'>                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>            <span class="k">super</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">if</span> <span class="vi">@successful</span>
+</span><span class='line'>                <span class="vi">@result</span>
+</span><span class='line'>            <span class="k">else</span>
+</span><span class='line'>                <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@information</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;rubytag&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">RubyTag</span><span class="p">)</span>
@@ -410,7 +399,7 @@
 <span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">//Rubytag Plugin:</span>
 </span><span class='line'><span class="nc">.rubytagrt</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">font-family</span><span class="o">:</span> <span class="n">microsoft</span> <span class="n">yahei</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-family</span><span class="o">:</span> <span class="n">microsoft</span> <span class="n">yahei</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -420,64 +409,6 @@
 2. 包含多个单词的情况：<code>{% rubytag 明-みょう/日-にち %}</code>会显示成<ruby><rb>明</rb><rp>(</rp><rt class="rubytagrt">みょう</rt><rp>)</rp></ruby><ruby><rb>日</rb><rp>(</rp><rt class="rubytagrt">にち</rt><rp>)</rp></ruby>；<br/>
 3. 包含多个单词，但是有些单词没有标注的情况：<code>{% rubytag 振-ふ/り/仮-が/名-な %}</code>会显示成<ruby><rb>振</rb><rp>(</rp><rt class="rubytagrt">ふ</rt><rp>)</rp></ruby>り<ruby><rb>仮</rb><rp>(</rp><rt class="rubytagrt">が</rt><rp>)</rp></ruby><ruby><rb>名</rb><rp>(</rp><rt class="rubytagrt">な</rt><rp>)</rp></ruby>；<br/>
 4. 错误情况：<code>{% rubytag 明-みょう-日-にち %}</code>会显示成<strong>错误：每组对应关系中内容太多</strong>。</p>
-
-<h3>Octopress插件的嵌套浅析</h3>
-
-<p>在插件测试中，我发现了一个神奇的事情：本插件可以嵌套在一些<code>Block</code>类型的Octopress插件中使用。比如下面的例子，我就将本插件嵌套进了<code>blockquote</code>插件中：</p>
-
-<blockquote><p><ruby><rb>迷</rb><rp>(</rp><rt class="rubytagrt">まよ</rt><rp>)</rp></ruby>いはないよ、<ruby><rb>固</rb><rp>(</rp><rt class="rubytagrt">かた</rt><rp>)</rp></ruby>く<ruby><rb>決</rb><rp>(</rp><rt class="rubytagrt">き</rt><rp>)</rp></ruby>めたから。<ruby><rb>涙</rb><rp>(</rp><rt class="rubytagrt">なみだ</rt><rp>)</rp></ruby>は<ruby><rb>見</rb><rp>(</rp><rt class="rubytagrt">み</rt><rp>)</rp></ruby>せないと<ruby><rb>誓</rb><rp>(</rp><rt class="rubytagrt">ちか</rt><rp>)</rp></ruby>った。<br/>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。</p><footer><strong>阿万音铃羽</strong> <cite>虹色の光りの中で</cite></footer></blockquote>
-
-
-<p>对应的markdown文件如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{% blockquote 阿万音铃羽, 虹色の光りの中で %}
-</span><span class='line'>{% rubytag 迷-まよ/いはないよ、/固-かた/く/決-き/めたから。/涙-なみだ/は/見-み/せないと/誓-ちか/った。 %}
-</span><span class='line'>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。
-</span><span class='line'>{% endblockquote %}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于产生这种现象的原因，我研究了一下<code>blockquote.rb</code>，可以发现，在该代码的47行处有这样的一段话：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">quote</span> <span class="o">=</span> <span class="n">paragraphize</span><span class="p">(</span><span class="k">super</span><span class="p">)</span>
-</span><span class='line'>  <span class="c1">#以下省略</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么这个<code>super</code>究竟代表什么呢？通过查阅资料发现，Ruby中<code>super</code>指<strong>调用父类的同名函数，并将本函数的所有参数传入父类的同名函数</strong>。上面的代码中调用的就是其父类的<code>render(context)</code>函数。我们可以在这一行代码的前面加入<code>print super</code>，然后运行<code>rake generate</code>，看看其父类的<code>render(context)</code>函数究竟会返回什么。我们发现，输出的结果正是将嵌套在其内部的标识符<code>rubytag</code>解析完成之后的结果：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ruby>&lt;rb>迷&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">まよ&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>いはないよ、&lt;ruby>&lt;rb>固&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">かた&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>く&lt;ruby>&lt;rb>決&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">き&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>めたから。&lt;ruby>&lt;rb>涙&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">なみだ&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>は&lt;ruby>&lt;rb>見&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">み&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>せないと&lt;ruby>&lt;rb>誓&lt;/rb>&lt;rp>(&lt;/rp>&lt;rt class="rubytagrt">ちか&lt;/rt>&lt;rp>)&lt;/rp>&lt;/ruby>った。
-</span><span class='line'>我不会迷惘，因为早已下定决心，发誓不再让他人看到我的泪水。</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过这个结果，我们可以得出一个猜想：在<code>Block</code>类型标识符的解析过程中，Octopress会先解析被该标识符包裹的内容，如果这些内容中有子标识符存在，那么先解析它们并且将它们转化为html代码，然后才是对该<code>Block</code>类型标识符本身的解析。<br/>
-对于<code>blockquote.rb</code>来讲，它在<code>render(context)</code>函数中通过<code>super</code>获得对其包裹的内容的解析结果，然后再通过<code>paragraphize(super)</code>对这个结果进行进一步的处理，该函数的代码如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">paragraphize</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
-</span><span class='line'>  <span class="s2">&quot;&lt;p&gt;</span><span class="si">#{</span><span class="n">input</span><span class="o">.</span><span class="n">lstrip</span><span class="o">.</span><span class="n">rstrip</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/\n\n/</span><span class="p">,</span> <span class="s1">&#39;&lt;/p&gt;&lt;p&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/\n/</span><span class="p">,</span> <span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/p&gt;&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过观察这段代码，我们发现，该函数对其包裹的内容的处理至少涉及三个方面：<br/>
-1. 在其包裹的内容前后添加<code>&lt;p&gt;</code>和<code>&lt;/p&gt;</code>标签；<br/>
-2. 将其包裹的内容中的<code>\n\n</code>替换为<code>&lt;/p&gt;&lt;p&gt;</code>标签；<br/>
-3. 将其包裹的内容中的<code>\n</code>替换为<code>&lt;br/&gt;</code>标签。<br/>
-说到这里，我忽然想到，在写markdown文件的时候，我们其实经常用到一个插件去嵌套其他插件，那就是<code>{% raw %}</code>。那么<code>{% raw %}</code>是如何避免解析被其包裹的内容的呢？笔者观察了<code>raw.rb</code>，但还是没有研究出答案。</p>
 
 <h2>总结与展望：</h2>
 

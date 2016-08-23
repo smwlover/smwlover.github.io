@@ -178,7 +178,7 @@
 <!--more-->
 
 
-<p>之前我开发的几款插件都是<code>Tag</code>型插件，但是这次<code>Tag</code>型插件就不能实现我们想要的功能了。我们需要使用<code>Block</code>型插件（姑且命名为<code>{% expand %}</code>），将要显示的内容用<code>{% expand title %}</code>和<code>{% endexpand %}</code>包裹起来。</p>
+<p>之前我开发的几款插件都是<code>Tag</code>型插件，但是这次<code>Tag</code>型插件就不能实现我们想要的功能了。我们需要使用<code>Block</code>型插件（姑且命名为<code>expand</code>），将要显示的内容用<code>{% expand title %}</code>和<code>{% endexpand %}</code>包裹起来。</p>
 
 <h2>Javascript部分</h2>
 
@@ -267,7 +267,7 @@
 <code>style="float: right;"</code>：这段代码使得该按钮一直位于一行的最右侧。<br/>
 <code>class="expandtitle"</code>：对应我们在<code>source/javascripts/octopress.js</code>文件中增加的代码，使该按钮在点击时触发效果。</p>
 
-<p>按钮的下一个兄弟对象则是需要隐藏或展开的部分，我用<code>&lt;div&gt;&lt;/div&gt;</code>表示，并且<code>style="display: none;"</code>保证其初始状态是隐藏的。</p>
+<p>按钮的下一个兄弟对象则是需要隐藏或展开的部分，我用<code>&lt;div&gt;&lt;/div&gt;</code>表示，并且该元素的属性<code>style="display: none;"</code>保证其初始状态是隐藏的。</p>
 
 <h2>样式表调节部分</h2>
 
@@ -351,9 +351,7 @@
 
 <h2>局限性</h2>
 
-<p>插件的基本开发过程大致就是这样，就像上面所说的，该插件支持将一些内容折叠起来。可折叠的内容包括一段文本、一张图片或者一段代码段（因为Octopress支持插件嵌套）。但是该插件有一点局限性存在：<br/>
-在本插件内部，除去用<code>{% plugin_name parameters %}</code>调用插件的语法之外，其余的markdown语法（包括用两个空格换行，或者用三个反引号引用一段代码段）都不适用了。笔者原以为在调用完父类的<code>super</code>函数后，这类语法同样也可以被转化为相应的html代码，但是好像并不是这样，貌似这类语法的解析方式和普通的插件是不一样的。有兴趣的读者可以在代码中加上<code>print super</code>并调用<code>rake generate</code>查看一下输出结果，<del>反正我是不知道为什么会有那样的输出</del>。<br/>
-在这里，我提供了几种<span class="mask">曲线救国的</span>方案来解决上面的问题：<br/>
+<p>插件的基本开发过程大致就是这样，就像上面所说的，该插件支持将一些内容折叠起来。可折叠的内容包括一段文本、一张图片或者一段代码段（因为Octopress支持插件嵌套）。但是该插件有一点局限性存在：在该插件内部，除去用<code>{% plugin_name parameters %}</code>调用插件的语法之外，其余的markdown语法（包括用两个空格换行，或者用三个反引号引用一段代码段）都不适用了。在这里，我提供了几种方案来解决上面的问题：<br/>
 1. 要在本插件内部换行，直接写<code>&lt;br/&gt;</code>吧；<br/>
 2. 要在本插件内部添加代码段，不要用三个反引号，改用<code>codeblock</code>吧；<br/>
 3. 要在本插件内部添加行内代码，不要用反引号，直接写成<code>&lt;code&gt;...&lt;/code&gt;</code>吧，或者把下面的<code>code.rb</code>文件加入到插件目录下后，用<code>{% code ... %}</code>吧。</p>
@@ -373,9 +371,7 @@
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-<span class='line-number'>15</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
-</span><span class='line'>
 </span><span class='line'>    <span class="k">class</span> <span class="nc">CodeTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
 </span><span class='line'>        <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
 </span><span class='line'>            <span class="vi">@code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
@@ -390,15 +386,6 @@
 </span><span class='line'>
 </span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">CodeTag</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
-
-
-<h2>最终效果</h2>
-
-<div class="expand">开发感想<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
-总体来讲，开发这个插件的重点还是html层次结构以及jQuery逻辑的实现。<br/>
-至于Octopress为什么不能正确解析插件内部的一些markdown语法，这东西太<ruby><rb>高端</rb><rp>(</rp><rt class="rubytagrt">扯淡</rt><rp>)</rp></ruby>了，我反正不想管了。<br/>
-要换行的时候就加个<code>&lt;br/&gt;</code>吧，反正就五个字符，也不会累死人。
-</div></div>
 
 </div>
 

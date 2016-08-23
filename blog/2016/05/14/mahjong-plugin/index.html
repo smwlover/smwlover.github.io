@@ -185,7 +185,7 @@
 <h2>一、基本功能</h2>
 
 <p>具体来说，我的需求分为两部分：首先是在一行文本内部加入单张麻将牌的图片，我计划开发一个名为<code>mahjong</code>的插件来实现；然后是可以另起一行显示一组麻将牌（通常是13张，表示某位玩家的手牌）的图片，我计划开发一个名为<code>mahjonglist</code>的插件来实现。这篇博文讲的是第一个插件的实现方式。<br/>
-然后我们可以开始定义本插件的语法了，在markdown中调用插件一般是通过<code>{% plugin_name parameters %}</code>的方式，我们当然也需要遵循这种方式，所以调用我们的插件语法是<code>{% mahjong cardName %}</code>。<br/>
+然后我们可以开始定义本插件的语法了。我们一般通过<code>{% plugin_name parameters %}</code>的方式调用插件，所以我将本插件的语法定义为<code>{% mahjong cardName %}</code>。<br/>
 下一步定义<code>cardName</code>的语法。首先我们遵照日本麻将玩家的习惯，“万”简写为<code>m</code>，“饼”简写为<code>p</code>，“索”简写为<code>s</code>，这样就可以表示所有非字牌了。对于字牌，我采用后缀<code>j</code>来表示，<code>1j</code>到<code>7j</code>对应东南西北白发中。<br/>
 另外，日麻中有红宝牌（赤ドラ）的概念，通常是红五万、红五索、红五饼。我采用在数字后加一个<code>!</code>的方法将红宝牌与普通牌区分。所以“五索”为<code>5s</code>，“红五索”则为<code>5!s</code>。<br/>
 还有，由于日麻中在吃、碰、杠后会将其中一张牌横置，表示这张牌来自于哪个玩家。所以我采用在数字后加一个<code>$</code>的方法表示这张牌是横置的。比如要表示一个横置的北风，即为<code>4$j</code>。后缀符<code>$</code>和<code>!</code>的先后顺序无关。<br/>
@@ -193,7 +193,7 @@
 
 <h2>二、插件开发</h2>
 
-<p>首先我们有一组<a href="https://github.com/smwlover/smwlover.github.io/tree/master/images/mahjong">麻将牌图片的资源</a>，我们需要做的是写一个<code>rb</code>文件，解析我们定义的<code>cardName</code>的语法，并且生成对应的<code>&lt;img/&gt;</code>标签。我们在<code>plugins/</code>目录下新建一个文件名为<code>mahjong.rb</code>。笔者之前没有任何Ruby开发的经验，这次开发插件，完全是参照已有插件的写法开发的。<br/>
+<p>首先我们有一组<a href="https://github.com/smwlover/smwlover.github.io/tree/master/images/mahjong">麻将牌图片的资源</a>，我们需要做的是写一个<code>rb</code>文件，解析<code>cardName</code>的语法，并且生成对应的<code>&lt;img/&gt;</code>标签。我们在<code>plugins/</code>目录下新建一个文件名为<code>mahjong.rb</code>。笔者之前没有任何Ruby开发的经验，这次开发插件，完全是参照已有插件的写法开发的。<br/>
 我们发现，大部分插件都是自己定义了一个类，继承自<code>Liquid::Tag</code>或者<code>Liquid::Block</code>。在文件的最后，我们需要利用<code>Liquid::Template.register_tag()</code>对插件进行注册。<br/>
 其中，继承自<code>Liquid::Block</code>的插件属于语句块类型的，即用一个开始标识符和一个结束标识符将要显示的内容包裹起来，比如<code>blockquote.rb</code>；而继承自<code>Liquid::Tag</code>的插件属于标签类型的，不需要用两个标识符包裹，比如<code>image_tag.rb</code>。考虑到我们的功能，我们需要选用的是后一种类型，即继承自<code>Liquid::Tag</code>。<br/>
 我们还发现，我们的插件需要写的函数包括<code>initialize(tag_name, markup, tokens)</code>函数，我们的<code>cardName</code>就是通过<code>markup</code>参数传递进来的。在该函数中，我们需要对传进来的参数进行解析。<br/>
@@ -317,7 +317,6 @@
 <span class='line-number'>114</span>
 <span class='line-number'>115</span>
 <span class='line-number'>116</span>
-<span class='line-number'>117</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Title: Simple Mahjong tag for Jekyll</span>
 </span><span class='line'><span class="c1"># Author: smwlover</span>
 </span><span class='line'><span class="c1"># Syntax: {% mahjong cardName %}</span>
@@ -330,107 +329,106 @@
 </span><span class='line'><span class="c1"># 暗牌用数字0加m、s、p或j中的任何一个都可以表示。</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
-</span><span class='line'>
 </span><span class='line'>  <span class="k">class</span> <span class="nc">MahjongTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@curFlag</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">#m, s, p或j对应0, 1, 2, 3</span>
-</span><span class='line'>      <span class="vi">@cardNumber</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">#牌的编号</span>
-</span><span class='line'>      <span class="vi">@isAkaDora</span> <span class="o">=</span> <span class="kp">false</span> <span class="c1">#是否是红宝牌</span>
-</span><span class='line'>      <span class="vi">@isRotated</span> <span class="o">=</span> <span class="kp">false</span> <span class="c1">#是否是横置的牌</span>
-</span><span class='line'>      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span> <span class="c1">#解析是否成功</span>
-</span><span class='line'>      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="c1">#存储解析的结果</span>
-</span><span class='line'>  
-</span><span class='line'>      <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
-</span><span class='line'>      <span class="n">strLen</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">size</span>
-</span><span class='line'>      <span class="n">strReversed</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">reverse</span>
-</span><span class='line'>      <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>      <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">strLen</span> <span class="k">do</span>
-</span><span class='line'>          <span class="n">curChar</span> <span class="o">=</span> <span class="n">strReversed</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
-</span><span class='line'>          <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
-</span><span class='line'>              <span class="k">if</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span>
-</span><span class='line'>                  <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>              <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;s&quot;</span>
-</span><span class='line'>                  <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'>              <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;p&quot;</span>
-</span><span class='line'>                  <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">2</span>
-</span><span class='line'>              <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;j&quot;</span>
-</span><span class='line'>                  <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">3</span>
-</span><span class='line'>              <span class="k">else</span>
-</span><span class='line'>                  <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;缺少m、p、s、j标签&quot;</span>
-</span><span class='line'>                  <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                  <span class="k">break</span>
-</span><span class='line'>              <span class="k">end</span>
-</span><span class='line'>          <span class="k">else</span>
-</span><span class='line'>              <span class="k">if</span> <span class="vi">@cardNumber</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="c1">#如果重复声明了牌的编号</span>
-</span><span class='line'>                  <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;重复声明了牌的编号&quot;</span>
-</span><span class='line'>                  <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                  <span class="k">break</span>
-</span><span class='line'>              <span class="k">end</span>
-</span><span class='line'>              <span class="k">if</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span>
-</span><span class='line'>                  <span class="vi">@isRotated</span> <span class="o">=</span> <span class="kp">true</span>
-</span><span class='line'>              <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span>
-</span><span class='line'>                  <span class="vi">@isAkaDora</span> <span class="o">=</span> <span class="kp">true</span>
-</span><span class='line'>              <span class="k">else</span>
-</span><span class='line'>                  <span class="vi">@cardNumber</span> <span class="o">=</span> <span class="n">curChar</span><span class="o">.</span><span class="n">getbyte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">48</span>
-</span><span class='line'>                  <span class="k">if</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="vi">@cardNumber</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="vi">@cardNumber</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">)</span>
-</span><span class='line'>                      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;j标签对应的编号只能为0到7&quot;</span>
-</span><span class='line'>                      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                      <span class="k">break</span>
-</span><span class='line'>                  <span class="k">elsif</span> <span class="vi">@cardNumber</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="vi">@cardNumber</span> <span class="o">&gt;</span> <span class="mi">9</span>
-</span><span class='line'>                      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;m、p、s标签对应的编号只能为0到9&quot;</span>
-</span><span class='line'>                      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                      <span class="k">break</span>
-</span><span class='line'>                  <span class="k">elsif</span> <span class="vi">@isAkaDora</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="vi">@cardNumber</span> <span class="o">!=</span> <span class="mi">5</span> <span class="o">||</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="c1">#红宝牌必须是五索、五万、五饼。</span>
-</span><span class='line'>                      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;红宝牌必须是五万、五饼、五索&quot;</span>
-</span><span class='line'>                      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                      <span class="k">break</span>
-</span><span class='line'>                  <span class="k">elsif</span> <span class="vi">@isRotated</span> <span class="o">&amp;&amp;</span> <span class="vi">@cardNumber</span> <span class="o">==</span> <span class="mi">0</span> <span class="c1">#暗牌不能横置</span>
-</span><span class='line'>                      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;暗牌不能横置&quot;</span>
-</span><span class='line'>                      <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>                      <span class="k">break</span>
-</span><span class='line'>                  <span class="k">end</span>
-</span><span class='line'>              <span class="k">end</span>
-</span><span class='line'>          <span class="k">end</span>
-</span><span class='line'>          <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="k">if</span> <span class="vi">@cardNumber</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">||</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
-</span><span class='line'>          <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="k">if</span> <span class="vi">@successful</span>
-</span><span class='line'>          <span class="n">getPath</span><span class="p">()</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="k">super</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">if</span> <span class="vi">@successful</span>
-</span><span class='line'>          <span class="s2">&quot;&lt;img class=</span><span class="se">\&quot;</span><span class="s2">mahjong</span><span class="se">\&quot;</span><span class="s2"> src=</span><span class="se">\&quot;</span><span class="si">#{</span><span class="vi">@path</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">/&gt;&quot;</span>
-</span><span class='line'>      <span class="k">else</span>
-</span><span class='line'>          <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@path</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="k">def</span> <span class="nf">getPath</span><span class="p">()</span>
-</span><span class='line'>      <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;tate&quot;</span>
-</span><span class='line'>      <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span class='line'>      <span class="k">if</span> <span class="vi">@isRotated</span>
-</span><span class='line'>          <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;yoko&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="k">if</span> <span class="vi">@isAkaDora</span>
-</span><span class='line'>          <span class="k">if</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">0</span>
-</span><span class='line'>              <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;aka5m&quot;</span>
-</span><span class='line'>          <span class="k">elsif</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">1</span>
-</span><span class='line'>              <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;aka5s&quot;</span>
-</span><span class='line'>          <span class="k">elsif</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">2</span>
-</span><span class='line'>              <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;aka5p&quot;</span>
-</span><span class='line'>          <span class="k">end</span>
-</span><span class='line'>      <span class="k">elsif</span> <span class="vi">@cardNumber</span> <span class="o">==</span> <span class="mi">0</span>
-</span><span class='line'>          <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;back&quot;</span>
-</span><span class='line'>      <span class="k">else</span>
-</span><span class='line'>          <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="vi">@cardNumber</span> <span class="o">+</span> <span class="mi">9</span> <span class="o">*</span> <span class="vi">@curFlag</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;/images/mahjong/</span><span class="si">#{</span><span class="n">direction</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">.png&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">markup</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@curFlag</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">#m, s, p或j对应0, 1, 2, 3</span>
+</span><span class='line'>        <span class="vi">@cardNumber</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">#牌的编号</span>
+</span><span class='line'>        <span class="vi">@isAkaDora</span> <span class="o">=</span> <span class="kp">false</span> <span class="c1">#是否是红宝牌</span>
+</span><span class='line'>        <span class="vi">@isRotated</span> <span class="o">=</span> <span class="kp">false</span> <span class="c1">#是否是横置的牌</span>
+</span><span class='line'>        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">true</span> <span class="c1">#解析是否成功</span>
+</span><span class='line'>        <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="c1">#存储解析的结果</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">markup</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>        <span class="n">strLen</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">size</span>
+</span><span class='line'>        <span class="n">strReversed</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">reverse</span>
+</span><span class='line'>        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>        <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">strLen</span> <span class="k">do</span>
+</span><span class='line'>            <span class="n">curChar</span> <span class="o">=</span> <span class="n">strReversed</span><span class="o">[</span><span class="n">count</span><span class="o">]</span>
+</span><span class='line'>            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>                <span class="k">if</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span>
+</span><span class='line'>                    <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>                <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;s&quot;</span>
+</span><span class='line'>                    <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'>                <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;p&quot;</span>
+</span><span class='line'>                    <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span class='line'>                <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;j&quot;</span>
+</span><span class='line'>                    <span class="vi">@curFlag</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span class='line'>                <span class="k">else</span>
+</span><span class='line'>                    <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;缺少m、p、s、j标签&quot;</span>
+</span><span class='line'>                    <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                    <span class="k">break</span>
+</span><span class='line'>                <span class="k">end</span>
+</span><span class='line'>            <span class="k">else</span>
+</span><span class='line'>                <span class="k">if</span> <span class="vi">@cardNumber</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="c1">#如果重复声明了牌的编号</span>
+</span><span class='line'>                    <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;重复声明了牌的编号&quot;</span>
+</span><span class='line'>                    <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                    <span class="k">break</span>
+</span><span class='line'>                <span class="k">end</span>
+</span><span class='line'>                <span class="k">if</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span>
+</span><span class='line'>                    <span class="vi">@isRotated</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>                <span class="k">elsif</span> <span class="n">curChar</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span>
+</span><span class='line'>                    <span class="vi">@isAkaDora</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>                <span class="k">else</span>
+</span><span class='line'>                    <span class="vi">@cardNumber</span> <span class="o">=</span> <span class="n">curChar</span><span class="o">.</span><span class="n">getbyte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">48</span>
+</span><span class='line'>                    <span class="k">if</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="vi">@cardNumber</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="vi">@cardNumber</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">)</span>
+</span><span class='line'>                        <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;j标签对应的编号只能为0到7&quot;</span>
+</span><span class='line'>                        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                        <span class="k">break</span>
+</span><span class='line'>                    <span class="k">elsif</span> <span class="vi">@cardNumber</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="vi">@cardNumber</span> <span class="o">&gt;</span> <span class="mi">9</span>
+</span><span class='line'>                        <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;m、p、s标签对应的编号只能为0到9&quot;</span>
+</span><span class='line'>                        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                        <span class="k">break</span>
+</span><span class='line'>                    <span class="k">elsif</span> <span class="vi">@isAkaDora</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="vi">@cardNumber</span> <span class="o">!=</span> <span class="mi">5</span> <span class="o">||</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="c1">#红宝牌必须是五索、五万、五饼。</span>
+</span><span class='line'>                        <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;红宝牌必须是五万、五饼、五索&quot;</span>
+</span><span class='line'>                        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                        <span class="k">break</span>
+</span><span class='line'>                    <span class="k">elsif</span> <span class="vi">@isRotated</span> <span class="o">&amp;&amp;</span> <span class="vi">@cardNumber</span> <span class="o">==</span> <span class="mi">0</span> <span class="c1">#暗牌不能横置</span>
+</span><span class='line'>                        <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;暗牌不能横置&quot;</span>
+</span><span class='line'>                        <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>                        <span class="k">break</span>
+</span><span class='line'>                    <span class="k">end</span>
+</span><span class='line'>                <span class="k">end</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="k">if</span> <span class="vi">@cardNumber</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">||</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>            <span class="vi">@successful</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="k">if</span> <span class="vi">@successful</span>
+</span><span class='line'>            <span class="n">getPath</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="k">super</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">if</span> <span class="vi">@successful</span>
+</span><span class='line'>            <span class="s2">&quot;&lt;img class=</span><span class="se">\&quot;</span><span class="s2">mahjong</span><span class="se">\&quot;</span><span class="s2"> src=</span><span class="se">\&quot;</span><span class="si">#{</span><span class="vi">@path</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">/&gt;&quot;</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="s2">&quot;&lt;strong&gt;错误：</span><span class="si">#{</span><span class="vi">@path</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">getPath</span><span class="p">()</span>
+</span><span class='line'>        <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;tate&quot;</span>
+</span><span class='line'>        <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="vi">@isRotated</span>
+</span><span class='line'>            <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;yoko&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="k">if</span> <span class="vi">@isAkaDora</span>
+</span><span class='line'>            <span class="k">if</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>                <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;aka5m&quot;</span>
+</span><span class='line'>            <span class="k">elsif</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span class='line'>                <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;aka5s&quot;</span>
+</span><span class='line'>            <span class="k">elsif</span> <span class="vi">@curFlag</span> <span class="o">==</span> <span class="mi">2</span>
+</span><span class='line'>                <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;aka5p&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">elsif</span> <span class="vi">@cardNumber</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>            <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;back&quot;</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="nb">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="vi">@cardNumber</span> <span class="o">+</span> <span class="mi">9</span> <span class="o">*</span> <span class="vi">@curFlag</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="vi">@path</span> <span class="o">=</span> <span class="s2">&quot;/images/mahjong/</span><span class="si">#{</span><span class="n">direction</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">.png&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
@@ -438,10 +436,10 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>对于我来讲，在短时间内学习Ruby语法是一件比实现代码逻辑更加困难的事情。关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以<code>@</code>开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过<code>#{expression}</code>的方式直接引用一个变量或表达式的值。<br/>
-需要注意到的是，在上面的代码中，我生成html的时候，为每个image增加了一个属性<code>class="mahjong"</code>。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：<br/>
+<p>关于Ruby语法需要说明的有两点：一是Ruby中变量的命名有一套规范，代码中以<code>@</code>开头的变量，代表类的成员变量；二是Ruby中的字符串可以通过<code>#{expression}</code>的方式直接引用一个变量或表达式的值。<br/>
+需要注意的是，在上面的代码中，我生成html时为每张图片增加了一个属性<code>class="mahjong"</code>。为什么要这样呢？因为Octopress自己的主题中，显示的图片有默认的样式，如果我们不加这一句，显示时就会按照默认的样式显示。而Octopress默认的样式有很粗的白色边框，还有阴影效果，不适合显示麻将牌。下图是Octopress默认的显示效果：<br/>
 <img src="/images/mahjong/tate/1.png" /><br/>
-为了覆盖这种默认的显示效果，我为每个image添加一个属性<code>class="mahjong"</code>，并且在<code>sass/custom/_styles.scss</code>文件中添加了分类器：</p>
+为了覆盖这种默认的显示效果，我为每张图片增加了一个属性<code>class="mahjong"</code>，并且在<code>sass/custom/_styles.scss</code>文件中添加了分类器：</p>
 
 <figure class='code'><figcaption><span>_styles.scss </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -451,10 +449,10 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="nc">.mahjong</span><span class="p">{</span>
-</span><span class='line'>      <span class="na">border</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">border-radius</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">box-shadow</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
-</span><span class='line'>      <span class="na">vertical-align</span><span class="o">:</span> <span class="no">middle</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-radius</span><span class="o">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">box-shadow</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">vertical-align</span><span class="o">:</span> <span class="no">middle</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
