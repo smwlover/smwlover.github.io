@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>C++中指针的简要总结 - 美柑の部屋</title>
+  <meta name="author" content="smwlover">
+
+  
+  <meta name="description" content="本文解析了面试中可能考察的关于指针的一些内容。">
+  <meta name="keywords" content="smwlover, 指针, pointer">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://smwlover.github.io/blog/2016/08/28/pointers/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="美柑の部屋" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<!-- <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css"> -->
+<script type="text/javascript">
+	function addBlankTargetForLinks () {
+	  $('a[href^="http"]').each(function(){
+		  $(this).attr('target', '_blank');
+	  });
+	}
+
+	$(document).bind('DOMNodeInserted', function(event) {
+	  addBlankTargetForLinks();
+	});
+</script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">美柑の部屋</a></h1>
+  
+    <h2>涙は見せないと誓った。</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><!-- <ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="smwlover.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+   -->
+<ul class="main-navigation">
+  <li><a href="/">博客主页</a></li>
+  <li><a href="/blog/archives">文档列表</a></li>
+  <li><a href="/about">个人简介</a></li>
+</ul>
+
+</nav>
+  <div id="lyrics">
+	<a id="leftArrow" onclick="last();" href="javascript:void(0)"></a>
+	<a id="rightArrow" onclick="next();" href="javascript:void(0)"></a>
+	<script type="text/javascript">
+		var xmlhttp;
+		var totNumber = -1;
+		var curNumber;
+		
+		function getLRCNum(){
+			loadXMLDoc("/lyrics/num.txt");
+		}
+		
+		function adjustPos(){
+			var pos = $("#lyrics").height() / 2 - 45;
+			$("#leftArrow").css("margin-top", pos); 
+			$("#rightArrow").css("margin-top", pos); 
+		}
+		
+		function last(){
+			curNumber--;
+			if(curNumber <= 0)
+				curNumber = totNumber;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function next(){
+			curNumber++;
+			if(curNumber > totNumber)
+				curNumber = 1;
+			loadXMLDoc("/lyrics/" + curNumber + ".txt");
+		}
+		
+		function loadXMLDoc(url){
+			xmlhttp = null;
+			if(window.XMLHttpRequest){ // code for Firefox, Opera, IE7, etc.
+				xmlhttp = new XMLHttpRequest();
+			}else if (window.ActiveXObject){ // code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp != null){
+				xmlhttp.onreadystatechange = state_change;
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send(null);
+			}
+		}
+
+		function state_change(){
+			if(xmlhttp.readyState == 4){ // 4="loaded"
+				if (xmlhttp.status == 200){ // 200="OK"
+					//处理传回的数据：
+					var text = xmlhttp.responseText;
+					if(totNumber < 0){ //如果是获取歌词数量;
+						totNumber = parseInt(text);
+						curNumber = Math.floor(Math.random() * totNumber) + 1;
+						loadXMLDoc("/lyrics/" + curNumber + ".txt");
+					}else{
+						var splited = text.split("\n");
+						$("#lyric").html(splited[0]);
+						$("#translate").html(splited[1]);
+						$("#singer").html("————" + splited[2]);
+						$("#song").html("「" + splited[3] + "」");
+						$("#song").attr("href", splited[4]); 
+						
+						//调节两个按钮的位置：
+						$("#leftArrow").show();
+						$("#rightArrow").show();
+						adjustPos();
+					}
+				}
+			}
+		}
+	</script>
+	<div id="lyricsContent"">
+		<h3 id="lyric">Loading…</h3>
+		<p id="translate"></p>
+		<p id="from"><span id="singer"></span><a id="song" href="javascript:void(0)"></a></p>
+	</div>
+</div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">C++中指针的简要总结</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-08-28T21:40:57+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:40 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>指针被誉为“C语言的灵魂”。C语言之所以强大，很大一部分原因在于其灵活的指针运用。在这篇文章中，我就对C/C++中指针这一重要的语言特性进行简要的总结。</p>
+
+<!--more-->
+
+
+<h3>一、给指针分配一个绝对地址会发生什么？</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span><span class="o">*</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'><span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="mh">0x8000</span><span class="p">;</span>
+</span><span class='line'><span class="o">*</span><span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们可以给指针分配一个绝对地址，但是这样的做法是非常危险的。一旦我们试图改变它指向的内容，程序就会崩溃。上述代码的第二行可以执行，但是会在第三行崩溃。</p>
+
+<h3>二、指针和引用有什么区别？</h3>
+
+<ol>
+<li>非空区别，一个引用必须总是指向某些对象，而指针可以为空，所以在使用指针之前需要测试其合法性，防止其为空。</li>
+<li>二是可修改区别，引用总是指向初始化时被指定的对象，之后引用所指的对象就不能改变（但是所指对象的内容可以改变），但是指针可以被重新赋值，指向另外的对象。</li>
+<li>三是初始化时的区别，引用在声明的时候必须初始化，而指针在声明的时候可以不初始化，但是这样它会指向一个不确定的值，在这种情况下就改变其指向的内容是不合理的。</li>
+</ol>
+
+
+<h3>三、指针、引用与<code>const</code></h3>
+
+<p><code>const</code>修饰符意味着一个变量或函数是只读的。<code>const</code>修饰指针，一般分为以下三种情况：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">const</span> <span class="kt">int</span><span class="o">*</span> <span class="n">a</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="k">const</span><span class="o">*</span> <span class="n">a</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span><span class="o">*</span> <span class="k">const</span> <span class="n">a</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中第一种和第二种情况是等价的，都是说明指针<code>a</code>指向的是一个<code>const int</code>，这种情况下不允许对指针所指向的内容进行修改操作，但是指针本身的值可以修改；第三种情况中<code>const</code>位于星号右侧，说明指针<code>a</code>本身是一个常量，该指针指向的位置是不能变化的，但是该指针所指向的内容可以修改。<br/>
+另外在前两种情况中，我们在声明指针<code>a</code>的同时可以不对其进行初始化；而第三种情况中，因为指针<code>a</code>本身是常量，我们必须在声明指针<code>a</code>的同时对其进行初始化（声明常量时必须对其进行初始化）。</p>
+
+<p><code>const</code>修饰引用时，有一点需要注意：在声明引用的时候，我们需要用一个变量对其进行初始化。而在声明<code>const</code>引用时，不仅可以利用变量进行初始化，还允许用一个字面值，甚至是一个表达式作为初始值。此时编译器会创建一个临时量，然后将该<code>const</code>引用绑定到临时量上。参考下面的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span><span class="o">&amp;</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span> <span class="c1">//错误，不能将非常量引用绑定到字面量上。</span>
+</span><span class='line'><span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span> <span class="c1">//正确。</span>
+</span><span class='line'><span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span> <span class="c1">//正确。</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong><code>const</code>指针与引用的“自以为是”：</strong>我们不能通过指向常量的指针或引用修改其指向的内容，但是可以通过其他途径修改。所谓常量指针或引用，其实只是指针或引用自以为是，它们觉得自己指向了常量，所以自觉不去改变所指对象的值，但是这个值还是可以通过其他途径改变的。比如下面的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+</span><span class='line'><span class="k">const</span> <span class="kt">int</span><span class="o">*</span> <span class="n">a</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">;</span> <span class="c1">//这句是合法的，允许非常量转化为常量。</span>
+</span><span class='line'><span class="o">*</span><span class="n">a</span> <span class="o">=</span> <span class="mi">600</span><span class="p">;</span> <span class="c1">//错误，不能通过a改变其内容。</span>
+</span><span class='line'><span class="n">b</span> <span class="o">=</span> <span class="mi">600</span><span class="p">;</span> <span class="c1">//正确，a指向的内容已经被改变成了600。</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span><span class='line'><span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span><span class="o">&amp;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'><span class="n">a</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span> <span class="c1">//错误。</span>
+</span><span class='line'><span class="n">b</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span> <span class="c1">//均正确，a的内容已经被改变成了20。</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>四、<code>char*</code>与<code>char[]</code>字符串有什么区别？</h3>
+
+<p>观察下面的代码，并寻找其中潜在的危险：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="nf">getStr</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str</span><span class="p">[]</span> <span class="o">=</span> <span class="err">“</span><span class="mo">01234567</span><span class="mi">89</span><span class="err">”</span><span class="p">;</span> <span class="c1">//如果想得到正确的结果，可以将char数组改为char*。</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">str</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上述代码中，函数体中的<code>str</code>以数组的形式存储，这个数组的空间是在栈中分配的，且<code>str</code>指向的是这个数组在栈中的首地址。在函数调用完成之后，栈恢复到调用函数之前的状态，调用函数时的临时空间（包括函数内部的临时变量）被回缩，<code>str</code>所对应的地址已经不再属于应该被访问到的范围了。如果将<code>str</code>的类型改为<code>char*</code>则是正确的。通过数组方式分配的字符串位于栈上，在函数执行完毕后，该空间就被回缩；通过指针方式分配字符串位于内存中全局区域的文字常量区，该空间是一直存在的。<br/>
+<code>char*</code>与<code>char[]</code>的区别还包括：<strong>①</strong>我们可以修改<code>char[]</code>字符串的内容，但是<code>char*</code>字符串存储在全局区域中的文字常量区，我们无法修改该字符串的内容，如果试图修改，程序会在运行时崩溃。<strong>②</strong>对于<code>char str[]</code>，在存储字符串的内容之外，没有额外存储一个指向该数组的指针，因为<code>str</code>本身可以当作指向该数组第一个元素的指针来使用；而对于<code>char* str</code>，除了在文字常量区存储字符串的内容之外，在栈中还会利用4字节的空间存储指向该字符串的指针。</p>
+
+<h3>五、指针与动态分配内存</h3>
+
+<p>在C++中，我们经常利用操作符<code>new</code>动态分配一块内存，这块内存位于堆中。需要注意两点：<strong>①</strong>使用<code>new</code>动态分配的内存要使用<code>delete</code>释放掉，否则会造成内存泄漏。<strong>②</strong>在我们<code>delete</code>了一个<code>new</code>返回的指针后，它对应的内存空间已经被释放，但是该指针本身仍然存在且不指向任何有效的空间，成为了悬空指针。如果在没有对该指针重新赋值的情况下就要修改它指向的空间，会造成程序崩溃。</p>
+
+<p>那么，C++中的<code>new</code>和C语言中的<code>malloc</code>有什么区别呢？<br/>
+首先，动态销毁<code>malloc</code>创建的内存要用到<code>free</code>，而<code>new</code>则对应<code>delete</code>；另外，对于我们自定义的类型，我们需要在动态创建对象的时候执行该类型的构造函数，在动态销毁对象的时候执行该类型的析构函数，<code>malloc/free</code>则无法完成这一点。</p>
+
+<h3>六、<code>this</code>指针</h3>
+
+<p><code>this</code>指针是一种特殊的指针，在类成员函数的调用过程中，它时时刻刻指向类的实例本身。关于这个特别的指针，我们有一些要点需要了解：<br/>
+<strong>①</strong>如果类的一个非静态成员函数中访问到了类的非静态成员，那么编译器会对该函数进行一些处理：将对象本身的地址作为一个隐含参数传递给函数。实际上，对于类<code>T</code>，成员函数默认的第一个参数都是<code>T* const this</code>。比如成员函数<code>int func(int a)</code>，在编译器看来其实应该是<code>int func(T* const this, int a)</code>。<br/>
+<strong>②</strong><code>this</code>指针的生命周期同任何一个成员函数的参数是一样的，在成员函数的开始前构造，在成员函数的结束后清除。当然，<code>this</code>指针作为参数的传递效率一般比其他参数要高，可能会使用寄存器传递，而不是通过栈。<br/>
+<strong>③</strong>一个对象的<code>this</code>指针并不是对象本身的一部分，不会影响对该对象使用<code>sizeof</code>的结果。其实，所有成员函数的参数都不会占用对象本身的空间，它们只会在参数传递的时候占用栈空间，或者直接通过一个寄存器进行传递。<br/>
+<strong>④</strong>静态函数中不能使用<code>this</code>指针，因为它可以不通过类的实例，而是类对象本身进行调用。</p>
+
+<div class="expand">一道关于<code>this</code>指针的奇葩问题<a href="javascript:void(0)" style="float: right;" class="expandtitle">展开</a><div class="expandcontent" style="display: none;">
+观察下面的代码，注释1到注释4中，哪些行会令程序崩溃？
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">int</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">func1</span><span class="p">(){</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;func1&quot;</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">func2</span><span class="p">(){</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;func2 &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">a</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">func3</span><span class="p">(){</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;func3&quot;</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">void</span> <span class="nf">func4</span><span class="p">(){</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;func4 &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">b</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">A</span><span class="o">::</span><span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">A</span><span class="o">*</span> <span class="n">pa</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">pa</span><span class="o">-&gt;</span><span class="n">func1</span><span class="p">();</span> <span class="c1">//1</span>
+</span><span class='line'>    <span class="n">pa</span><span class="o">-&gt;</span><span class="n">func2</span><span class="p">();</span> <span class="c1">//2</span>
+</span><span class='line'>    <span class="n">pa</span><span class="o">-&gt;</span><span class="n">func3</span><span class="p">();</span> <span class="c1">//3</span>
+</span><span class='line'>    <span class="n">pa</span><span class="o">-&gt;</span><span class="n">func4</span><span class="p">();</span> <span class="c1">//4</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+<br/>
+注释1这一行不会崩溃，因为<code>func1()</code>这个函数首先不是虚函数，所以要调用该函数不需要查询虚表；另外该函数无需访问类的非静态成员，所以不需要隐含地传递一个<code>this</code>指针进去。<br/>
+注释2这一行会崩溃，因为<code>func2()</code>这个函数需要访问类的非静态成员变量<code>a</code>，而空指针是无法访问非静态成员变量的。<br/>
+注释3这一行会崩溃，因为<code>func3()</code>是虚函数，为了找到该函数的地址需要访问虚表，也就需要访问指向虚表的指针<code>vptr</code>，而空指针是无法访问<code>vptr</code>的。<br/>
+注释4这一行不会崩溃，因为<code>func4()</code>是一个静态成员函数，不需要<code>this</code>指针，并且访问的静态成员变量<code>b</code>不占用类实例的内存空间。
+</div></div>
+
+
+<h3>七、函数指针</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
+</span><span class='line'><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">)(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span> <span class="o">=</span> <span class="n">func</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上述代码中，我们声明了一个名称为<code>p</code>的函数指针，它的参数表为<code>(int, int)</code>，返回值为<code>int</code>。需要注意的是，绝对不能将<code>*p</code>外面的括号省略掉，否则<code>p</code>就成为了一个返回值为<code>int*</code>类型的函数。然后我们令指针<code>p</code>指向一个函数<code>func</code>。当我们把函数名称作为一个变量使用时，该变量会自动转化为指针，所以没必要写成<code>&amp;func</code>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">typedef</span> <span class="nf">int</span> <span class="p">(</span><span class="o">*</span><span class="n">Func</span><span class="p">)(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
+</span><span class='line'><span class="n">Func</span> <span class="n">q</span> <span class="o">=</span> <span class="n">func</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>函数指针类型通常比较冗长，我们可能想通过<code>typedef</code>为它起一个别名。对函数指针类型使用<code>typedef</code>的语法如上述代码所示。</p>
+
+<h3>八、数组指针</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上述代码中，我们声明了一个名称为<code>p</code>的数组指针，它指向的是长度为3的<code>int</code>类型数组。与函数指针类似，我们绝对不能将<code>*p</code>外面的括号省略掉，否则<code>p</code>就成为了一个长度为3的<code>int*</code>类型数组（这里涉及到数组指针与指针数组的区别。数组指针是指向数组类型的指针，指针数组是一个数组，其中的元素都是指针类型）。然后我们令指针<code>p</code>指向了一个数组<code>a</code>，<code>a</code>的类型是<code>int[3]</code>，<code>p</code>的类型则为<code>int(*)[3]</code>。<br/>
+<strong>※</strong>这里有一个误区，由于数组的名称可以当作指向数组第一个元素的指针来使用，很多人都认为<code>a</code>的类型为<code>int*</code>。实际上<code>a</code>的类型为<code>int[3]</code>，只不过可以为<code>int*</code>类型的指针赋值而已。</p>
+
+<p><strong>数组指针的加减运算：</strong>正如对<code>int*</code>类型的指针使用自增时，该指针会移动<code>sizeof(int)</code>字节的长度一样，我们对<code>int(*)[3]</code>类型的指针使用自增时，该指针会移动<code>sizeof(int[3])</code>，也就是12字节的长度。观察下面的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">a</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="p">(</span><span class="n">ptr</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>a</code>是<code>int[5]</code>类型，<code>&amp;a</code>则是<code>int(*)[5]</code>类型，将该类型的指针<code>+1</code>，即移动20个字节，指向<code>a</code>最后一个元素的下一个位置。然后我们将该<code>int(*)[5]</code>类型的指针强制转化为<code>int*</code>类型，并对其<code>-1</code>，即前移4字节，此时该指针指向<code>a</code>的最后一个元素。所以输出的内容应该是5。</p>
+
+<h3>九、智能指针<code>auto_ptr</code></h3>
+
+<p>使用C++中的智能指针<code>auto_ptr</code>可以方便管理单个堆内存对象，它解决了因为动态分配的对象忘记<code>delete</code>而导致的内存泄漏问题。比如下面的代码将不会导致<code>T</code>类型对象的内存泄漏，无论函数是正常退出还是因为异常跳出，<code>pt</code>都会将对应的内存空间自动释放掉。智能指针调用成员函数的方法与普通指针基本一致。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="nf">func</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">pt</span><span class="p">(</span><span class="k">new</span> <span class="n">T</span><span class="p">());</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>智能指针的<code>get()</code>函数：</strong>该函数返回被该智能指针管理的裸指针，在上述代码中，<code>pt-&gt;get()</code>返回的就是<code>T*</code>类型的指针。<br/>
+<strong>智能指针的<code>release()</code>函数：</strong>该函数让出该智能指针对裸指针的管理权（注意只是让出管理权，而不是释放对应的内存空间），一旦管理权被让出，那么该智能指针就不会自动释放内存空间了，需要我们手动<code>delete</code>。<br/>
+<strong>注意：智能指针不能相互赋值！</strong>将<code>pt1</code>赋值给<code>pt2</code>会使<code>pt2</code>完全夺取<code>pt1</code>的内存管理所有权，导致<code>pt1</code>悬空，之后再对<code>pt1</code>指向的内存空间进行访问时就会程序崩溃。所以，智能指针绝对不能使用赋值操作符，并且由智能指针管理的对象也不能放入<code>vector</code>等容器中。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">smwlover</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-08-28T21:40:57+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:40 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bi-ji/'>笔记</a>
+  
+</span>
+
+
+      
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/c-plus-plus/'>c++</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/08/21/binary-tree-traversal/" title="Previous Post: 巩固基础：二叉树的遍历">&laquo; 巩固基础：二叉树的遍历</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>博客简介</h1>
+  <script type="text/javascript" src="/javascripts/jquery.qrcode.min.js"></script>
+  <p>欢迎来到美柑的房间！</p>
+  <p>Welcome to Mikan's Room!</p>
+  <p>美柑の部屋へようこそ！</p>
+  <p>我是一个同时生活在二次元和三次元中的人，身为一个年轻的ITer的同时，我也是一个年轻的ACGer。所以当您在本博客中发现以下内容时，请不要过分惊讶：</p>
+  <p>数据结构、算法、程序设计相关内容，日语学习相关内容，日本动漫、游戏以及音乐相关内容……</p>
+  <div id="qrcode">
+		<script>
+		jQuery('#qrcode').qrcode({width: 128, height: 128, text: "http://smwlover.github.io"});
+		</script>
+  </div>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/kai-fa/'>开发 (6)</a></li>
+<li class='category'><a href='/blog/categories/shu-ju-jie-gou/'>数据结构 (6)</a></li>
+<li class='category'><a href='/blog/categories/ri-ma/'>日麻 (2)</a></li>
+<li class='category'><a href='/blog/categories/bi-ji/'>笔记 (12)</a></li>
+<li class='category'><a href='/blog/categories/suan-fa/'>算法 (9)</a></li>
+
+  </ul>
+</section><section>
+  <h1>标签云</h1>
+  <ul class="tag-cloud">
+<a style="font-size: 200%" href="/tags/c-plus-plus/">c++</a>
+<a style="font-size: 163%" href="/tags/octopress/">octopress</a>
+<a style="font-size: 145%" href="/tags/ruby/">ruby</a>
+<a style="font-size: 134%" href="/tags/wei-yun-suan/">位运算</a>
+<a style="font-size: 97%" href="/tags/dong-tai-gui-hua/">动态规划</a>
+<a style="font-size: 60%" href="/tags/bing-cha-ji/">并查集</a>
+<a style="font-size: 97%" href="/tags/shu-zu/">数组</a>
+<a style="font-size: 60%" href="/tags/ri-yu/">日语</a>
+<a style="font-size: 97%" href="/tags/ri-ma/">日麻</a>
+<a style="font-size: 118%" href="/tags/shu/">树</a>
+<a style="font-size: 60%" href="/tags/shu-zhuang-shu-zu/">树状数组</a>
+<a style="font-size: 60%" href="/tags/xian-duan-shu/">线段树</a>
+<a style="font-size: 60%" href="/tags/lian-biao/">链表</a>
+<a style="font-size: 118%" href="/tags/sui-ji-cha-xun/">随机查询</a>
+
+  </ul>
+</section>
+<section>
+  <h1>最近发表</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/08/28/pointers/">C++中指针的简要总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/21/binary-tree-traversal/">巩固基础：二叉树的遍历</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/13/sizeof-operator/">C++中sizeof运算符的简要总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/06/add-numbers/">面试问题赏析：求1到N的和</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/07/31/union-find/">hihoCoder题目赏析：并查集</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>我在GitHub</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/smwlover36011">@smwlover36011</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'smwlover36011',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<!-- 判断浏览器是不是safari，如果不是再加入虾米音乐歌单。safari无法显示。 -->
+<script type="text/javascript">
+   var Sys = {};
+   var ua = navigator.userAgent.toLowerCase();
+   var s;
+   (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+   (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+   (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+   (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+   (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+   
+   if (Sys.ie || Sys.firefox || Sys.chrome){
+		document.write('<section>');
+		document.write('<h1>歌曲列表</h1>');
+		document.write('<embed src="http://www.xiami.com/widget/45617555_1775285236,1770680938,1770159008,1770170728,1775285220,1771766273,1775544376,1772264432,1770159009,1773860829,1772872306,1774086311,1774086312,1775386408,1771569221,1771569222,1774515626,1771350121,1774465468,1773639256,1773639047,1773371280,1772264404,3429942,3442942,3648733,1770109754,1770959946,1774314637,1769817540,1769822191,1770059637,1770059641,1770059638,1770163789,1771940409,1771940412,1768955553,1769804446,1773377276,1775386396,_280_400_999999_c0c0c0_0/multiPlayer.swf" type="application/x-shockwave-flash" width="280" height="400" wmode="opaque"></embed>');
+		document.write('</section>');
+   }
+</script><section>
+  <h1>友情链接</h1>
+  <ul>
+    <li>
+      <a href="http://music.163.com/#/playlist?id=60530487">我的《命运石之门》歌单</a>
+    </li>
+    <li>
+      <a href="http://wangshenghu.github.io">Wangsheng Hu的个人博客</a>
+    </li>
+	<li>
+      <a href="http://coderduan.github.io">CoderDuan的个人博客</a>
+    </li>
+  </ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - smwlover -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'yuukimikan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://smwlover.github.io/blog/2016/08/28/pointers/';
+        var disqus_url = 'http://smwlover.github.io/blog/2016/08/28/pointers/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <!--返回顶部开始-->
+<div id="full" style="position:fixed; right:10px; bottom:10px; z-index:100; text-align:center; cursor:pointer; border:0px">
+        <a class="totop" href="#" onclick="goTop(); return false;"></a>
+</div>
+<script src="/javascripts/top.js" type="text/javascript"></script>
+<!--返回顶部结束-->
+</body>
+</html>
